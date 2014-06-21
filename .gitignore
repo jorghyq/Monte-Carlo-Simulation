@@ -4,6 +4,8 @@ __pycache__/
 
 # C extensions
 *.so
+*.o
+*.exe
 
 # Distribution / packaging
 .Python
@@ -52,3 +54,6 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
+# Python Compiled file
+*.pyc
+*.txt
