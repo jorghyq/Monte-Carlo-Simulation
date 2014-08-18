@@ -15,10 +15,11 @@ TOTAL_RUN = 1000000
 print "Total run: %d" % TOTAL_RUN
 
 def set_in_range(x,range):
-    if x > range-1:
-        x = x - range
-    elif x < 0:
-        x = x + range
+	for i in x:
+		if x[i] > range-1:
+			x[i] = x[i] - range
+		elif x[i] < 0:
+			x[i] = x[i] + range
     return x
 
 
@@ -33,13 +34,6 @@ def get_coor_mol(input_coor):
     coor[4,:] = [x, set_in_range(y+1,latt_len)]
     return coor
 
-#def set_mol(input_coor,op,id_mol,coor,latt):
-#    temp = get_coor_mol(input_coor)
-#    for i in range(0,len(temp)):
-#        latt[temp[i][0],temp[i][1]] = op
-#    if input_coor[0] != -1:
-#        coor[id_mol,:] = temp[0,:]
-
 def set_element(input_coor,op,id_ele,coor,latt):
     ele_length = input_coor.shape[0]
     if ele_length == 0:
@@ -53,13 +47,6 @@ def set_element(input_coor,op,id_ele,coor,latt):
         for i in range(0,ele_length):
             latt[input_coor[i,0],input_coor[i,1]] = op
         coor[id_ele,:] = input_coor[0,:]
-
-
-#def set_metal(input_coor,op,id_metal,coor,latt):
-#    temp = input_coor
-#    latt[temp[0],temp[1]] = op
-#    coor[id_metal,:] = temp
-
 
 def is_occupied(input_coor,latt):
     ele_length = input_coor.shape[0]
@@ -79,25 +66,22 @@ def cal_energy_mol(coor,coor_mol,latt):
     # First detect if there are molecules around
     energy = 0
     temp = get_coor_mol(coor)
+    direct = np.zeros((4,2))
+    direct[0,:] = [-1,0]
+    direct[1,:] = [+1,0]
+    direct[2,:] = [0,-1]
+    direct[3,:] = [0,+1]
     # Get the points around this molecule
-    pos_around = np.zeros((8,2))
-    pos_around[0:3,:] = get_coor_mol(temp[3,:])[1:4,:]
-    pos_around[3:5,:] = get_coor_mol(temp[1,:])[[1,4],:]
-    pos_around[5:7,:] = get_coor_mol(temp[2,:])[[2,4],:]
-    pos_around[7,:] = get_coor_mol(temp[4,:])[4,:]
-    mol_around = []
-    for i in range(0,8):
-        if lattice_num[pos_around[i,0],pos_around[i,1]] != 0 and lattice_num[pos_around[i,0],pos_around[i,1]] != 40 :
-            mol_around.append(lattice_num[pos_around[i,0],pos_around[i,1]])
-    mol_around = list(set(mol_around))
-    #print mol_around
-    for i in mol_around:
-        temp_coor = coor_mol[i,:]
-        dis = math.sqrt(math.pow(temp_coor[0] - coor[0],2) +math.pow(temp_coor[1] - coor[1],2))
-        if dis < 2.5:
-            energy = energy - 3
-        elif dis == 3:
-            energy = energy - 1
+    pos_around = np.zeros((4,2))
+    pos_around[0,:] = [set_in_range(temp[1,0]-1,latt_len),temp[1,1]]
+    pos_around[1,:] = [set_in_range(temp[2,0]+1,latt_len),temp[2,1]]
+    pos_around[2,:] = [temp[3,0],set_in_range(temp[3,1]-1,latt_len)]
+    pos_around[3,:] = [temp[4,0],set_in_range(temp[4,1]+1,latt_len)]
+    for i in range(0,4):
+        if lattice_num[pos_around[i,0],pos_around[i,1]] = 40 :
+            energy = energy - 10
+        elif lattice_num[pos_around[i,0],pos_around[i,1]] != 0:
+			energy = energy - 2
     return energy
 
 def cal_energy_metal(coor,coor_metal,latt):
