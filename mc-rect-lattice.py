@@ -11,15 +11,14 @@ import time
 
 # global lattice_size
 LATTICE_CONSTANT = 1
-TOTAL_RUN = 1000000
+TOTAL_RUN = 10000
 print "Total run: %d" % TOTAL_RUN
 
 def set_in_range(x,range):
-	for i in x:
-		if x[i] > range-1:
-			x[i] = x[i] - range
-		elif x[i] < 0:
-			x[i] = x[i] + range
+    if x > range-1:
+	x = x - range
+    elif x < 0:
+	x = x + range
     return x
 
 
@@ -73,29 +72,37 @@ def cal_energy_mol(coor,coor_mol,latt):
     direct[3,:] = [0,+1]
     # Get the points around this molecule
     pos_around = np.zeros((4,2))
-    pos_around[0,:] = [set_in_range(temp[1,0]-1,latt_len),temp[1,1]]
-    pos_around[1,:] = [set_in_range(temp[2,0]+1,latt_len),temp[2,1]]
-    pos_around[2,:] = [temp[3,0],set_in_range(temp[3,1]-1,latt_len)]
-    pos_around[3,:] = [temp[4,0],set_in_range(temp[4,1]+1,latt_len)]
+    #pos_around[0,:] = [set_in_range(temp[1,0]-1,latt_len),temp[1,1]]
+    #pos_around[1,:] = [set_in_range(temp[2,0]+1,latt_len),temp[2,1]]
+    #pos_around[2,:] = [temp[3,0],set_in_range(temp[3,1]-1,latt_len)]
+    #pos_around[3,:] = [temp[4,0],set_in_range(temp[4,1]+1,latt_len)]
+    pos_around = temp[1:5,:] + direct
+    pos_around2 = pos_around + direct
     for i in range(0,4):
-        if lattice_num[pos_around[i,0],pos_around[i,1]] = 40 :
-            energy = energy - 10
-        elif lattice_num[pos_around[i,0],pos_around[i,1]] != 0:
-			energy = energy - 2
+        if latt[set_in_range(pos_around[i,0],latt_len),set_in_range(pos_around[i,1],latt_len)] == 40:
+            energy = energy - 20
+        elif latt[set_in_range(pos_around[i,0],latt_len),set_in_range(pos_around[i,1],latt_len)] != 0:
+            if latt[set_in_range(pos_around[i,0],latt_len),set_in_range(pos_around[i,1],latt_len)] != \
+                    latt[set_in_range(pos_around2[i,0],latt_len),set_in_range(pos_around2[i,1],latt_len)]: 
+			energy = energy - 5
     return energy
 
 def cal_energy_metal(coor,coor_metal,latt):
     energy = 0
-    ind_x = coor[0]
-    ind_y = coor[0]
+    direct = np.zeros((4,2))
+    direct[0,:] = [-1,0]
+    direct[1,:] = [+1,0]
+    direct[2,:] = [0,-1]
+    direct[3,:] = [0,+1]
     pos_around = np.zeros((4,2))
-    pos_around[0,:] = [set_in_range(ind_x-1,latt_len),set_in_range(ind_y-1,latt_len)]
-    pos_around[1,:] = [set_in_range(ind_x-1,latt_len),set_in_range(ind_y+1,latt_len)]
-    pos_around[2,:] = [set_in_range(ind_x+1,latt_len),set_in_range(ind_y-1,latt_len)]
-    pos_around[3,:] = [set_in_range(ind_x+1,latt_len),set_in_range(ind_y+1,latt_len)]
-    for i in range(0,len(pos_around)):
-        if latt[pos_around[i,0],pos_around[i,1]] != 0 and  latt[pos_around[i,0],pos_around[i,1]] != 40: 
-            energy = energy - 10
+    pos_around2 = np.zeros((4,2))
+    for i in range(0,4):
+        pos_around[i,:] = pos_around[i,:] + direct[i,:]
+        pos_around2[i,:] = pos_around[i,:] + direct[i,:]
+        if latt[pos_around[i,0],pos_around[i,1]] != 0 and latt[pos_around[i,0],pos_around[i,1]] != 40: 
+            if latt[set_in_range(pos_around[i,0],latt_len),set_in_range(pos_around[i,1],latt_len)] == \
+                    latt[set_in_range(pos_around2[i,0],latt_len),set_in_range(pos_around2[i,1],latt_len)]:
+                        energy = energy -15 
     return energy
 ################################### define the lattice ###################
 # assume the coordinate is (i,j)
@@ -140,7 +147,7 @@ for i in range(0,num_metal):
         #print len(pos_current)
         if is_occupied(pos_current, lattice) == False:
             set_element(pos_current,1,i,coor_metal,lattice)
-            #set_element(pos_current,latt_len,i,coor_metal,lattice_num)
+            set_element(pos_current,latt_len,i,coor_metal,lattice_num)
             state = False
 print "Metals are distributed..."
             
