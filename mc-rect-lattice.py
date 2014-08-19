@@ -11,7 +11,7 @@ import time
 
 # global lattice_size
 LATTICE_CONSTANT = 1
-TOTAL_RUN = 10000
+TOTAL_RUN = 1000000
 
 latt_len = 40
 
@@ -31,15 +31,19 @@ def sir(x,range):
 
 
 def get_coor_mol(input_coor):
-    x = input_coor[0,0]
-    y = input_coor[0,1]
-    coor = np.zeros((5,2))
-    coor[0,:] = [x, y]
-    coor[1,:] = [sir(x-1,latt_len), y]
-    coor[2,:] = [x, sir(y+1,latt_len)]
-    coor[3,:] = [sir(x+1,latt_len), y]
-    coor[4,:] = [x, sir(y-1,latt_len)]
-    return coor
+	if input_coor.shape[0] == 1:
+		x = input_coor[0,0]
+		y = input_coor[0,1]
+	else:
+		x = input_coor[0]
+		y = input_coor[1]
+	coor = np.zeros((5,2))
+	coor[0,:] = [x, y]
+	coor[1,:] = [sir(x-1,latt_len), y]
+	coor[2,:] = [x, sir(y+1,latt_len)]
+	coor[3,:] = [sir(x+1,latt_len), y]
+	coor[4,:] = [x, sir(y-1,latt_len)]
+	return coor
 
 def set_element(input_coor,op,id_ele,coor,latt):
     ele_length = input_coor.shape[0]
@@ -57,61 +61,60 @@ def set_element(input_coor,op,id_ele,coor,latt):
 
 def is_occupied(input_coor,latt):
     ele_length = input_coor.shape[0]
-    if ele_length == 0:
-        print "Invalid Input!"
-    elif ele_length == 1:
-        if latt[input_coor[0,0],input_coor[0,1]] != 0:
+    if len(input_coor.shape) == 1:
+        if latt[input_coor[0],input_coor[0]] != 0:
             return True
-    elif ele_length > 2:
+    elif input_coor.shape[0] > 1:
         for i in range(0,ele_length):
             if latt[input_coor[i,0],input_coor[i,1]] != 0:
                 return True
     return False
 
 def is_forbidden(input_coor,latt):
-	direct = np.zeros((4,2))
-	direct[0,:] = [-1,0]
-	direct[1,:] = [0,+1]
-	direct[2,:] = [+1,0]
-	direct[3,:] = [0,-1]
-	ele_length = input_coor.shape[0]
-	if ele_length == 0:
-		print "Invalid Input!"
-	elif ele_length == 1:
-		count = []
-		print input_coor
-		pos_around = get_coor_mol(input_coor)[1:,:]
-		pos_around2 = pos_around + direct
-		for i in range(0,4):
-			if latt[pos_around[i,0],pos_around[i,1]] != 0 and latt[pos_around[i,0],pos_around[i,1]] != 40: 
-				if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] == \
-				latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)]:
-							count.append(i)
-		if len(count) > 2:
-			return True
-		elif len(count) == 2:
-			if count[0] == 0 and count[1] == 1:
-				return False
-			elif count[0] == 2 and count[1] == 3:
-				return False
-			else:
-				return True
-		else:
-			return False
-	elif ele_length > 1:
-		pos_around = input_coor[1:,:]
-		pos_around2 = pos_around + direct
-		for i in range(0,4):
-			if latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)] == 40:
-				plus1 = pos_around2[i,:] + direct[sir(i+1,4),:]
-				plus2 = pos_around2[i,:] + direct[sir(i+1,4),:]
-				minus1 = pos_around2[i,:] + direct[sir(i-1,4),:]
-				minus2 = pos_around2[i,:] + direct[sir(i-1,4),:]
-				if latt[sir(plus1[0],latt_len),sir(plus1[1],latt_len)] == latt[sir(plus2[0],latt_len),sir(plus2[1],latt_len)] \
-						or latt[sir(minus1[0],latt_len),sir(minus1[1],latt_len)] == latt[sir(minus2[0],latt_len),sir(minus2[1],latt_len)]:
-							return True
-		else:
-			return False
+	return False
+	#direct = np.zeros((4,2))
+	#direct[0,:] = [-1,0]
+	#direct[1,:] = [0,+1]
+	#direct[2,:] = [+1,0]
+	#direct[3,:] = [0,-1]
+	#if len(input_coor.shape) == 1:
+		#count = []
+		##print input_coor
+		#pos_around = get_coor_mol(input_coor)[1:,:]
+		#pos_around2 = pos_around + direct
+		#for i in range(0,4):
+			#if latt[pos_around[i,0],pos_around[i,1]] != 0 and latt[pos_around[i,0],pos_around[i,1]] != 40: 
+				#if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] == \
+				#latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)]:
+							#count.append(i)
+		#if len(count) > 1:
+			#return True
+		#elif len(count) == 2:
+			#if count[0] == 0 and count[1] == 1:
+				#return False
+			#elif count[0] == 2 and count[1] == 3:
+				#return False
+			#else:
+				#return True
+		#else:
+			#return False
+	#elif input_coor.shape[0] > 2:
+		##print ele_length
+		#pos_around = input_coor[1:,:]
+		#pos_around2 = pos_around + direct
+		#for i in range(0,4):
+			#if latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)] == 40:
+				#plus1 = pos_around2[i,:] + direct[sir(i+1,4),:]
+				#plus2 = pos_around2[i,:] + direct[sir(i+1,4),:]
+				#minus1 = pos_around2[i,:] + direct[sir(i-1,4),:]
+				#minus2 = pos_around2[i,:] + direct[sir(i-1,4),:]
+				#if latt[sir(plus1[0],latt_len),sir(plus1[1],latt_len)] == latt[sir(plus2[0],latt_len),sir(plus2[1],latt_len)] \
+						#or latt[sir(minus1[0],latt_len),sir(minus1[1],latt_len)] == latt[sir(minus2[0],latt_len),sir(minus2[1],latt_len)]:
+							#return True
+		#else:
+			#return False
+	#else:
+		#return False
 				
 
 
@@ -154,7 +157,7 @@ def cal_energy_metal(coor,coor_metal,latt):
     #print pos_around
     pos_around2 = np.zeros((4,2))
     for i in range(0,4):
-        if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] != 0 and latt[sir(pos_around[i,0]),latt_len,sir(pos_around[i,1],latt_len)] != 40: 
+        if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] != 0 and latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] != 40: 
             if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] == \
                     latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)]:
                         energy = energy -15 
@@ -217,7 +220,7 @@ if Sim_Enabled == True:
             #### It is optional whether to remove the selected molecules before go on ######
             state = True
             while state == True:
-                new_mol_pos = [rd.randint(0,latt_len-1), rd.randint(0,latt_len-1)]
+                new_mol_pos = np.array([rd.randint(0,latt_len-1), rd.randint(0,latt_len-1)])
                 pos_new = get_coor_mol(new_mol_pos)
                 if is_occupied(pos_new, lattice) == False and is_forbidden(pos_new,lattice_num) == False:
                     pos_old = get_coor_mol(coor_mol[ind_element,:])
