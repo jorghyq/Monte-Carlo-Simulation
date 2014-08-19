@@ -12,25 +12,33 @@ import time
 # global lattice_size
 LATTICE_CONSTANT = 1
 TOTAL_RUN = 10000
+
+latt_len = 40
+
+num_mol = 40
+num_metal = 20 
+
+
 print "Total run: %d" % TOTAL_RUN
 
-def set_in_range(x,range):
-    if x > range-1:
-	x = x - range
-    elif x < 0:
-	x = x + range
-    return x
+def sir(x,range):
+	#global latt_len
+	if x > range-1:
+		x = x - range
+	elif x < 0:
+		x = x + range
+	return x
 
 
 def get_coor_mol(input_coor):
-    x = input_coor[0]
-    y = input_coor[1]
+    x = input_coor[0,0]
+    y = input_coor[0,1]
     coor = np.zeros((5,2))
     coor[0,:] = [x, y]
-    coor[1,:] = [set_in_range(x-1,latt_len), y]
-    coor[2,:] = [set_in_range(x+1,latt_len), y]
-    coor[3,:] = [x, set_in_range(y-1,latt_len)]
-    coor[4,:] = [x, set_in_range(y+1,latt_len)]
+    coor[1,:] = [sir(x-1,latt_len), y]
+    coor[2,:] = [x, sir(y+1,latt_len)]
+    coor[3,:] = [sir(x+1,latt_len), y]
+    coor[4,:] = [x, sir(y-1,latt_len)]
     return coor
 
 def set_element(input_coor,op,id_ele,coor,latt):
@@ -60,6 +68,57 @@ def is_occupied(input_coor,latt):
                 return True
     return False
 
+def is_forbidden(input_coor,latt):
+	direct = np.zeros((4,2))
+	direct[0,:] = [-1,0]
+	direct[1,:] = [0,+1]
+	direct[2,:] = [+1,0]
+	direct[3,:] = [0,-1]
+	ele_length = input_coor.shape[0]
+	if ele_length == 0:
+		print "Invalid Input!"
+	elif ele_length == 1:
+		count = []
+		print input_coor
+		pos_around = get_coor_mol(input_coor)[1:,:]
+		pos_around2 = pos_around + direct
+		for i in range(0,4):
+			if latt[pos_around[i,0],pos_around[i,1]] != 0 and latt[pos_around[i,0],pos_around[i,1]] != 40: 
+				if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] == \
+				latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)]:
+							count.append(i)
+		if len(count) > 2:
+			return True
+		elif len(count) == 2:
+			if count[0] == 0 and count[1] == 1:
+				return False
+			elif count[0] == 2 and count[1] == 3:
+				return False
+			else:
+				return True
+		else:
+			return False
+	elif ele_length > 1:
+		pos_around = input_coor[1:,:]
+		pos_around2 = pos_around + direct
+		for i in range(0,4):
+			if latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)] == 40:
+				plus1 = pos_around2[i,:] + direct[sir(i+1,4),:]
+				plus2 = pos_around2[i,:] + direct[sir(i+1,4),:]
+				minus1 = pos_around2[i,:] + direct[sir(i-1,4),:]
+				minus2 = pos_around2[i,:] + direct[sir(i-1,4),:]
+				if latt[sir(plus1[0],latt_len),sir(plus1[1],latt_len)] == latt[sir(plus2[0],latt_len),sir(plus2[1],latt_len)] \
+						or latt[sir(minus1[0],latt_len),sir(minus1[1],latt_len)] == latt[sir(minus2[0],latt_len),sir(minus2[1],latt_len)]:
+							return True
+		else:
+			return False
+				
+
+
+
+
+
+
 
 def cal_energy_mol(coor,coor_mol,latt):
     # First detect if there are molecules around
@@ -67,23 +126,19 @@ def cal_energy_mol(coor,coor_mol,latt):
     temp = get_coor_mol(coor)
     direct = np.zeros((4,2))
     direct[0,:] = [-1,0]
-    direct[1,:] = [+1,0]
-    direct[2,:] = [0,-1]
-    direct[3,:] = [0,+1]
+    direct[1,:] = [0,+1]
+    direct[2,:] = [+1,0]
+    direct[3,:] = [0,-1]
     # Get the points around this molecule
     pos_around = np.zeros((4,2))
-    #pos_around[0,:] = [set_in_range(temp[1,0]-1,latt_len),temp[1,1]]
-    #pos_around[1,:] = [set_in_range(temp[2,0]+1,latt_len),temp[2,1]]
-    #pos_around[2,:] = [temp[3,0],set_in_range(temp[3,1]-1,latt_len)]
-    #pos_around[3,:] = [temp[4,0],set_in_range(temp[4,1]+1,latt_len)]
     pos_around = temp[1:5,:] + direct
     pos_around2 = pos_around + direct
     for i in range(0,4):
-        if latt[set_in_range(pos_around[i,0],latt_len),set_in_range(pos_around[i,1],latt_len)] == 40:
-            energy = energy - 20
-        elif latt[set_in_range(pos_around[i,0],latt_len),set_in_range(pos_around[i,1],latt_len)] != 0:
-            if latt[set_in_range(pos_around[i,0],latt_len),set_in_range(pos_around[i,1],latt_len)] != \
-                    latt[set_in_range(pos_around2[i,0],latt_len),set_in_range(pos_around2[i,1],latt_len)]: 
+        if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] == 40:
+            energy = energy - 15
+        elif latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] != 0:
+            if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] != \
+                    latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)]: 
 			energy = energy - 5
     return energy
 
@@ -91,17 +146,17 @@ def cal_energy_metal(coor,coor_metal,latt):
     energy = 0
     direct = np.zeros((4,2))
     direct[0,:] = [-1,0]
-    direct[1,:] = [+1,0]
-    direct[2,:] = [0,-1]
-    direct[3,:] = [0,+1]
-    pos_around = np.zeros((4,2))
+    direct[1,:] = [0,+1]
+    direct[2,:] = [+1,0]
+    direct[3,:] = [0,-1]
+    pos_around = get_coor_mol(coor)[1:,:]
+    pos_around2 = pos_around + direct
+    #print pos_around
     pos_around2 = np.zeros((4,2))
     for i in range(0,4):
-        pos_around[i,:] = pos_around[i,:] + direct[i,:]
-        pos_around2[i,:] = pos_around[i,:] + direct[i,:]
-        if latt[pos_around[i,0],pos_around[i,1]] != 0 and latt[pos_around[i,0],pos_around[i,1]] != 40: 
-            if latt[set_in_range(pos_around[i,0],latt_len),set_in_range(pos_around[i,1],latt_len)] == \
-                    latt[set_in_range(pos_around2[i,0],latt_len),set_in_range(pos_around2[i,1],latt_len)]:
+        if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] != 0 and latt[sir(pos_around[i,0]),latt_len,sir(pos_around[i,1],latt_len)] != 40: 
+            if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] == \
+                    latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)]:
                         energy = energy -15 
     return energy
 ################################### define the lattice ###################
@@ -114,12 +169,10 @@ def cal_energy_metal(coor,coor_metal,latt):
 # for a hexagonal lattice: if i < 0, i = i + latticeSize, if i > latticeSize-1, i = i -latticeSize
 #
 ##########################################################################
-latt_len = 40
+
 lattice = np.zeros((latt_len,latt_len))
 lattice_num = np.zeros((latt_len,latt_len))
 
-num_mol = 40
-num_metal = 20 
 coor_mol = np.zeros((num_mol,2))
 coor_metal = np.zeros((num_metal,2))
 ################### Distribute the molecules ####################
@@ -129,8 +182,8 @@ for i in range(0,num_mol):
     while state == True:
         ind_x = rd.randint(0, latt_len-1)
         ind_y = rd.randint(0, latt_len-1)
-        pos_current = get_coor_mol([ind_x,ind_y])
-        if is_occupied(pos_current, lattice) == False:
+        pos_current = get_coor_mol(np.array([[ind_x,ind_y]]))
+        if is_occupied(pos_current, lattice) == False and is_forbidden(pos_current,lattice_num) == False:
             set_element(pos_current,1,i,coor_mol,lattice)
             set_element(pos_current,i,i,coor_mol,lattice_num)
             state = False
@@ -145,7 +198,7 @@ for i in range(0,num_metal):
         ind_y = rd.randint(0, latt_len-1)
         pos_current = np.array([[ind_x,ind_y]])
         #print len(pos_current)
-        if is_occupied(pos_current, lattice) == False:
+        if is_occupied(pos_current, lattice) == False and is_forbidden(pos_current,lattice_num) == False:
             set_element(pos_current,1,i,coor_metal,lattice)
             set_element(pos_current,latt_len,i,coor_metal,lattice_num)
             state = False
@@ -166,7 +219,7 @@ if Sim_Enabled == True:
             while state == True:
                 new_mol_pos = [rd.randint(0,latt_len-1), rd.randint(0,latt_len-1)]
                 pos_new = get_coor_mol(new_mol_pos)
-                if is_occupied(pos_new, lattice) == False: #and is_forbidden(new_mol_pos,lattice) == False:
+                if is_occupied(pos_new, lattice) == False and is_forbidden(pos_new,lattice_num) == False:
                     pos_old = get_coor_mol(coor_mol[ind_element,:])
                     energy_new = cal_energy_mol(new_mol_pos,coor_mol,lattice_num)
                     p = min(math.exp(-(energy_new - energy_current)),1)
@@ -183,7 +236,7 @@ if Sim_Enabled == True:
             state = True
             while state == True:
                 new_metal_pos = np.array([rd.randint(0,latt_len-1), rd.randint(0,latt_len-1)])
-                if is_occupied(new_metal_pos, lattice) == False:
+                if is_occupied(new_metal_pos, lattice) == False and is_forbidden(new_metal_pos,lattice_num) == False:
                     old_metal_pos = coor_metal[ind_element,:]
                     energy_new = cal_energy_metal(new_metal_pos,coor_metal,lattice_num)
                     p = min(math.exp(-(energy_new - energy_current)),1)
