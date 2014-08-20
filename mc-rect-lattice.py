@@ -11,7 +11,7 @@ import time
 
 # global lattice_size
 LATTICE_CONSTANT = 1
-TOTAL_RUN = 100000
+TOTAL_RUN = 10000000
 
 latt_len = 60
 
@@ -85,12 +85,13 @@ def is_forbidden(input_coor,latt):
 		pos_around = get_coor_mol(input_coor)[1:,:]
 		pos_around2 = pos_around + direct
 		for i in range(0,4):
-			if latt[pos_around[i,0],pos_around[i,1]] != 0 and latt[pos_around[i,0],pos_around[i,1]] != 40: 
+			if latt[pos_around[i,0],pos_around[i,1]] != 0 and latt[pos_around[i,0],pos_around[i,1]] != latt_len: 
 				if latt[pos_around[i,0],pos_around[i,1]] == \
 						latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)]:
 							count.append(i)
 		#print count
 		if len(count) > 2:
+			#print count
 			return True
 		elif len(count) == 2:
 			if count[0] == 0 and count[1] == 2:
@@ -98,26 +99,27 @@ def is_forbidden(input_coor,latt):
 			elif count[0] == 1 and count[1] == 3:
 				return False
 			else:
+				#print count
 				return True
-		else:
-			return False
 	elif ele_length > 2:
-		#print ele_length
+		#print input_coor
 		pos_around = input_coor[1:,:]
 		pos_around2 = pos_around + direct
 		for i in range(0,4):
-			if latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)] == 40:
+			if latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)] == latt_len:
 				plus1 = pos_around2[i,:] + direct[sir(i+1,4),:]
-				plus2 = pos_around2[i,:] + direct[sir(i+1,4),:]
+				plus2 = plus1 + direct[sir(i+1,4),:]
+				#print "test is forbiden"
+				#print pos_around
+				#print pos_around2
+				#print plus1
+				#print plus2
 				minus1 = pos_around2[i,:] + direct[sir(i-1,4),:]
-				minus2 = pos_around2[i,:] + direct[sir(i-1,4),:]
+				minus2 = minus1 + direct[sir(i-1,4),:]
 				if latt[sir(plus1[0],latt_len),sir(plus1[1],latt_len)] == latt[sir(plus2[0],latt_len),sir(plus2[1],latt_len)] \
 						or latt[sir(minus1[0],latt_len),sir(minus1[1],latt_len)] == latt[sir(minus2[0],latt_len),sir(minus2[1],latt_len)]:
 							return True
-		else:
-			return False
-	else:
-		return False
+	return False
 
 def cal_energy_mol(coor,coor_mol,latt):
     # First detect if there are molecules around
@@ -133,7 +135,7 @@ def cal_energy_mol(coor,coor_mol,latt):
     pos_around = temp[1:5,:] + direct
     pos_around2 = pos_around + direct
     for i in range(0,4):
-        if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] == 40:
+        if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] == latt_len:
             energy = energy - 15
         elif latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] != 0:
             if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] != \
@@ -152,7 +154,7 @@ def cal_energy_metal(coor,coor_metal,latt):
     pos_around2 = pos_around + direct
     #print pos_around
     for i in range(0,4):
-        if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] != 0 and latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] != 40: 
+        if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] != 0 and latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] != latt_len: 
             if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] == \
                     latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)]:
                         energy = energy -15 
@@ -196,7 +198,7 @@ for i in range(0,num_metal):
         ind_y = rd.randint(0, latt_len-1)
         pos_current = np.array([ind_x,ind_y])
         #print len(pos_current)
-        if is_occupied(pos_current, lattice) == False and is_forbidden(pos_current,lattice_num) == False:
+        if is_occupied(pos_current, lattice) == False and is_forbidden(pos_current, lattice_num) == False:
             set_element(pos_current,1,i,coor_metal,lattice)
             set_element(pos_current,latt_len,i,coor_metal,lattice_num)
             state = False
@@ -208,8 +210,8 @@ print "Simulation begins..."
 if Sim_Enabled == True:
     count = 0
     while count < TOTAL_RUN:
-        #ind_element = rd.randint(0, num_mol+num_metal-1)
-        ind_element = rd.randint(0, num_mol-1)
+        ind_element = rd.randint(0, num_mol+num_metal-1)
+        #ind_element = rd.randint(0, num_mol-1)
         if ind_element < num_mol:
             #print ind_element
             energy_current = cal_energy_mol(coor_mol[ind_element,:],coor_mol,lattice_num)
