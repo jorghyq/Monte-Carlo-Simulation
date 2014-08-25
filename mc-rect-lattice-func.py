@@ -83,7 +83,9 @@ def is_forbidden(input_coor,latt):
 		pos_around = get_coor_mol(input_coor)[1:,:]
 		pos_around2 = pos_around + direct
 		for i in range(0,4):
-			if latt[pos_around[i,0],pos_around[i,1]] != 0 and latt[pos_around[i,0],pos_around[i,1]] != latt_len: 
+			if latt[pos_around[i,0],pos_around[i,1]] == latt_len:
+				return True
+			elif latt[pos_around[i,0],pos_around[i,1]] != 0 and latt[pos_around[i,0],pos_around[i,1]] != latt_len: 
 				if latt[pos_around[i,0],pos_around[i,1]] == \
 						latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)]:
 							count.append(i)

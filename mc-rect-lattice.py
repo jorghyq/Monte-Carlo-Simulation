@@ -7,19 +7,31 @@ import random as rd
 import matplotlib.pyplot as plt
 import copy
 import time
+import argparse
 # import Image
 
 # global lattice_size
 LATTICE_CONSTANT = 1
-TOTAL_RUN = 10000000
+total_run = 10000000
 
-latt_len = 60
+latt_len = 80
 
-num_mol = 60
-num_metal = 40
+num_mol = 200
+num_metal = 500
+cenergy = 25
+venergy = 1
+mcenergy = 25
+#parser = argparse.ArgumentParser(description='Set the run time and the number of elements.')
+#parser.add_argument('-n', action = "store", dest="total_run", default = 100000)
+#parser.add_argument('-ll', action = "store", dest="latt_len", default = 50)
+#parser.add_argument('-nm', action = "store", dest="num_mol", default = 50)
+#parser.add_argument('-nme', action = "store", dest="num_metal", default = 50)
+#parser.add_argument('-', action = "store", dest="num_mol", default = 50)
+#parser.add_argument('-', action = "store", dest="num_mol", default = 50)
+#parser.add_argument('-', action = "store", dest="num_mol", default = 50)
 
 
-print "Total run: %d" % TOTAL_RUN
+print "Total run: %d" % total_run
 
 def sir(x,range):
 	#global latt_len
@@ -85,7 +97,9 @@ def is_forbidden(input_coor,latt):
 		pos_around = get_coor_mol(input_coor)[1:,:]
 		pos_around2 = pos_around + direct
 		for i in range(0,4):
-			if latt[pos_around[i,0],pos_around[i,1]] != 0 and latt[pos_around[i,0],pos_around[i,1]] != latt_len: 
+			if latt[pos_around[i,0],pos_around[i,1]] == latt_len:
+				return True
+			elif latt[pos_around[i,0],pos_around[i,1]] != 0 and latt[pos_around[i,0],pos_around[i,1]] != latt_len: 
 				if latt[pos_around[i,0],pos_around[i,1]] == \
 						latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)]:
 							count.append(i)
@@ -136,11 +150,11 @@ def cal_energy_mol(coor,coor_mol,latt):
     pos_around2 = pos_around + direct
     for i in range(0,4):
         if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] == latt_len:
-            energy = energy - 15
+            energy = energy - cenergy
         elif latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] != 0:
             if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] != \
                     latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)]: 
-			energy = energy - 5
+			energy = energy - venergy
     return energy
 
 def cal_energy_metal(coor,coor_metal,latt):
@@ -157,7 +171,7 @@ def cal_energy_metal(coor,coor_metal,latt):
         if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] != 0 and latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] != latt_len: 
             if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] == \
                     latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)]:
-                        energy = energy -15 
+                        energy = energy - mcenergy 
     return energy
 ################################### define the lattice ###################
 # assume the coordinate is (i,j)
@@ -184,7 +198,7 @@ for i in range(0,num_mol):
         ind_y = rd.randint(0, latt_len-1)
         pos_current = get_coor_mol(np.array([ind_x,ind_y]))
         if is_occupied(pos_current, lattice) == False and is_forbidden(pos_current,lattice_num) == False:
-            set_element(pos_current,1,i,coor_mol,lattice)
+            set_element(pos_current,2,i,coor_mol,lattice)
             set_element(pos_current,i,i,coor_mol,lattice_num)
             state = False
 #print lattice_num
@@ -209,7 +223,7 @@ Sim_Enabled =  True
 print "Simulation begins..."
 if Sim_Enabled == True:
     count = 0
-    while count < TOTAL_RUN:
+    while count < total_run:
         ind_element = rd.randint(0, num_mol+num_metal-1)
         #ind_element = rd.randint(0, num_mol-1)
         if ind_element < num_mol:
@@ -227,7 +241,7 @@ if Sim_Enabled == True:
                     if p > rd.random():
                         set_element(pos_old,0,ind_element,coor_mol,lattice)
                         set_element(pos_old,0,ind_element,coor_mol,lattice_num)
-                        set_element(pos_new,1,ind_element,coor_mol,lattice)
+                        set_element(pos_new,2,ind_element,coor_mol,lattice)
                         set_element(pos_new,ind_element,ind_element,coor_mol,lattice_num)
                 state = False
         else:
@@ -251,18 +265,22 @@ if Sim_Enabled == True:
 
 
         count = count + 1
-        if count%(TOTAL_RUN/10) == 0:
-            print "number of run: %d / 10, costed time: %f" % (count/(TOTAL_RUN/10), time.clock())
+        if count%(total_run/10) == 0:
+            print "number of run: %d / 10, costed time: %f" % (count/(total_run/10), time.clock())
 
 print "Simulation is done! costed time: %f" % (time.clock())
-
-
-
+plt.imsave("results1\%d-%d-%d-%d-%d-%.1e.png" % (num_mol,num_metal,cenergy,venergy,mcenergy,total_run),lattice,[0,2])
+np.savetxt('results1\%d-%d-%d-%d-%d-%.1e.txt' % (num_mol,num_metal,cenergy,venergy,mcenergy,total_run), lattice_num, fmt='%i', delimiter=',', comments = '(%.1e-%d-%d-%d-%d-%d' % (total_run,num_mol,num_metal \
+			,cenergy, venergy, mcenergy))
 plt.figure(1)
 plt.imshow(lattice)
+
 plt.figure(2)
 plt.imshow(lattice_num)
 plt.show()
+
+#np.savetxt('lattice.txt', lattice, fmt='%i', delimiter=',')
+#np.savetxt('lattice_num.txt', lattice_num, fmt='%i', delimiter=',')
 
 
 
