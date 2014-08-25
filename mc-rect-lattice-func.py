@@ -251,8 +251,8 @@ def experiment(total_run, latt_len, num_mol, num_metal, cenergy, venergy, mcener
 	#lattice_num = lattice_num.astype(np.uint8)
 	#im = Image.fromarray(lattice_num)
 	#im.save("results/%d-%d-%d-%d-%d.jpeg" % (num_mol,num_metal,cenergy,venergy,mcenergy))
-	plt.imsave("results/%d-%d-%d-%d-%d.png" % (num_mol,num_metal,cenergy,venergy,mcenergy),lattice,[0,2])
-	np.savetxt('results\%d-%d-%d-%d-%d.txt' % (num_mol,num_metal,cenergy,venergy,mcenergy), lattice_num, fmt='%i', delimiter=',', comments = '(%d-%d-%d-%d-%d-%d' % (total_run,num_mol,num_metal \
+	plt.imsave("results1\%d-%d-%d-%d-%d-%d-%.1e.png" % (num_mol,num_metal,cenergy,venergy,mcenergy,latt_len,total_run),lattice,[0,2])
+	np.savetxt('results1\%d-%d-%d-%d-%d-%d-%.1e.txt' % (num_mol,num_metal,cenergy,venergy,mcenergy,latt_len,total_run), lattice_num, fmt='%i', delimiter=',', comments = '(%.1e-%d-%d-%d-%d-%d' % (total_run,num_mol,num_metal \
 			,cenergy, venergy, mcenergy))
 	print "End, %s" % time.clock()
 

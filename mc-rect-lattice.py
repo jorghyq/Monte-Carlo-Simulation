@@ -269,8 +269,8 @@ if Sim_Enabled == True:
             print "number of run: %d / 10, costed time: %f" % (count/(total_run/10), time.clock())
 
 print "Simulation is done! costed time: %f" % (time.clock())
-plt.imsave("results1\%d-%d-%d-%d-%d-%.1e.png" % (num_mol,num_metal,cenergy,venergy,mcenergy,total_run),lattice,[0,2])
-np.savetxt('results1\%d-%d-%d-%d-%d-%.1e.txt' % (num_mol,num_metal,cenergy,venergy,mcenergy,total_run), lattice_num, fmt='%i', delimiter=',', comments = '(%.1e-%d-%d-%d-%d-%d' % (total_run,num_mol,num_metal \
+plt.imsave("results1\%d-%d-%d-%d-%d-%d-%.1e.png" % (num_mol,num_metal,cenergy,venergy,mcenergy,latt_len,total_run),lattice,[0,2])
+np.savetxt('results1\%d-%d-%d-%d-%d-%d-%.1e.txt' % (num_mol,num_metal,cenergy,venergy,mcenergy,latt_len,total_run), lattice_num, fmt='%i', delimiter=',', comments = '(%.1e-%d-%d-%d-%d-%d' % (total_run,num_mol,num_metal \
 			,cenergy, venergy, mcenergy))
 plt.figure(1)
 plt.imshow(lattice)
