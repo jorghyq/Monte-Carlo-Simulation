@@ -12,14 +12,14 @@ import argparse
 
 # global lattice_size
 LATTICE_CONSTANT = 1
-total_run = 10000000
+total_run = 100000
 
-latt_len = 80
+latt_len = 40
 
-num_mol = 200
-num_metal = 500
+num_mol = 60
+num_metal = 60
 cenergy = 25
-venergy = 1
+venergy = 2
 mcenergy = 25
 #parser = argparse.ArgumentParser(description='Set the run time and the number of elements.')
 #parser.add_argument('-n', action = "store", dest="total_run", default = 100000)
@@ -97,9 +97,9 @@ def is_forbidden(input_coor,latt):
 		pos_around = get_coor_mol(input_coor)[1:,:]
 		pos_around2 = pos_around + direct
 		for i in range(0,4):
-			if latt[pos_around[i,0],pos_around[i,1]] == latt_len:
+			if latt[pos_around[i,0],pos_around[i,1]] == num_mol:
 				return True
-			elif latt[pos_around[i,0],pos_around[i,1]] != 0 and latt[pos_around[i,0],pos_around[i,1]] != latt_len: 
+			elif latt[pos_around[i,0],pos_around[i,1]] != 0 and latt[pos_around[i,0],pos_around[i,1]] != num_mol: 
 				if latt[pos_around[i,0],pos_around[i,1]] == \
 						latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)]:
 							count.append(i)
@@ -120,7 +120,7 @@ def is_forbidden(input_coor,latt):
 		pos_around = input_coor[1:,:]
 		pos_around2 = pos_around + direct
 		for i in range(0,4):
-			if latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)] == latt_len:
+			if latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)] == num_mol:
 				plus1 = pos_around2[i,:] + direct[sir(i+1,4),:]
 				plus2 = plus1 + direct[sir(i+1,4),:]
 				#print "test is forbiden"
@@ -149,7 +149,7 @@ def cal_energy_mol(coor,coor_mol,latt):
     pos_around = temp[1:5,:] + direct
     pos_around2 = pos_around + direct
     for i in range(0,4):
-        if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] == latt_len:
+        if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] == num_mol:
             energy = energy - cenergy
         elif latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] != 0:
             if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] != \
@@ -168,7 +168,7 @@ def cal_energy_metal(coor,coor_metal,latt):
     pos_around2 = pos_around + direct
     #print pos_around
     for i in range(0,4):
-        if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] != 0 and latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] != latt_len: 
+        if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] != 0 and latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] != num_mol: 
             if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] == \
                     latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)]:
                         energy = energy - mcenergy 
@@ -214,7 +214,7 @@ for i in range(0,num_metal):
         #print len(pos_current)
         if is_occupied(pos_current, lattice) == False and is_forbidden(pos_current, lattice_num) == False:
             set_element(pos_current,1,i,coor_metal,lattice)
-            set_element(pos_current,latt_len,i,coor_metal,lattice_num)
+            set_element(pos_current,num_mol,i,coor_metal,lattice_num)
             state = False
 print "Metals are distributed..."
             
@@ -259,7 +259,7 @@ if Sim_Enabled == True:
                         set_element(old_metal_pos,0,ind_element,coor_metal,lattice)
                         set_element(old_metal_pos,0,ind_element,coor_metal,lattice_num)
                         set_element(new_metal_pos,1,ind_element,coor_metal,lattice)
-                        set_element(new_metal_pos,latt_len,ind_element,coor_metal,lattice_num)
+                        set_element(new_metal_pos,num_mol,ind_element,coor_metal,lattice_num)
                     state = False
 
 

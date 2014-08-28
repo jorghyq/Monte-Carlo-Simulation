@@ -1,20 +1,78 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <string.h>
+#include <unistd.h>
+#include <stdlib.h>
+//extern char *optarg;
+//extern int optind, opterr, optopt;
 using namespace std;
-  
-int main()
+const int num1 = 2;
+const int num2 = 3;
+int testprint(int (*coor)[2])
 {
-    int a[2][2];
+	cout << *coor[1] << " " << *(coor[1]+1) << endl;
+	
+	return 0;
+}
+int main(int argc, char *argv[])
+{
+	int opt;
+	int test[4];
+	//int i = 0;
+	string temp;
+	const char *optstring = "a:b:c:d:";
+	while((opt = getopt(argc, argv, optstring)) != -1)
+	{
+		switch(opt)
+		{
+			case 'a':
+				test[0] = atoi(optarg);
+				break;
+			case 'b':
+				test[1] = atoi(optarg);
+				break;
+			case 'c':
+				test[2] = atoi(optarg);
+				break;
+			case 'd':
+				test[3] = atoi(optarg);
+				break;
+			default:
+				break;
+			}
+		int *test1 = new int[test[1]];
+		test1[0] = 1;
+		/*cout<<"opt: "<<opt<<endl;
+		cout<<"optarg: "<<optarg<<endl;
+		temp = optarg;
+		test[i] = atoi(optarg);
+		cout<<i<<" element = "<<temp<<" "<<test[i]<<endl;
+		i = i + 1;*/
+
+	}
+	cout<<test[0]<<" "<<test[1]<<" "<<test[2]<<" "<<test[3]<<endl;
+    /*int a[3][2];
+    int b[num1+num2] = {0,2};
+    int *ptr;
+    int (*p)[2];
     a[0][0] = 1;
-    a[0][1] = 2;
+    a[0][1] = 23;
     a[1][0] = 3;
     a[1][1] = 4;
-    int *b;
-    b = a[1];
-    srand((unsigned)time(NULL));
-    cout << a[0][0] << " " <<endl;//<< rand()%20;
-    a[0][0] = a[0][0] + 1;
-    cout << a[0][0];
+    a[2][0] = 5;
+    a[2][1] = 6;
+    //int *b;
+    p = a;
+    ptr = b;
+    
+    //srand((unsigned)time(NULL));
+    cout << p[1] << " " <<endl;//<< rand()%20;
+    //cout << *(p[4]+1) << " " <<endl;
+    testprint(p);
+    //a[0][0] = a[0][0] + 1;
+    //cout << a[0][0];*/
     return 0;
 } 
+
+
