@@ -21,6 +21,7 @@ int main(int argc, char *argv[])
 	int test[4];
 	//int i = 0;
 	string temp;
+	
 	const char *optstring = "a:b:c:d:";
 	while((opt = getopt(argc, argv, optstring)) != -1)
 	{
@@ -41,8 +42,8 @@ int main(int argc, char *argv[])
 			default:
 				break;
 			}
-		int *test1 = new int[test[1]];
-		test1[0] = 1;
+		
+		
 		/*cout<<"opt: "<<opt<<endl;
 		cout<<"optarg: "<<optarg<<endl;
 		temp = optarg;
@@ -51,6 +52,20 @@ int main(int argc, char *argv[])
 		i = i + 1;*/
 
 	}
+	int *test1 = new int[test[1]];
+	test1[0] = 25;
+	int b = 100000000;
+	stringstream ss;
+	ss.precision(1);
+	ss.setf(ios::scientific);
+	//ss<<std::setprecision(3)<<scientific;
+	ss<<"results1\\";
+	ss<<double(b);
+	ss<<"-";
+	ss<<test1[0];
+	string test2;
+	test2 = ss.str().c_str();
+	cout<<" test output: "<<test2<<endl;
 	cout<<test[0]<<" "<<test[1]<<" "<<test[2]<<" "<<test[3]<<endl;
     /*int a[3][2];
     int b[num1+num2] = {0,2};

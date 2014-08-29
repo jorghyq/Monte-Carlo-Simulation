@@ -11,12 +11,13 @@
 using namespace std;
 
 
-int total_run = 1000000;
+int total_run = 1000000000;
 const int SECOND_LOOP = 1;
-const int lattice_size = 20;
-const int num_molecule = 20;
-const int num_metal = 20;
-const int num_total = num_molecule + num_metal;
+const int lattice_size = 30;
+const int element_num = 10 * lattice_size;
+int num_molecule = 40;
+int num_metal = 20;
+int num_total = num_molecule + num_metal;
 int cenergy = 10;
 int venergy = 1;
 int mcenergy = 10;
@@ -25,7 +26,7 @@ int temp[5][2];
 int ind[5] = {0};
 int lattice[lattice_size][lattice_size];
 int lattice_num[lattice_size][lattice_size];
-int elements[num_molecule+num_metal][2];
+int elements[element_num][2];
 int direct[5][2] = {{-1,0},{0,1},{1,0},{0,-1},{0,0}};
 int kwn(int n, int var);
 void p2a(int (*ptr)[2], int arr[][2], int length);
@@ -38,48 +39,49 @@ int cal_energy_metal(int (*co)[2], int length);
 void print_array(int (*ar)[2], int length, string name);
 void save_to_txt();
 void disp_array(int i);
-int main()
+int main(int argc, char *argv[])
 {
 	// SET THE COMMANDLINE ARGUMENTS
 	// a: total_run
-	// b: latt_len
-	// c: num_mol
-	// d: num_metal
-	// e: cenergy
-	// f: venergy
-	// g: mcenergy
-	//const char *optstring = "a:b:c:d:e:f:g:";
-	//while((opt = getopt(argc, argv, optstring)) != -1)
-	//{
-		//switch(opt)
-		//{
-			//case 'a':
-				//total_run = atoi(optarg);
-				//break;
+	// b: num_mol
+	// c: num_metal
+	// d: cenergy
+	// e: venergy
+	// f: mcenergy
+	int opt;
+	const char *optstring = "a:b:c:d:e:f:";
+	while((opt = getopt(argc, argv, optstring)) != -1)
+	{
+		switch(opt)
+		{
+			case 'a':
+				total_run = atoi(optarg);
+				break;
 			//case 'b':
-				//lattice_size = atoi(optarg);
-				//break;
-			//case 'c':
-				//num_molecule = atoi(optarg);
-				//break;
-			//case 'd':
-				//num_metal = atoi(optarg);
-				//break;
-			//case 'e':
-				//cenergy = atoi(optarg);
-				//break;
-			//case 'f':
-				//venergy = atoi(optarg);
-				//break;
-			//case 'g':
-				//mcenergy = atoi(optarg);
-				//break;	
-			//default:
-				//break;
-			//}
-	//}
-	cout<<"Program is initialized with: "<<endl
-	cout<<"total_run = "<< total_run<<", latt_lenth = "<<lattice_size<<endl;
+			//	lattice_size = atoi(optarg);
+			//	break;
+			case 'b':
+				num_molecule = atoi(optarg);
+				break;
+			case 'c':
+				num_metal = atoi(optarg);
+				break;
+			case 'd':
+				cenergy = atoi(optarg);
+				break;
+			case 'e':
+				venergy = atoi(optarg);
+				break;
+			case 'f':
+				mcenergy = atoi(optarg);
+				break;	
+			default:
+				break;
+			}
+	}
+	num_total = num_molecule + num_metal;
+	cout<<"Program is initialized with: "<<endl;
+	cout<<"total_run = "<< total_run<<", latt_length = "<<lattice_size<<endl;
 	cout<<"num of molecule = "<<num_molecule<<", num of metals = "<<num_metal<<endl;
 	cout<<"cenergy = "<<cenergy<<", venergy = "<<venergy<<", mcenergy = "<<mcenergy<<endl;
 	clock_t start, finish; 	
@@ -96,8 +98,8 @@ int main()
 	ind[3] = 3;
 	ind[4] = 4;
 
-	int reg = 0;
-	int reg2 = 0;
+	//int reg = 0;
+	//int reg2 = 0;
 	for(int i = 0; i < num_molecule + num_metal; i++)
 	{
 		int state = 1;
@@ -116,7 +118,7 @@ int main()
 				{
 					set_element(points_t1,5,2,i);
 					state = 0;
-					reg2 = reg2 + 1;
+					//reg2 = reg2 + 1;
 				}
 				//disp_array(1);
 			}
@@ -129,18 +131,18 @@ int main()
 				{
 					set_element(&points_temp[4],1,1,i);
 					state = 0;
-					reg = reg + 1;
+					//reg = reg + 1;
 				}
 				//disp_array(1);		
 			}
 		}
 		//cout << "The" << i << "is done..."<< endl;
 	}
-	cout << "number of metals: "<<reg<<endl;
-	cout << "number of molecules: "<<reg2<<endl;
+	//cout << "number of metals: "<<reg<<endl;
+	//cout << "number of molecules: "<<reg2<<endl;
 	cout << "Elements are distributed..." << endl;
 	start = clock();
-	disp_array(1);
+	//disp_array(1);
 	// Begin to simulatte
 	cout << "Begin to simulate..." << endl;
 	int energy_old;
@@ -180,9 +182,12 @@ int main()
 						if (p > (double)rand()/RAND_MAX)
 						{
 							set_element(&points_old[0],5,0,ind_ele);
+							//print_array(points_t1,5,"points_t1");
+							//print_array(&points_old[0],5,"points_old");
 							set_element(&points_new[0],5,2,ind_ele);
 						}
 						state = 0;
+						//cout <<ind_ele<< " is done"<<endl;
 					}
 				}	
 			}
@@ -223,10 +228,10 @@ int main()
 	}
 	finish = clock();
 	cout<<"costed time: " << (finish-start)/CLOCKS_PER_SEC<<endl;
-	//save_to_txt();
-	disp_array(1);
-	cout<<endl;
-	disp_array(2);
+	save_to_txt();
+	//disp_array(1);
+	//cout<<endl;
+	//disp_array(2);
 	return 0;
 }
 
@@ -489,7 +494,19 @@ void disp_array(int i)
 
 void save_to_txt()
 {
-	ofstream file ("lat.txt");
+	string filename;
+	stringstream ss;
+	//ss<<total_run<<"-"<<lattice_size<<"-"<<num_molecule<<"-"<<num_metal<<"-"<<cenergy<<"-"<<venergy<<"-"<<mcenergy<<".txt";
+	ss << "results3\\";
+	ss.precision(1);
+	ss.setf(ios::scientific);
+	ss << double(total_run) << "-" << lattice_size << "-" << num_molecule << "-" << num_metal << "-";
+	ss << cenergy << "-" << venergy << "-" << mcenergy << ".txt";
+	//ofstream file ("%e-%d-%d-%d-%d-%d-%d.txt", total_run,lattice_size,num_molecule,num_metal,cenergy,venergy,mcenergy);
+	filename = ss.str();
+	cout<<"output to file: "<<filename<<endl;
+	ofstream file(filename.c_str());
+	//ofstream file("latt.txt");
 	string line;
 	stringstream linestream;
 	for(int i = 0; i < lattice_size; i = i+1)
