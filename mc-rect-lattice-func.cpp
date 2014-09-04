@@ -11,15 +11,15 @@
 using namespace std;
 
 
-int total_run = 1000000000;
+int total_run = 100;
 const int SECOND_LOOP = 1;
-const int lattice_size = 30;
-const int element_num = 10 * lattice_size;
-int num_molecule = 40;
-int num_metal = 20;
+const int lattice_size = 10;
+const int element_num = 20;//12 * lattice_size;
+int num_molecule = 5;
+int num_metal = 5;
 int num_total = num_molecule + num_metal;
 int cenergy = 10;
-int venergy = 1;
+double venergy = 0.5;
 int mcenergy = 10;
 int (*ctemp)[2];
 int temp[5][2];
@@ -28,17 +28,20 @@ int lattice[lattice_size][lattice_size];
 int lattice_num[lattice_size][lattice_size];
 int elements[element_num][2];
 int direct[5][2] = {{-1,0},{0,1},{1,0},{0,-1},{0,0}};
+double energy_sys = 0;
 int kwn(int n, int var);
 void p2a(int (*ptr)[2], int arr[][2], int length);
 int (*det_neighbour(int ind_x, int ind_y, int *ind, int length))[2];
 int is_occupied(int (*co)[2], int length);
 int is_forbidden(int (*co)[2], int length);
 void set_element(int (*co)[2], int length, int op,int ind_ele);
-int cal_energy_mol(int (*co)[2], int length);
-int cal_energy_metal(int (*co)[2], int length);
+double cal_energy_mol(int (*co)[2], int length);
+double cal_energy_metal(int (*co)[2], int length);
 void print_array(int (*ar)[2], int length, string name);
 void save_to_txt();
 void disp_array(int i);
+double cal_energy_sys(void);
+
 int main(int argc, char *argv[])
 {
 	// SET THE COMMANDLINE ARGUMENTS
@@ -70,7 +73,7 @@ int main(int argc, char *argv[])
 				cenergy = atoi(optarg);
 				break;
 			case 'e':
-				venergy = atoi(optarg);
+				venergy = atof(optarg);
 				break;
 			case 'f':
 				mcenergy = atoi(optarg);
@@ -145,8 +148,8 @@ int main(int argc, char *argv[])
 	//disp_array(1);
 	// Begin to simulatte
 	cout << "Begin to simulate..." << endl;
-	int energy_old;
-	int energy_new;
+	double energy_old;
+	double energy_new;
 	for(int m = 0; m < SECOND_LOOP;m = m + 1)
 	{
 		for(int l = 0; l < total_run; l = l + 1)
@@ -181,6 +184,8 @@ int main(int argc, char *argv[])
 						double p = min(exp(-double(energy_new - energy_old)),double(1));
 						if (p > (double)rand()/RAND_MAX)
 						{
+							//cout<<"energy lowered by "<<energy_new-energy_old<<endl;
+							//cout<< "new molecule position!!"<<endl;
 							set_element(&points_old[0],5,0,ind_ele);
 							//print_array(points_t1,5,"points_t1");
 							//print_array(&points_old[0],5,"points_old");
@@ -209,6 +214,8 @@ int main(int argc, char *argv[])
 						double p = min(exp(-double(energy_new - energy_old)),double(1));
 						if(p > (double)rand()/RAND_MAX)
 						{
+							//cout<<"energy lowered by "<<energy_new-energy_old<<endl;
+							//cout<< "new metal position!!"<<endl;
 							set_element(&points_old[4],1,0,ind_ele);
 							set_element(&points_new[4],1,1,ind_ele);
 						}
@@ -222,14 +229,16 @@ int main(int argc, char *argv[])
 			if((l%(total_run/10)) == 0)
 			{
 				finish = clock();
-				cout<<"current number: "<< l/(total_run/10)<<",time: "<<(finish-start)/CLOCKS_PER_SEC<<endl;
+				energy_sys = cal_energy_sys();
+				cout<<"current number: "<< l/(total_run/10)<<",time: "<<(finish-start)/CLOCKS_PER_SEC<<" system energy: "<<energy_sys<<endl;
 			}
 		}
 	}
 	finish = clock();
-	cout<<"costed time: " << (finish-start)/CLOCKS_PER_SEC<<endl;
-	save_to_txt();
-	//disp_array(1);
+	energy_sys = cal_energy_sys();
+	cout<<"costed time: " << (finish-start)/CLOCKS_PER_SEC<<" system energy: "<<energy_sys<<endl;
+	//save_to_txt();
+	disp_array(1);
 	//cout<<endl;
 	//disp_array(2);
 	return 0;
@@ -292,11 +301,11 @@ void set_element(int (*co)[2], int length, int op,int ind_ele)
 		{
 			if (ind_ele < num_molecule)
 			{
-				lattice_num[*co[i]][*(co[i]+1)] = ind_ele;
+				lattice_num[*co[i]][*(co[i]+1)] = ind_ele+1;
 				}
 			else
 			{
-				lattice_num[*co[i]][*(co[i]+1)] = num_total;
+				lattice_num[*co[i]][*(co[i]+1)] = num_total+1;
 				}
 			}
 		}
@@ -322,7 +331,6 @@ int is_occupied(int (*co)[2], int length)
 	}
 	for (int i=0;i<length;i++)
 	{
-		//cout<<*co[i]<<" "<<*(co[i]+1)<<endl;
 		if (lattice[*co[i]][*(co[i]+1)] != 0)
 		{
 			return 1;
@@ -331,9 +339,9 @@ int is_occupied(int (*co)[2], int length)
 	return 0;
 }
 
-int cal_energy_mol(int (*co)[2], int length)
+double cal_energy_mol(int (*co)[2], int length)
 {
-	int energy = 0;
+	double energy = 0;
 	int pos_around[4][2];
 	int pos_around2[4][2];
 	for (int i=0;i<length;i++)
@@ -342,24 +350,25 @@ int cal_energy_mol(int (*co)[2], int length)
 		pos_around[i][1] = kwn(lattice_size, *(co[i]+1) + direct[i][1]);
 		pos_around2[i][0] = kwn(lattice_size, pos_around[i][0] + direct[i][0]);
 		pos_around2[i][1] = kwn(lattice_size, pos_around[i][1] + direct[i][1]);
-		if (lattice_num[pos_around[i][0]][pos_around[i][1]] == num_total)
+		if (lattice_num[pos_around[i][0]][pos_around[i][1]] == (num_total+1))
 		{
-			energy = energy - cenergy;
+			energy = energy - double(cenergy);
+			
 			}
 		else if (lattice_num[pos_around[i][0]][pos_around[i][1]] != 0)
 		{
 			if (lattice_num[pos_around[i][0]][pos_around[i][1]] != lattice_num[pos_around2[i][0]][pos_around2[i][1]])
 			{
-				energy = energy - venergy;
+				energy = energy - double(venergy);
 				}
 			}
 		}
 	return energy;
 }
 
-int cal_energy_metal(int (*co)[2], int length)
+double cal_energy_metal(int (*co)[2], int length)
 {
-	int energy = 0;
+	double energy = 0;
 	int pos_around[4][2];
 	int pos_around2[4][2];
 	for (int i=0;i<length;i++)
@@ -368,15 +377,47 @@ int cal_energy_metal(int (*co)[2], int length)
 		pos_around[i][1] = *(co[i]+1);
 		pos_around2[i][0] = kwn(lattice_size, pos_around[i][0] + direct[i][0]);
 		pos_around2[i][1] = kwn(lattice_size, pos_around[i][1] + direct[i][1]);
-		if ((lattice_num[pos_around[i][0]][pos_around[i][1]] != 0) && (lattice_num[pos_around[i][0]][pos_around[i][1]] != num_total))
+		if ((lattice_num[pos_around[i][0]][pos_around[i][1]] != 0) && (lattice_num[pos_around[i][0]][pos_around[i][1]] != num_total+1))
 		{
 			if (lattice_num[pos_around[i][0]][pos_around[i][1]] == lattice_num[pos_around2[i][0]][pos_around2[i][1]])
 			{
-				energy = energy - mcenergy;
+				energy = energy - double(mcenergy);
 				}
 			}
 		}
 	return energy;
+}
+
+double cal_energy_sys(void)
+{
+	double energy = 0;
+	double energy_temp = 0;
+	//int cbond_count = 0;
+	//int vbond_count = 0;
+	//int temp = 0;
+	int (*points_t1)[2];
+	for (int i=0;i<num_total;i++)
+	{
+		energy_temp = 0;
+		if (i < num_molecule)
+		{
+			points_t1 = det_neighbour(elements[i][0],elements[i][1],ind,5);
+			energy_temp = cal_energy_mol(points_t1,4);
+			//if (energy_temp/cenergy != 0)
+			//{
+			//	cbond_count = cbond_count+
+			//	}
+			}
+		else
+		{
+			points_t1 = det_neighbour(elements[i][0],elements[i][1],ind,5);
+			energy_temp = cal_energy_metal(points_t1,4);
+			
+			}
+		energy = energy + energy_temp;
+		//cout<<"energy change: "<<energy_temp<<" energy total: "<<energy<<endl;
+	}
+	return energy/2.0;	
 }
 
 int is_forbidden(int (*co)[2], int length)
@@ -395,8 +436,8 @@ int is_forbidden(int (*co)[2], int length)
 			pos_around[i][1] = *(co[i]+1);
 			pos_around2[i][0] = kwn(lattice_size, pos_around[i][0] + direct[i][0]);
 			pos_around2[i][1] = kwn(lattice_size, pos_around[i][1] + direct[i][1]);
-			if (lattice_num[pos_around[i][0]][pos_around[i][1]] == num_total) return 1;
-			else if ((lattice_num[pos_around[i][0]][pos_around[i][1]] != 0) && (lattice_num[pos_around[i][0]][pos_around[i][1]] != num_total))
+			if (lattice_num[pos_around[i][0]][pos_around[i][1]] == (num_total+1)) return 1;
+			else if ((lattice_num[pos_around[i][0]][pos_around[i][1]] != 0) && (lattice_num[pos_around[i][0]][pos_around[i][1]] != (num_total+1)))
 			{
 				if (lattice_num[pos_around[i][0]][pos_around[i][1]] == lattice_num[pos_around2[i][0]][pos_around2[i][1]])
 				{
@@ -429,7 +470,7 @@ int is_forbidden(int (*co)[2], int length)
 			int plus2[2] = {0};
 			int minus1[2] = {0};
 			int minus2[2] = {0};
-			if (lattice_num[pos_around[i][0]][pos_around[i][1]] == num_total)
+			if (lattice_num[pos_around[i][0]][pos_around[i][1]] == (num_total+1))
 			{
 				int plus = kwn(4,i+1);
 				int minus = kwn(4,i-1);
@@ -497,7 +538,7 @@ void save_to_txt()
 	string filename;
 	stringstream ss;
 	//ss<<total_run<<"-"<<lattice_size<<"-"<<num_molecule<<"-"<<num_metal<<"-"<<cenergy<<"-"<<venergy<<"-"<<mcenergy<<".txt";
-	ss << "results3\\";
+	ss << "results2\\";
 	ss.precision(1);
 	ss.setf(ios::scientific);
 	ss << double(total_run) << "-" << lattice_size << "-" << num_molecule << "-" << num_metal << "-";
