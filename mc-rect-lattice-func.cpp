@@ -11,15 +11,15 @@
 using namespace std;
 
 
-int total_run = 10000;
+int total_run = 1000000;
 const int SECOND_LOOP = 1;
 const int lattice_size = 80;
 const int element_num = 800;//12 * lattice_size;
 int num_molecule = 200;
-int num_metal = 50;
+int num_metal = 60;
 int num_total = num_molecule + num_metal;
 int cenergy = 10;
-double venergy = 0.5;
+double venergy = 2;
 int mcenergy = 10;
 int ctemp[2];
 int temp[5][2];
@@ -257,6 +257,9 @@ int main(int argc, char *argv[])
 	energy_sys = cal_energy_sys();
 	cout<<"costed time: " << (finish-start)/CLOCKS_PER_SEC<<" system energy: "<<energy_sys<<endl;
 	save_to_txt();
+	int *bond_num;
+	bond_num = cal_bond_num();
+	cout<<"cbond: "<<bond_num[0]<<" vbond: "<<bond_num[1]<<endl;
 	//disp_array(1);
 	//cout<<endl;
 	//disp_array(2);
@@ -311,6 +314,7 @@ void set_element(int (*co)[2], int length, int op,int ind_ele)
 	for (int i=0;i<length;i++)
 	{
 		lattice[*co[i]][*(co[i]+1)] = op;
+		if (length == 5 && i == 4 && op != 0) lattice[*co[i]][*(co[i]+1)] = op+1;
 		//cout<<"point in "<<*co[i]<<" "<<*(co[i]+1)<<" is set to "<<op<<endl;
 		if (op == 0)
 		{
@@ -556,7 +560,7 @@ int *cal_bond_num(void)
 			}
 		}
 	ctemp[0] = cbond;
-	ctemp[1] = vbond;
+	ctemp[1] = vbond/2;
 	return ctemp;
 }
 
@@ -597,12 +601,11 @@ void save_to_txt()
 	string filename;
 	stringstream ss;
 	//ss<<total_run<<"-"<<lattice_size<<"-"<<num_molecule<<"-"<<num_metal<<"-"<<cenergy<<"-"<<venergy<<"-"<<mcenergy<<".txt";
-	ss << "results6\\";
+	ss << "results5\\";
 	ss.precision(1);
 	ss.setf(ios::scientific);
 	ss << double(total_run) << "-" << lattice_size << "-" << num_molecule << "-" << num_metal << "-";
 	ss << cenergy << "-" << venergy << "-" << mcenergy << ".txt";
-	//ofstream file ("%e-%d-%d-%d-%d-%d-%d.txt", total_run,lattice_size,num_molecule,num_metal,cenergy,venergy,mcenergy);
 	filename = ss.str();
 	cout<<"output to file: "<<filename<<endl;
 	ofstream file(filename.c_str());
@@ -610,16 +613,36 @@ void save_to_txt()
 	string line;
 	stringstream linestream;
 	int *bond_num;
+	double enersys;
 	bond_num = cal_bond_num();
-	cout<<"cbond: "<<bond_num[0]<<" vbond: "<<bond_num[1]<<endl;
+	linestream<<bond_num[0];
+	linestream>>line;
+	file<<line<<",";
+	linestream.clear();
+	linestream<<bond_num[1];
+	linestream>>line;
+	file<<line<<",";
+	linestream.clear();
+	enersys = cal_energy_sys();
+	linestream<<enersys;
+	linestream>>line;
+	file<<line<<",";
+	linestream.clear();
+	linestream<<lattice_size;
+	linestream>>line;
+	file<<line<<"\n";
+	linestream.clear();
+	//cout<<"cbond: "<<bond_num[0]<<" vbond: "<<bond_num[1]<<endl;
 	for(int i = 0; i < lattice_size; i = i+1)
 	{
 		 for(int j = 0; j < lattice_size; j = j+1)
 		{
+			
 			//string line;
 			//stringstream linestream;
 			linestream<<lattice[i][j];
 			linestream>>line;
+			linestream.clear();
 			if(j == (lattice_size-1))
 			{
 				file<<line;

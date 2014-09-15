@@ -9,28 +9,33 @@ import matplotlib.pyplot as plt
 import time
 
 total_run = 10000000
-latt_len = 80
+
 num_mol = 30
 num_metal = 30
 cenergy = 24
 venergy = 0
 mcenergy = 24
-os.system('mc-rect-lattice-func -a %d -b %d -c %d -d %d -e %f -f %d' % (total_run,num_mol,num_metal,cenergy,venergy,mcenergy))
-lattice = np.loadtxt("latt.txt", delimiter=',')
-temp1, temp2 = np.where(lattice == 2)
+f = open('latt.txt', 'r')
+temp = f.readline().strip()
+headdate = temp.split(',')
+latt_len = int(headdate[-1])
+print headdate
+f.close()
+#os.system('mc-rect-lattice-func -a %d -b %d -c %d -d %d -e %f -f %d' % (total_run,num_mol,num_metal,cenergy,venergy,mcenergy))
+lattice = np.loadtxt("latt.txt", delimiter=',',skiprows=1)
+temp1, temp2 = np.where(lattice == 3)
 temp3, temp4 = np.where(lattice == 1)
-plt.figure()
-plt.imshow(lattice)
-#print line
-#fig = plt.figure()
-#ax = plt.axes()
-#fig.add_axes(ax)
-#ax.set_aspect("equal")
-#ax.scatter(temp1,temp2,s = 70,c = "r",marker = "s")
-#ax.scatter(temp3,temp4,s = 60,c = "b",marker = "s")
-#plt.show()
-		#newline = line[:-4]+'.png'
-		#plt.savefig(newline)
-		#print newline
-		#plt.imsave(newline,lattice,[0,2])
+#plt.figure()
+#plt.imshow(lattice)
+x = [-1.5,-0.5,-0.5,0.5,0.5,1.5,1.5,0.5,0.5,-0.5,-0.5,-1.5,-1.5]
+y = [0.5,0.5,1.5,1.5,0.5,0.5,-0.5,-0.5,-1.5,-1.5,-0.5,-0.5,0.5]
+xy1 = list(zip(x,y))
+fig = plt.figure()
+ax = plt.axes()
+fig.add_axes(ax)
+
+ax.scatter(temp1,temp2,s = int(2000/latt_len),c = "r",marker = (xy1,0))
+ax.scatter(temp3,temp4,s = int(600/latt_len),c = "b",marker = "s")
+ax.text(-10,0,headdate[0])
+ax.set_aspect("equal")
 plt.show()
