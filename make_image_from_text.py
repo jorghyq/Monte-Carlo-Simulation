@@ -19,7 +19,7 @@ for line in files:
 			lattice = np.loadtxt(line, delimiter=',')
 			#cbond, vbond = cal_bond_num(lattice)
 			#out.write(line[-4:]+'\t')
-			plt.savefig(newline)
+			#plt.savefig(newline)
 			print newline
 			plt.imsave(newline,lattice,[0,2])
 	
