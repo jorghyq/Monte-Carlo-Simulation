@@ -25,8 +25,7 @@ f.close()
 lattice = np.loadtxt("latt.txt", delimiter=',',skiprows=1)
 temp1, temp2 = np.where(lattice == 3)
 temp3, temp4 = np.where(lattice == 1)
-#plt.figure()
-#plt.imshow(lattice)
+# To have a customer designed shape, one has to draw it by himself
 x = [-1.5,-0.5,-0.5,0.5,0.5,1.5,1.5,0.5,0.5,-0.5,-0.5,-1.5,-1.5]
 y = [0.5,0.5,1.5,1.5,0.5,0.5,-0.5,-0.5,-1.5,-1.5,-0.5,-0.5,0.5]
 xy1 = list(zip(x,y))

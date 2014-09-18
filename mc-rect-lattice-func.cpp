@@ -659,4 +659,31 @@ void save_to_txt()
 		}
 		file<<"\r\n";
 	}
+	file<<"\r\n";
+	for(int i = 0; i < lattice_size; i = i+1)
+	{
+		 for(int j = 0; j < lattice_size; j = j+1)
+		{
+			
+			//string line;
+			//stringstream linestream;
+			linestream<<lattice_num[i][j];
+			linestream>>line;
+			linestream.clear();
+			if(j == (lattice_size-1))
+			{
+				file<<line;
+				//cout<<line<<",";
+				
+				}
+			else
+			{
+				file<<line<<",";
+				//cout<<line<<",";
+			}
+				
+			
+		}
+		file<<"\r\n";
+	}
 }
