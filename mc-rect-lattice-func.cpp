@@ -11,12 +11,12 @@
 using namespace std;
 
 
-int total_run = 1000000;
+int total_run = 100000000;
 const int SECOND_LOOP = 1;
-const int lattice_size = 80;
-const int element_num = 800;//12 * lattice_size;
-int num_molecule = 200;
-int num_metal = 60;
+const int lattice_size = 100;
+const int element_num = 1000;//12 * lattice_size;
+int num_molecule = 50;
+int num_metal = 50;
 int num_total = num_molecule + num_metal;
 int cenergy = 10;
 double venergy = 2;
@@ -601,15 +601,15 @@ void save_to_txt()
 	string filename;
 	stringstream ss;
 	//ss<<total_run<<"-"<<lattice_size<<"-"<<num_molecule<<"-"<<num_metal<<"-"<<cenergy<<"-"<<venergy<<"-"<<mcenergy<<".txt";
-	ss << "results5\\";
+	ss << "results6\\";
 	ss.precision(1);
 	ss.setf(ios::scientific);
 	ss << double(total_run) << "-" << lattice_size << "-" << num_molecule << "-" << num_metal << "-";
 	ss << cenergy << "-" << venergy << "-" << mcenergy << ".txt";
 	filename = ss.str();
 	cout<<"output to file: "<<filename<<endl;
-	ofstream file(filename.c_str());
-	//ofstream file("latt.txt");
+	//ofstream file(filename.c_str());
+	ofstream file("latt.txt");
 	string line;
 	stringstream linestream;
 	int *bond_num;

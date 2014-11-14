@@ -22,15 +22,11 @@ for line in files:
 		num_metal_ind = num_metal/50 - 1
 		cenergy = int(namedata[4])
 		cenergy_ind = (cenergy -1)/2
-		
-		#print namedata
-		#print cenergy
 		f = open(line, 'r')
 		headdata = f.readline().strip().split(',')
-		#latt_len = int(headdata[-1])
-		#print headdata
+		#energyvalue = np.zeros((15,8))
 		f.close()
-		cbondvalue[cenergy_ind][num_metal_ind] = float(headdata[0])/float(num_metal)
+		cbondvalue[cenergy_ind][num_metal_ind] = float(headdata[0])#/float(num_metal)
 		vbondvalue[cenergy_ind][num_metal_ind] = int(headdata[1])
 		energyvalue[cenergy_ind][num_metal_ind] = int(headdata[2])
 
@@ -38,6 +34,12 @@ plt.figure()
 #plt.plot(xvalue,cbondvalue)
 #plt.plot(xvalue,vbondvalue)
 #plt.plot(xvalue2,np.transpose(vbondvalue))
-plt.plot(xvalue2,np.transpose(cbondvalue))
+vbondtr = np.transpose(vbondvalue)
+for i in range(0,cbondvalue.shape[0]):
+	plt.plot(xvalue2,cbondvalue[i,:],label = 'cenerg = %d' % (i*2+1))
+plt.legend(loc=0,fontsize = 8)
+plt.xlabel('metal numbers')
+plt.ylabel('coordination bond numbers')
+#plt.plot(xvalue2,np.transpose(cbondvalue))
 #plt.plot(xvalue,energyvalue)
 plt.show()
