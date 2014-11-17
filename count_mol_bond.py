@@ -13,7 +13,7 @@ dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results14"
 os.chdir(dname)
 latt_len = 80
 files = os.listdir(dname)
-line = files[47]
+line = files[45]
 print line
 lattice = np.loadtxt(line, delimiter=',',skiprows=1)
 ##################################################
@@ -36,27 +36,29 @@ def sir(x,range):
 		x = x + range
 	return x
 
-def find_neighbour(coor, direct, lattice):
+def find_neighbour(mode, coor, direct, lattice):
 	
 	#print "input coordinate for find_neighbour: " + str(coor)
 	neighbours = []
 	latt_len = lattice.shape[0]
 	x = coor[0]
 	y = coor[1]
-	for i in range(0,direct.shape[0]):
-		temp_coor1 = [sir(x+direct[i,0],latt_len),sir(y+direct[i,1],latt_len)]
-		if lattice[temp_coor1[0]][temp_coor1[1]] == 1000:
-			temp_coor2 = [sir(temp_coor1[0]+direct[i,0],latt_len),sir(temp_coor1[1]+direct[i,1],latt_len)]
-			if lattice[temp_coor2[0]][temp_coor2[1]] != 0 and lattice[temp_coor2[0]][temp_coor2[1]] != 1000:
-				neighbours.append(lattice[temp_coor2[0],temp_coor2[1]]-1)
+	if mode == 2:
+		for i in range(0,direct.shape[0]):
+			temp_coor1 = [sir(x+direct[i,0],latt_len),sir(y+direct[i,1],latt_len)]
+			if lattice[temp_coor1[0]][temp_coor1[1]] == 1000:
+				temp_coor2 = [sir(temp_coor1[0]+direct[i,0],latt_len),sir(temp_coor1[1]+direct[i,1],latt_len)]
+				if lattice[temp_coor2[0]][temp_coor2[1]] != 0 and lattice[temp_coor2[0]][temp_coor2[1]] != 1000:
+					neighbours.append(lattice[temp_coor2[0],temp_coor2[1]]-1)
+	elif mode == 0:
+		for i in range(0,direct.shape[0]):
+			temp_coor1 = [sir(x+direct[i,0],latt_len),sir(y+direct[i,1],latt_len)]
+			if lattice[temp_coor1[0]][temp_coor1[1]] != 0 and lattice[temp_coor1[0]][temp_coor1[1]] != 1000:
+				neighbours.append(lattice[temp_coor1[0],temp_coor1[1]]-1)
 	return neighbours
 				
-def cluster(lattice):
-	direct = np.zeros((4,2))
-	direct[0,:] = [-2,0]
-	direct[1,:] = [0,+2]
-	direct[2,:] = [+2,0]
-	direct[3,:] = [0,-2]
+def cluster(mode, lattice, direct):
+	
 	latt = deepcopy(lattice)
 	latt = prepro(latt)
 	mol = np.transpose(np.array(np.where(lattice == 3)))
@@ -73,7 +75,7 @@ def cluster(lattice):
 				# pop out the first element
 				current_index = templist.pop(0)
 				# find out the neighbours of this element
-				connected_neighbours = find_neighbour(mol[current_index,:],direct,latt)
+				connected_neighbours = find_neighbour(mode,mol[current_index,:],direct,latt)
 				#print "connected_neighbours " + str(connected_neighbours)
 				# loop through all the neighbours, if it is not the first element and if it has been already asigned
 				for j in range(len(connected_neighbours)):
@@ -108,11 +110,14 @@ def corr_num(coor, direction, lattice):
 
 # auto-correlation for different mode: 0 for dense-packed, 1 for 1D, 2 for 2D		
 def auto_correlate(mode, threshold, element, index, lattice):
-	latt = deepcopy(lattice)
-	latt = prepro(latt)
 	# 1. cluster
 	#output,latt = cluster(lattice)
 	# 2. auto-correlation
+	latt_len = lattice.shape[0]
+	latt = np.zeros((latt_len,latt_len))
+	#latt[tuple(map(tuple,element))] == 3
+	for i in range(element.shape[0]):
+		latt[tuple(element[i,:])] = 3
 	th = threshold # elements with auto-correlation larger than threshold are chosen
 	mol_count = 0
 	# store the picked elements for debugging
@@ -134,53 +139,125 @@ def auto_correlate(mode, threshold, element, index, lattice):
 		direction[7,:] = [-4,-4]
 		# go through each cluster
 		for i in range(num_mol):
-			temp_count = corr_num(mol[i,:],direction,lattice)
+			temp_count = corr_num(mol[i,:],direction,latt)
+
 			#print "entry " + str(i) + "  temp_count " + str(temp_count)
 			if temp_count > th:
 				mol_count = mol_count + 1
 				mol_list.append(index[i])
-				latt[mol[i][0]][mol[i][1]] = 1001
+				#latt[mol[i][0]][mol[i][1]] = 1001
+	elif mode == 0:
+		direct0 = np.zeros((8,2))
+		direct0[0,:] = [-2,+1]
+		direct0[1,:] = [-1,+2]
+		direct0[2,:] = [+1,+2]
+		direct0[3,:] = [+2,+1]
+		direct0[4,:] = [+2,-1]
+		direct0[5,:] = [+1,-2]
+		direct0[6,:] = [-1,-2]
+		direct0[7,:] = [-2,-1]
+		for i in range(num_mol):
+			temp_count = corr_num(mol[i,:],direct0,latt)
+			#if index[i] == 108:
+			#	print "temp_count 108 : " + str(temp_count)
+			#print "entry " + str(i) + "  temp_count " + str(temp_count)
+			if temp_count > th:
+				mol_count = mol_count + 1
+				mol_list.append(index[i])
 	return (mol_count,mol_list)
-			
-plt.figure()	
-plt.imshow(lattice)
-plt.show()
-output,latt = cluster(lattice)
-for i in range(len(output)):
-	print "new: " + str(len(output[i])) + "  " + str(output[i])
+
 
 mol = np.transpose(np.array(np.where(lattice == 3)))
 num_mol = mol.shape[0]
-new_mol = []
-for i in range(len(output)):
-	if len(output[i]) > 3:
-		ind = np.transpose(np.array(output[i]))
-		#print ind
 		
-		ind_num = ind.shape[0]
-		#print ind_num
-		ele = mol[ind,:]
-		count, mols = auto_correlate(2, 2, ele, ind, lattice)
-	new_mol.append(mols)
-print "###############################"
-for i in range(len(new_mol)):
-	print "new: " + str(len(new_mol[i])) + "  " + str(new_mol[i])
+fig = plt.figure()	
+a = fig.add_subplot(1,3,1)
+imgplot = plt.imshow(lattice)
 
 
-new_latt = np.zeros((lattice.shape[0],lattice.shape[0]))
-for i in range(len(new_mol)):
-	for j in range(len(new_mol[i])):
-		#print new_mol[i][j]
-		new_latt[mol[new_mol[i][j]][0]][mol[new_mol[i][j]][1]] = (i+1)*3
-	
-legs = np.where(lattice == 2)
-lattice[legs] = 0
 
-metal = np.where(lattice == 1)
-lattice[metal] = 0
+############################### Dense packed ############################
+
+direct0 = np.zeros((8,2))
+direct0[0,:] = [-2,+1]
+direct0[1,:] = [-1,+2]
+direct0[2,:] = [+1,+2]
+direct0[3,:] = [+2,+1]
+direct0[4,:] = [+2,-1]
+direct0[5,:] = [+1,-2]
+direct0[6,:] = [-1,-2]
+direct0[7,:] = [-2,-1]
+
+output0,latt0 = cluster(0, lattice, direct0)
+new_mol0 = []
+for i in range(len(output0)):
+	print "new: " + str(len(output0[i])) + "  " + str(output0[i])
+
+#print "##################################################"
+for i in range(len(output0)):
+	if len(output0[i]) > 3:
+		ind0 = np.transpose(np.array(output0[i]))
+		ind_num0 = ind0.shape[0]
+		ele0 = mol[ind0,:]
+		count0, mols0 = auto_correlate(0, 2, ele0, ind0, lattice)
+		new_mol0.append(mols0)
+
+for i in range(len(new_mol0)):
+	print "new: " + str(len(new_mol0[i])) + "  " + str(new_mol0[i])
+
+new_latt0 = np.zeros((lattice.shape[0],lattice.shape[0]))
+
+a = fig.add_subplot(1,3,2)
+imgplot = plt.imshow(lattice)
+#for i in range(len(new_mol0)):
+#	for j in range(len(new_mol0[i])):
+#		plt.text(mol[new_mol0[i][j]][1],mol[new_mol0[i][j]][0], str(new_mol0[i][j]),fontsize=10)
+#		new_latt0[mol[new_mol0[i][j]][0]][mol[new_mol0[i][j]][1]] = (i+1)*3
+
+for i in range(len(output0)):
+	if len(output0[i]) > 3:
+		for j in range(len(output0[i])):
+			plt.text(mol[output0[i][j]][1],mol[output0[i][j]][0], str(output0[i][j]),fontsize=8)
+			new_latt0[mol[output0[i][j]][0]][mol[output0[i][j]][1]] = (i+1)*3
+
+imgplot = plt.imshow(new_latt0)
+################################ 2D networks ##############################
+#a = fig.add_subplot(1,3,3)
+#direct2 = np.zeros((4,2))
+#direct2[0,:] = [-2,0]
+#direct2[1,:] = [0,+2]
+#direct2[2,:] = [+2,0]
+#direct2[3,:] = [0,-2]
+#output2,latt2 = cluster(2,lattice, direct2)
+#for i in range(len(output2)):
+	#print "new: " + str(len(output2[i])) + "  " + str(output2[i])
 
 
-plt.imshow(new_latt)
+#new_mol2 = []
+#for i in range(len(output2)):
+	#if len(output2[i]) > 3:
+		#ind2 = np.transpose(np.array(output2[i]))
+		##print ind
+		
+		#ind_num2 = ind2.shape[0]
+		##print ind_num
+		#ele2 = mol[ind2,:]
+		#count2, mols2 = auto_correlate(2, 2, ele2, ind2, lattice)
+		#new_mol2.append(mols2)
+#print "###############################"
+#for i in range(len(new_mol2)):
+	#print "new: " + str(len(new_mol2[i])) + "  " + str(new_mol2[i])
+
+
+#new_latt2 = np.zeros((lattice.shape[0],lattice.shape[0]))
+#for i in range(len(new_mol2)):
+	#for j in range(len(new_mol2[i])):
+		#plt.text(mol[new_mol2[i][j]][1],mol[new_mol2[i][j]][0], str(new_mol2[i][j]),fontsize=10)
+		##print new_mol2[i][j]
+		#new_latt2[mol[new_mol2[i][j]][0]][mol[new_mol2[i][j]][1]] = (i+1)*3	
+		
+#imgplot = plt.imshow(new_latt2)
+############################## 2D Networks END ###########################
 plt.show()
 
 
