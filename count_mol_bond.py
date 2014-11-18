@@ -147,7 +147,7 @@ def auto_correlate(mode, threshold, element, index, lattice):
 				mol_list.append(index[i])
 				#latt[mol[i][0]][mol[i][1]] = 1001
 	elif mode == 0:
-		direct0 = np.zeros((8,2))
+		direct0 = np.zeros((16,2))
 		direct0[0,:] = [-2,+1]
 		direct0[1,:] = [-1,+2]
 		direct0[2,:] = [+1,+2]
@@ -156,10 +156,19 @@ def auto_correlate(mode, threshold, element, index, lattice):
 		direct0[5,:] = [+1,-2]
 		direct0[6,:] = [-1,-2]
 		direct0[7,:] = [-2,-1]
+		# consider the neighbours in the diagonal
+		direct0[8,:] = [+3,-1]
+		direct0[9,:] = [+3,+1]
+		direct0[10,:] = [-3,+1]
+		direct0[11,:] = [-3,-1]
+		direct0[12,:] = [+1,-3]
+		direct0[13,:] = [+1,+3]
+		direct0[14,:] = [-1,+3]
+		direct0[15,:] = [-1,-3]
 		for i in range(num_mol):
 			temp_count = corr_num(mol[i,:],direct0,latt)
-			#if index[i] == 108:
-			#	print "temp_count 108 : " + str(temp_count)
+			if index[i] == 182:
+				print "temp_count 108 : " + str(temp_count)
 			#print "entry " + str(i) + "  temp_count " + str(temp_count)
 			if temp_count > th:
 				mol_count = mol_count + 1
@@ -177,6 +186,7 @@ imgplot = plt.imshow(lattice)
 
 
 ############################### Dense packed ############################
+a = fig.add_subplot(1,3,2)
 
 direct0 = np.zeros((8,2))
 direct0[0,:] = [-2,+1]
@@ -207,56 +217,73 @@ for i in range(len(new_mol0)):
 
 new_latt0 = np.zeros((lattice.shape[0],lattice.shape[0]))
 
-a = fig.add_subplot(1,3,2)
-imgplot = plt.imshow(lattice)
-#for i in range(len(new_mol0)):
-#	for j in range(len(new_mol0[i])):
-#		plt.text(mol[new_mol0[i][j]][1],mol[new_mol0[i][j]][0], str(new_mol0[i][j]),fontsize=10)
-#		new_latt0[mol[new_mol0[i][j]][0]][mol[new_mol0[i][j]][1]] = (i+1)*3
 
-for i in range(len(output0)):
-	if len(output0[i]) > 3:
-		for j in range(len(output0[i])):
-			plt.text(mol[output0[i][j]][1],mol[output0[i][j]][0], str(output0[i][j]),fontsize=8)
-			new_latt0[mol[output0[i][j]][0]][mol[output0[i][j]][1]] = (i+1)*3
+#imgplot = plt.imshow(lattice)
+for i in range(len(new_mol0)):
+	for j in range(len(new_mol0[i])):
+		plt.text(mol[new_mol0[i][j]][1],mol[new_mol0[i][j]][0], str(new_mol0[i][j]),fontsize=10)
+		new_latt0[mol[new_mol0[i][j]][0]][mol[new_mol0[i][j]][1]] = (i+1)*3
+
+#for i in range(len(output0)):
+#	if len(output0[i]) > 3:
+#		for j in range(len(output0[i])):
+#			plt.text(mol[output0[i][j]][1],mol[output0[i][j]][0], str(output0[i][j]),fontsize=8)
+#			new_latt0[mol[output0[i][j]][0]][mol[output0[i][j]][1]] = (i+1)*3
 
 imgplot = plt.imshow(new_latt0)
+
+############################## 1D networks ################################
+
+
+
+
+
+
+
+
+
+
+
+
+############################## 1D END ################################
 ################################ 2D networks ##############################
-#a = fig.add_subplot(1,3,3)
-#direct2 = np.zeros((4,2))
-#direct2[0,:] = [-2,0]
-#direct2[1,:] = [0,+2]
-#direct2[2,:] = [+2,0]
-#direct2[3,:] = [0,-2]
-#output2,latt2 = cluster(2,lattice, direct2)
-#for i in range(len(output2)):
-	#print "new: " + str(len(output2[i])) + "  " + str(output2[i])
+
+a = fig.add_subplot(1,3,3)
+direct2 = np.zeros((4,2))
+direct2[0,:] = [-2,0]
+direct2[1,:] = [0,+2]
+direct2[2,:] = [+2,0]
+direct2[3,:] = [0,-2]
+output2,latt2 = cluster(2,lattice, direct2)
+
+for i in range(len(output2)):
+	print "new: " + str(len(output2[i])) + "  " + str(output2[i])
 
 
-#new_mol2 = []
-#for i in range(len(output2)):
-	#if len(output2[i]) > 3:
-		#ind2 = np.transpose(np.array(output2[i]))
-		##print ind
+new_mol2 = []
+for i in range(len(output2)):
+	if len(output2[i]) > 3:
+		ind2 = np.transpose(np.array(output2[i]))
+		#print ind
 		
-		#ind_num2 = ind2.shape[0]
-		##print ind_num
-		#ele2 = mol[ind2,:]
-		#count2, mols2 = auto_correlate(2, 2, ele2, ind2, lattice)
-		#new_mol2.append(mols2)
-#print "###############################"
-#for i in range(len(new_mol2)):
-	#print "new: " + str(len(new_mol2[i])) + "  " + str(new_mol2[i])
+		ind_num2 = ind2.shape[0]
+		#print ind_num
+		ele2 = mol[ind2,:]
+		count2, mols2 = auto_correlate(2, 2, ele2, ind2, lattice)
+		new_mol2.append(mols2)
+print "###############################"
+for i in range(len(new_mol2)):
+	print "new: " + str(len(new_mol2[i])) + "  " + str(new_mol2[i])
 
 
-#new_latt2 = np.zeros((lattice.shape[0],lattice.shape[0]))
-#for i in range(len(new_mol2)):
-	#for j in range(len(new_mol2[i])):
-		#plt.text(mol[new_mol2[i][j]][1],mol[new_mol2[i][j]][0], str(new_mol2[i][j]),fontsize=10)
-		##print new_mol2[i][j]
-		#new_latt2[mol[new_mol2[i][j]][0]][mol[new_mol2[i][j]][1]] = (i+1)*3	
+new_latt2 = np.zeros((lattice.shape[0],lattice.shape[0]))
+for i in range(len(new_mol2)):
+	for j in range(len(new_mol2[i])):
+		plt.text(mol[new_mol2[i][j]][1],mol[new_mol2[i][j]][0], str(new_mol2[i][j]),fontsize=10)
+		#print new_mol2[i][j]
+		new_latt2[mol[new_mol2[i][j]][0]][mol[new_mol2[i][j]][1]] = (i+1)*3	
 		
-#imgplot = plt.imshow(new_latt2)
+imgplot = plt.imshow(new_latt2)
 ############################## 2D Networks END ###########################
 plt.show()
 
