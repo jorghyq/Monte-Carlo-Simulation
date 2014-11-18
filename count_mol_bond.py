@@ -13,7 +13,7 @@ dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results14"
 os.chdir(dname)
 latt_len = 80
 files = os.listdir(dname)
-line = files[45]
+line = files[31]
 print line
 lattice = np.loadtxt(line, delimiter=',',skiprows=1)
 ##################################################
@@ -55,6 +55,21 @@ def find_neighbour(mode, coor, direct, lattice):
 			temp_coor1 = [sir(x+direct[i,0],latt_len),sir(y+direct[i,1],latt_len)]
 			if lattice[temp_coor1[0]][temp_coor1[1]] != 0 and lattice[temp_coor1[0]][temp_coor1[1]] != 1000:
 				neighbours.append(lattice[temp_coor1[0],temp_coor1[1]]-1)
+	elif mode == 1:
+		direct_dense = direct[0:8,:]
+		direct_2d = direct[8:12,:]
+		for i in range(0,direct_dense.shape[0]):
+			temp_coor1 = [sir(x+direct_dense[i,0],latt_len),sir(y+direct_dense[i,1],latt_len)]
+			if lattice[temp_coor1[0]][temp_coor1[1]] != 0 and lattice[temp_coor1[0]][temp_coor1[1]] != 1000:
+				if len(find_neighbour(0,temp_coor1,direct_dense,lattice)) < 3:
+					neighbours.append(lattice[temp_coor1[0],temp_coor1[1]]-1)
+		for i in range(0,direct_2d.shape[0]):
+			temp_coor1 = [sir(x+direct_2d[i,0],latt_len),sir(y+direct_2d[i,1],latt_len)]
+			if lattice[temp_coor1[0]][temp_coor1[1]] == 1000:
+				temp_coor2 = [sir(temp_coor1[0]+direct_2d[i,0],latt_len),sir(temp_coor1[1]+direct_2d[i,1],latt_len)]
+				if lattice[temp_coor2[0]][temp_coor2[1]] != 0 and lattice[temp_coor2[0]][temp_coor2[1]] != 1000:
+					if len(find_neighbour(2,temp_coor2,direct_2d,lattice)) < 3:
+						neighbours.append(lattice[temp_coor2[0],temp_coor2[1]]-1)					
 	return neighbours
 				
 def cluster(mode, lattice, direct):
@@ -167,8 +182,47 @@ def auto_correlate(mode, threshold, element, index, lattice):
 		direct0[15,:] = [-1,-3]
 		for i in range(num_mol):
 			temp_count = corr_num(mol[i,:],direct0,latt)
-			if index[i] == 182:
-				print "temp_count 108 : " + str(temp_count)
+			#if index[i] == 182:
+			#	print "temp_count 108 : " + str(temp_count)
+			#print "entry " + str(i) + "  temp_count " + str(temp_count)
+			if temp_count > th:
+				mol_count = mol_count + 1
+				mol_list.append(index[i])
+	elif mode == 1:
+		direct1 = np.zeros((28,2))
+		direct1[0,:] = [-2,+1]
+		direct1[1,:] = [-1,+2]
+		direct1[2,:] = [+1,+2]
+		direct1[3,:] = [+2,+1]
+		direct1[4,:] = [+2,-1]
+		direct1[5,:] = [+1,-2]
+		direct1[6,:] = [-1,-2]
+		direct1[7,:] = [-2,-1]
+		# consider the neighbours in the diagonal
+		direct1[8,:] = [-4,0]
+		direct1[9,:] = [0,+4]
+		direct1[10,:] = [+4,0]
+		direct1[11,:] = [0,-4]
+		direct1[12,:] = [+2,-5]
+		direct1[13,:] = [+2,+5]
+		direct1[14,:] = [-2,+5]
+		direct1[15,:] = [-2,-5]
+		direct1[16,:] = [+5,-2]
+		direct1[17,:] = [+5,+2]
+		direct1[18,:] = [-5,+2]
+		direct1[19,:] = [-5,-2]
+		direct1[20,:] = [+2,-3]
+		direct1[21,:] = [+2,+3]
+		direct1[22,:] = [-2,+3]
+		direct1[23,:] = [-2,-3]
+		direct1[24,:] = [+3,-2]
+		direct1[25,:] = [+3,+2]
+		direct1[26,:] = [-3,+2]
+		direct1[27,:] = [-3,-2]
+		for i in range(num_mol):
+			temp_count = corr_num(mol[i,:],direct1,latt)
+			#if index[i] == 182:
+			#	print "temp_count 108 : " + str(temp_count)
 			#print "entry " + str(i) + "  temp_count " + str(temp_count)
 			if temp_count > th:
 				mol_count = mol_count + 1
@@ -180,13 +234,13 @@ mol = np.transpose(np.array(np.where(lattice == 3)))
 num_mol = mol.shape[0]
 		
 fig = plt.figure()	
-a = fig.add_subplot(1,3,1)
+a = fig.add_subplot(2,2,1)
 imgplot = plt.imshow(lattice)
 
 
 
 ############################### Dense packed ############################
-a = fig.add_subplot(1,3,2)
+a = fig.add_subplot(2,2,2)
 
 direct0 = np.zeros((8,2))
 direct0[0,:] = [-2,+1]
@@ -200,8 +254,11 @@ direct0[7,:] = [-2,-1]
 
 output0,latt0 = cluster(0, lattice, direct0)
 new_mol0 = []
+
+print "############# Here begins the dense packed information ###########"
 for i in range(len(output0)):
-	print "new: " + str(len(output0[i])) + "  " + str(output0[i])
+	if len(output0[i]) > 3 :
+		print "new: " + str(len(output0[i])) + "  " + str(output0[i])
 
 #print "##################################################"
 for i in range(len(output0)):
@@ -210,7 +267,8 @@ for i in range(len(output0)):
 		ind_num0 = ind0.shape[0]
 		ele0 = mol[ind0,:]
 		count0, mols0 = auto_correlate(0, 2, ele0, ind0, lattice)
-		new_mol0.append(mols0)
+		if count0 > 3:
+			new_mol0.append(mols0)
 
 for i in range(len(new_mol0)):
 	print "new: " + str(len(new_mol0[i])) + "  " + str(new_mol0[i])
@@ -234,11 +292,56 @@ imgplot = plt.imshow(new_latt0)
 
 ############################## 1D networks ################################
 
+a = fig.add_subplot(2,2,3)
 
+direct1 = np.zeros((12,2))
+direct1[0,:] = [-2,+1]
+direct1[1,:] = [-1,+2]
+direct1[2,:] = [+1,+2]
+direct1[3,:] = [+2,+1]
+direct1[4,:] = [+2,-1]
+direct1[5,:] = [+1,-2]
+direct1[6,:] = [-1,-2]
+direct1[7,:] = [-2,-1]
+direct1[8,:] = [-2,0]
+direct1[9,:] = [0,+2]
+direct1[10,:] = [+2,0]
+direct1[11,:] = [0,-2]
 
+output1,latt1 = cluster(1, lattice, direct1)
+new_mol1 = []
+new_latt1 = np.zeros((lattice.shape[0],lattice.shape[0]))
 
+print "############# Here begins the 1D information ###########"
+for i in range(len(output1)):
+	if len(output1[i]) > 3 :
+		print "new: " + str(len(output1[i])) + "  " + str(output1[i])
 
+#for i in range(len(output1)):
+#	if len(output1[i]) > 3:
+#		for j in range(len(output1[i])):
+#			plt.text(mol[output1[i][j]][1],mol[output1[i][j]][0], str(output1[i][j]),fontsize=8)
+#			new_latt1[mol[output1[i][j]][0]][mol[output1[i][j]][1]] = (i+1)*3
+			
+for i in range(len(output1)):
+	if len(output1[i]) > 3:
+		ind1 = np.transpose(np.array(output1[i]))
+		ind_num1 = ind1.shape[0]
+		ele1 = mol[ind1,:]
+		count1, mols1 = auto_correlate(1, 2, ele1, ind1, lattice)
+		if count1 > 3:
+			new_mol1.append(mols1)
+print "###############################"
+for i in range(len(new_mol1)):
+	print "new: " + str(len(new_mol1[i])) + "  " + str(new_mol1[i])
+	
+for i in range(len(new_mol1)):
+	for j in range(len(new_mol1[i])):
+		plt.text(mol[new_mol1[i][j]][1],mol[new_mol1[i][j]][0], str(new_mol1[i][j]),fontsize=10)
+		#print new_mol2[i][j]
+		new_latt1[mol[new_mol1[i][j]][0]][mol[new_mol1[i][j]][1]] = (i+1)*3		
 
+imgplot = plt.imshow(new_latt1)
 
 
 
@@ -248,7 +351,7 @@ imgplot = plt.imshow(new_latt0)
 ############################## 1D END ################################
 ################################ 2D networks ##############################
 
-a = fig.add_subplot(1,3,3)
+a = fig.add_subplot(2,2,4)
 direct2 = np.zeros((4,2))
 direct2[0,:] = [-2,0]
 direct2[1,:] = [0,+2]
@@ -256,18 +359,17 @@ direct2[2,:] = [+2,0]
 direct2[3,:] = [0,-2]
 output2,latt2 = cluster(2,lattice, direct2)
 
+print "############# Here begins 2D information ###########"
 for i in range(len(output2)):
-	print "new: " + str(len(output2[i])) + "  " + str(output2[i])
+	if len(output2[i]) > 3 :
+		print "new: " + str(len(output2[i])) + "  " + str(output2[i])
 
 
 new_mol2 = []
 for i in range(len(output2)):
 	if len(output2[i]) > 3:
 		ind2 = np.transpose(np.array(output2[i]))
-		#print ind
-		
 		ind_num2 = ind2.shape[0]
-		#print ind_num
 		ele2 = mol[ind2,:]
 		count2, mols2 = auto_correlate(2, 2, ele2, ind2, lattice)
 		new_mol2.append(mols2)
