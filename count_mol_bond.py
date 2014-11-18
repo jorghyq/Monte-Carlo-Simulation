@@ -13,7 +13,7 @@ dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results14"
 os.chdir(dname)
 latt_len = 80
 files = os.listdir(dname)
-line = files[31]
+line = files[32]
 print line
 lattice = np.loadtxt(line, delimiter=',',skiprows=1)
 ##################################################
@@ -130,15 +130,15 @@ def auto_correlate(mode, threshold, element, index, lattice):
 	# 2. auto-correlation
 	latt_len = lattice.shape[0]
 	latt = np.zeros((latt_len,latt_len))
-	#latt[tuple(map(tuple,element))] == 3
 	for i in range(element.shape[0]):
 		latt[tuple(element[i,:])] = 3
+	#metal = np.where(lattice == 1)
+	#latt[metal] = 1
 	th = threshold # elements with auto-correlation larger than threshold are chosen
 	mol_count = 0
 	# store the picked elements for debugging
 	mol_list = []
 	# get the positions of elements
-	#mol = np.transpose(np.array(np.where(lattice == 3)))
 	mol = element
 	num_mol = mol.shape[0]
 	#print num_mol
@@ -237,7 +237,9 @@ fig = plt.figure()
 a = fig.add_subplot(2,2,1)
 imgplot = plt.imshow(lattice)
 
-
+num_dense = 0
+num_1d = 0
+num_2d = 0
 
 ############################### Dense packed ############################
 a = fig.add_subplot(2,2,2)
@@ -281,6 +283,7 @@ for i in range(len(new_mol0)):
 	for j in range(len(new_mol0[i])):
 		plt.text(mol[new_mol0[i][j]][1],mol[new_mol0[i][j]][0], str(new_mol0[i][j]),fontsize=10)
 		new_latt0[mol[new_mol0[i][j]][0]][mol[new_mol0[i][j]][1]] = (i+1)*3
+	num_dense = num_dense + len(new_mol0[i])
 
 #for i in range(len(output0)):
 #	if len(output0[i]) > 3:
@@ -339,7 +342,8 @@ for i in range(len(new_mol1)):
 	for j in range(len(new_mol1[i])):
 		plt.text(mol[new_mol1[i][j]][1],mol[new_mol1[i][j]][0], str(new_mol1[i][j]),fontsize=10)
 		#print new_mol2[i][j]
-		new_latt1[mol[new_mol1[i][j]][0]][mol[new_mol1[i][j]][1]] = (i+1)*3		
+		new_latt1[mol[new_mol1[i][j]][0]][mol[new_mol1[i][j]][1]] = (i+1)*3
+	num_1d = num_1d + len(new_mol1[i])	
 
 imgplot = plt.imshow(new_latt1)
 
@@ -383,15 +387,17 @@ for i in range(len(new_mol2)):
 	for j in range(len(new_mol2[i])):
 		plt.text(mol[new_mol2[i][j]][1],mol[new_mol2[i][j]][0], str(new_mol2[i][j]),fontsize=10)
 		#print new_mol2[i][j]
-		new_latt2[mol[new_mol2[i][j]][0]][mol[new_mol2[i][j]][1]] = (i+1)*3	
+		new_latt2[mol[new_mol2[i][j]][0]][mol[new_mol2[i][j]][1]] = (i+1)*3
+	num_2d = num_2d + len(new_mol2[i])
 		
+		
+print "num_dense = " +str(num_dense) + "  " + "num_1d = " +str(num_1d) + "  " + "num_2d = " +str(num_2d) + "  "
 imgplot = plt.imshow(new_latt2)
 ############################## 2D Networks END ###########################
 plt.show()
 
 
-
-
+print "num_dense = " +str(num_dense) + "  " + "num_1d = " +str(num_1d) + "  " + "num_2d = " +str(num_2d) + "  "
 
 
 
