@@ -8,6 +8,9 @@ from copy import deepcopy
 
 
 ##################################################
+def sprint(txt, inp):
+	print txt + " : " + str(inp)
+	
 def prepro(lattice):
 	latt_len = lattice.shape[0]
 	mol = np.transpose(np.array(np.where(lattice == 3)))
@@ -246,7 +249,7 @@ def cluster(mode, lattice):
 						# change the label of these elements to the current_index
 						#latt[mol[connected_neighbours[j]][0]][mol[connected_neighbours[j]][1]] = i+1			
 			output_cluster.append(temp)
-	print output_cluster
+	#print output_cluster
 	new_mol = []
 	num_count = 0
 	for i in range(len(output_cluster)):
@@ -260,7 +263,7 @@ def cluster(mode, lattice):
 				num_count = num_count + len(mols)
 	return new_mol, num_count
 
-def get_coor_mol(input_coor):
+def get_coor_mol(input_coor,latt_len):
 	x = input_coor[0]
 	y = input_coor[1]
 	coor = np.zeros((5,2))
@@ -272,6 +275,7 @@ def get_coor_mol(input_coor):
 	return coor
 
 def cal_bond_num(latt):
+	latt_len = latt.shape[0]
 	direct = np.zeros((4,2))
 	direct[0,:] = [-1,0]
 	direct[1,:] = [0,+1]
@@ -287,7 +291,7 @@ def cal_bond_num(latt):
 	metal = np.array(zip(temp1,temp2))
 	#Get the points around this molecule
 	for i in range(0,num_mol):
-		pos_around0 = get_coor_mol(mol[i])[1:5]
+		pos_around0 = get_coor_mol(mol[i],latt_len)[1:5]
 		pos_around1 = pos_around0 + direct
 		pos_around2 = pos_around1 + direct
 		pos_around3 = pos_around2 + direct
@@ -309,7 +313,7 @@ if __name__ == "__main__":
 	os.chdir(dname)
 	latt_len = 80
 	files = os.listdir(dname)
-	line = files[32]
+	line = files[45]
 	print line
 	lattice = np.loadtxt(line, delimiter=',',skiprows=1)
 	mol = np.transpose(np.array(np.where(lattice == 3)))
@@ -317,20 +321,45 @@ if __name__ == "__main__":
 	num_mol = mol.shape[0]
 	cbond = cal_bond_num(lattice)
 	print cbond
-	output, count = cluster(1,lattice)
-	for i in range(len(output)):
-		if len(output[i]) > 3 :
-			print "new: " + str(len(output[i])) + "  " + str(output[i])
+	output0, count0 = cluster(0,lattice)
+	output1, count1 = cluster(1,lattice)
+	output2, count2 = cluster(2,lattice)
+	newlist = []
+	dislist = []
+	count3 = 0
+	mol_list = range(200)
+	for i in range(len(output0)):
+		for j in range(len(output0[i])):
+			if output0[i][j] not in newlist:
+				newlist.append(output0[i][j])
+	for i in range(len(output1)):
+		for j in range(len(output1[i])):
+			if output1[i][j] not in newlist:
+				newlist.append(output1[i][j])
+	for i in range(len(output2)):
+		for j in range(len(output2[i])):
+			if output2[i][j] not in newlist:
+				newlist.append(output2[i][j])
+	for i in range(200):
+		if i not in newlist:
+			count3 = count3 + 1
+			dislist.append(i)
+	sprint("count3",count3)
+	#for i in range(len(output)):
+	#	if len(output[i]) > 3 :
+	#		print "new: " + str(len(output[i])) + "  " + str(output[i])
 	fig = plt.figure()	
 	a = fig.add_subplot(1,2,1)
 	imgplot = plt.imshow(lattice)
 	new_latt1 = np.zeros((lattice.shape[0],lattice.shape[0]))
-	print " count : " + str(count)
-	for i in range(len(output)):
-		if len(output[i]) > 3:
-			for j in range(len(output[i])):
-				#plt.text(mol[output[i][j]][1],mol[output[i][j]][0], str(output[i][j]),fontsize=8)
-				new_latt1[mol[output[i][j]][0]][mol[output[i][j]][1]] = (i+1)*3
+	#print " count : " + str(count)
+	#for i in range(len(output)):
+		#if len(output[i]) > 3:
+			#for j in range(len(output[i])):
+				##plt.text(mol[output[i][j]][1],mol[output[i][j]][0], str(output[i][j]),fontsize=8)
+				#new_latt1[mol[output[i][j]][0]][mol[output[i][j]][1]] = (i+1)*3
+	for i in range(len(dislist)):
+		new_latt1[mol[dislist[i]][0]][mol[dislist[i]][1]] = (i+1)*3
 	a = fig.add_subplot(1,2,2)
 	imgplot = plt.imshow(new_latt1)
 	plt.show()
