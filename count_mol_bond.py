@@ -6,35 +6,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from copy import deepcopy
 
-#direct0 = np.zeros((8,2))
-#direct0[0,:] = [-2,+1]
-#direct0[1,:] = [-1,+2]
-#direct0[2,:] = [+1,+2]
-#direct0[3,:] = [+2,+1]
-#direct0[4,:] = [+2,-1]
-#direct0[5,:] = [+1,-2]
-#direct0[6,:] = [-1,-2]
-#direct0[7,:] = [-2,-1]
-#direct1 = np.zeros((12,2))
-#direct1[0,:] = [-2,+1]
-#direct1[1,:] = [-1,+2]
-#direct1[2,:] = [+1,+2]
-#direct1[3,:] = [+2,+1]
-#direct1[4,:] = [+2,-1]
-#direct1[5,:] = [+1,-2]
-#direct1[6,:] = [-1,-2]
-#direct1[7,:] = [-2,-1]
-#direct1[8,:] = [-2,0]
-#direct1[9,:] = [0,+2]
-#direct1[10,:] = [+2,0]
-#direct1[11,:] = [0,-2]
-#direct2 = np.zeros((4,2))
-#direct2[0,:] = [-2,0]
-#direct2[1,:] = [0,+2]
-#direct2[2,:] = [+2,0]
-#direct2[3,:] = [0,-2]
-
-# load the data
 
 ##################################################
 def prepro(lattice):
@@ -288,7 +259,6 @@ def cluster(mode, lattice):
 				new_mol.append(mols)
 				num_count = num_count + len(mols)
 	return new_mol, num_count
-	#return (output_cluster,latt)
 
 def get_coor_mol(input_coor):
 	x = input_coor[0]
