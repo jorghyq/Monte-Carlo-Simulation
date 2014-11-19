@@ -11,7 +11,7 @@
 using namespace std;
 
 
-int total_run = 100000000;
+int total_run = 100000;
 const int SECOND_LOOP = 1;
 const int lattice_size = 100;
 const int element_num = 1000;//12 * lattice_size;
@@ -608,8 +608,8 @@ void save_to_txt()
 	ss << cenergy << "-" << venergy << "-" << mcenergy << ".txt";
 	filename = ss.str();
 	cout<<"output to file: "<<filename<<endl;
-	//ofstream file(filename.c_str());
-	ofstream file("latt.txt");
+	ofstream file(filename.c_str());
+	//ofstream file("latt.txt");
 	string line;
 	stringstream linestream;
 	int *bond_num;
