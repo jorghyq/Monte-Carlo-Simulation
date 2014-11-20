@@ -15,11 +15,11 @@ int total_run = 100000;
 const int SECOND_LOOP = 1;
 const int lattice_size = 100;
 const int element_num = 1000;//12 * lattice_size;
-int num_molecule = 50;
-int num_metal = 50;
+int num_molecule = 200;
+int num_metal = 400;
 int num_total = num_molecule + num_metal;
 int cenergy = 10;
-double venergy = 2;
+double venergy = 3;
 int mcenergy = 10;
 int ctemp[2];
 int temp[5][2];
@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
 				points_t1 = det_neighbour(ind_x,ind_y,ind,5);
 				p2a(points_t1,&points_temp[0],5);
 				//print_array(points_t1,5);
-				if ((is_occupied(&points_temp[0],5)) == 0 && (is_forbidden(&points_temp[0],4)) == 0)
+				if ((is_occupied(&points_temp[0],5)) == 0)// && (is_forbidden(&points_temp[0],4)) == 0)
 				{
 					set_element(&points_temp[0],5,2,i);
 					state = 0;
@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
 				points_t1 = det_neighbour(ind_x,ind_y,ind,5);
 				p2a(points_t1,&points_temp[0],5);
 				//print_array(points_t1,4);
-				if (is_occupied(&points_temp[0],1) == 0 && is_forbidden(&points_temp[0],1) == 0)
+				if (is_occupied(&points_temp[0],1) == 0)// && is_forbidden(&points_temp[0],1) == 0)
 				{
 					set_element(&points_temp[4],1,1,i);
 					state = 0;
@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
 					points_t2 = det_neighbour(new_pos[0],new_pos[1],ind,5);
 					p2a(points_t2,points_new,5);
 					//print_array(points_t2,5);
-					if ((is_occupied(&points_new[0],5)) == 0 && (is_forbidden(&points_new[0],4)) == 0)
+					if ((is_occupied(&points_new[0],5)) == 0)// && (is_forbidden(&points_new[0],4)) == 0)
 					{
 						energy_old = cal_energy_mol(&points_old[0],4);
 						energy_new = cal_energy_mol(&points_new[0],4);
@@ -211,7 +211,7 @@ int main(int argc, char *argv[])
 					int new_pos[2] = {rand()%lattice_size,rand()%lattice_size};
 					points_t2 = det_neighbour(new_pos[0],new_pos[1],ind,5);
 					p2a(points_t2,&points_new[0],5);
-					if (is_occupied(&points_new[0],1) == 0 && is_forbidden(&points_new[0],1) == 0)
+					if (is_occupied(&points_new[0],1) == 0)// && is_forbidden(&points_new[0],1) == 0)
 					{
 						energy_old = cal_energy_metal(&points_old[0],4);
 						energy_new = cal_energy_metal(&points_new[0],4);
@@ -601,7 +601,7 @@ void save_to_txt()
 	string filename;
 	stringstream ss;
 	//ss<<total_run<<"-"<<lattice_size<<"-"<<num_molecule<<"-"<<num_metal<<"-"<<cenergy<<"-"<<venergy<<"-"<<mcenergy<<".txt";
-	ss << "results6\\";
+	ss << "results7\\";
 	ss.precision(1);
 	ss.setf(ios::scientific);
 	ss << double(total_run) << "-" << lattice_size << "-" << num_molecule << "-" << num_metal << "-";

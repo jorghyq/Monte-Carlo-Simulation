@@ -24,11 +24,13 @@ class McAnalyzer:
 	def __init__(self, wd_path):
 		self.path = wd_path
 		
-	def set_initial(self,nmet_init,nmet_step,cenergy_init,cernegy_step):
+	def set_initial(self,nmet_init,nmet_step,cenergy_init,cernegy_step,venergy_init,venergy_step):
 		self.nmet_init = nmet_init
 		self.nmet_step = nmet_step
 		self.cenergy_init = cenergy_init
 		self.cernegy_step = cernegy_step
+		self.venergy_int = venergy_init
+		self.venergy_step = venergy_step
 		
 	
 	def load_txt(self,txt_name):
@@ -36,17 +38,21 @@ class McAnalyzer:
 		namedata = txt_name[0:-4].strip().split('-')
 		self.latt_len = int(namedata[1])
 		self.num_metal = int(namedata[3])
+		self.num_mol = int(namedata[2])
 		self.nmetal_ind = (self.num_metal - self.nmet_init)/self.nmet_step
 		self.cenergy = float(namedata[4])
 		self.cenergy_ind = (self.cenergy - self.cenergy_init)/self.cernegy_step
+		self.venergy_ind = (self.venergy - self.venergy_init)/self.vernegy_step
 		####### information from the header #######
 		f = open(txt_name, 'r')
 		headdata = f.readline().strip().split(',')
 		f.close()
 		self.cbond_num = float(headdata[0])
-		self.cbond_num_av = self.cbond_num/float(self.num_metal)	
+		self.cbond_num_av = self.cbond_num/float(self.num_metal)
+		self.cbond_num_avt = self.cbond_num/float(self.num_metal + self.num_mol)	
 		self.vbond_num = float(headdata[1])
 		self.total_energy = float(headdata[2])
+		self.energy_av = self.total_energy/float(self.num_metal + self.num_mol)
 		####### information from the matrix #######
 		self.lattice = np.loadtxt(txt_name, delimiter=',',skiprows=1)
 		self.lattice = self.lattice[0:self.latt_len,0:]
@@ -74,7 +80,7 @@ ind_metal = (nmetal_final - nmetal_initial)/nmetal_step + 1
 ind_cenergy = (cenergy_final - cenergy_initial)/cenergy_step + 1
 
 analyzer = McAnalyzer(dname)
-analyzer.set_initial(nmetal_initial,nmetal_step,cenergy_initial,cenergy_step)
+analyzer.set_initial(nmetal_initial,nmetal_step,cenergy_initial,cenergy_step,3,1)
 #sprint("nmetal_intial",nmetal_initial)
 #sprint("nmetal_final",nmetal_final)
 #sprint("cenergy_initial",cenergy_initial)
@@ -99,7 +105,8 @@ totalenergy = np.zeros((ind_metal,ind_cenergy))
 cbond_num = np.zeros((ind_metal,ind_cenergy))
 vbond_num = np.zeros((ind_metal,ind_cenergy))
 cbond_num_av = np.zeros((ind_metal,ind_cenergy))
-
+totalenergy_av = np.zeros((ind_metal,ind_cenergy))
+cbond_num_avt = np.zeros((ind_metal,ind_cenergy))
 for line in files:
 	if line[0] == '1':
 		analyzer.load_txt(line)
@@ -107,11 +114,15 @@ for line in files:
 		cbond_num[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.cbond_num
 		vbond_num[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.vbond_num
 		cbond_num_av[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.cbond_num_av
+		totalenergy_av[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.energy_av
+		cbond_num_avt[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.cbond_num_avt
 		
 np.savetxt("totalenergy.txt",totalenergy,delimiter=',')	
 np.savetxt("cbond_num.txt",cbond_num,delimiter=',')
 np.savetxt("vbond_num.txt",vbond_num,delimiter=',')
 np.savetxt("cbond_num_av.txt",cbond_num_av,delimiter=',')
+np.savetxt("totalenergy_av.txt",totalenergy_av,delimiter=',')
+np.savetxt("cbond_num_avt.txt",cbond_num_avt,delimiter=',')
 #print mdense.shape
 #for line in files:
 	#if line[0] == '1':
@@ -154,6 +165,9 @@ np.savetxt("cbond_num_av.txt",cbond_num_av,delimiter=',')
 #m2d = np.loadtxt("m2d.txt", delimiter=',')
 #mdis = np.loadtxt("mdis.txt", delimiter=',')
 #mtotal = mdense + m1d + m2d + mdis
+#totalenergy_av = np.loadtxt("totalenergy_av.txt",delimiter=',')
+#cbond_num_avt = np.loadtxt("cbond_num_avt.txt",delimiter=',')
+
 
 #mdense_p = mdense/mtotal
 #m1d_p = m1d/mtotal
@@ -200,7 +214,7 @@ xmetal = np.array(range(nmetal_initial,nmetal_final + 10,nmetal_step))
 
 ##################################################################
 fig = plt.figure()
-fig.add_subplot(2,2,1)
+fig.add_subplot(2,3,1)
 for i in range(0,totalenergy.shape[1]):
 	plt.plot(xmetal,totalenergy[:,i],label = 'cenerg = %d' % (i*2+1))
 	plt.text(xmetal[int(ind_metal/2)],totalenergy[int(ind_metal/2),i], str(i*2+1),fontsize=8)
@@ -209,7 +223,7 @@ plt.xlabel('number of metals')
 plt.ylabel('total energy')
 
 
-fig.add_subplot(2,2,2)
+fig.add_subplot(2,3,2)
 for i in range(0,cbond_num.shape[1]):
 	plt.plot(xmetal,cbond_num[:,i],label = 'cenerg = %d' % (i*2+1))
 	plt.text(xmetal[int(ind_metal/2)],cbond_num[int(ind_metal/2),i], str(i*2+1),fontsize=8)
@@ -217,7 +231,7 @@ plt.legend(loc=0,fontsize = 8)
 plt.xlabel('number of metals')
 plt.ylabel('number of coordination bond')
 
-fig.add_subplot(2,2,3)
+fig.add_subplot(2,3,3)
 for i in range(0,vbond_num.shape[1]):
 	plt.plot(xmetal,vbond_num[:,i],label = 'cenerg = %d' % (i*2+1))
 	plt.text(xmetal[int(ind_metal/2)],vbond_num[int(ind_metal/2),i], str(i*2+1),fontsize=8)
@@ -225,11 +239,27 @@ plt.legend(loc=0,fontsize = 8)
 plt.xlabel('number of metals')
 plt.ylabel('number of vdW bond')
 
-fig.add_subplot(2,2,4)
+fig.add_subplot(2,3,4)
 for i in range(0,cbond_num_av.shape[1]):
 	plt.plot(xmetal,cbond_num_av[:,i],label = 'cenerg = %d' % (i*2+1))
 	plt.text(xmetal[int(ind_metal/2)],cbond_num_av[int(ind_metal/2),i], str(i*2+1),fontsize=8)
 plt.legend(loc=0,fontsize = 8)
 plt.xlabel('number of metals')
-plt.ylabel('ratio between coordiation bond/number of metals')
+plt.ylabel('total coordination bond per metal')
+
+fig.add_subplot(2,3,5)
+for i in range(0,totalenergy_av.shape[1]):
+	plt.plot(xmetal,totalenergy_av[:,i],label = 'cenerg = %d' % (i*2+1))
+	plt.text(xmetal[int(ind_metal/2)],totalenergy_av[int(ind_metal/2),i], str(i*2+1),fontsize=8)
+plt.legend(loc=0,fontsize = 8)
+plt.xlabel('number of metals')
+plt.ylabel('total energy per element')
+
+fig.add_subplot(2,3,6)
+for i in range(0,cbond_num_avt.shape[1]):
+	plt.plot(xmetal,cbond_num_avt[:,i],label = 'cenerg = %d' % (i*2+1))
+	plt.text(xmetal[int(ind_metal/2)],cbond_num_avt[int(ind_metal/2),i], str(i*2+1),fontsize=8)
+plt.legend(loc=0,fontsize = 8)
+plt.xlabel('number of metals')
+plt.ylabel('total coordination bond per element')
 plt.show()
