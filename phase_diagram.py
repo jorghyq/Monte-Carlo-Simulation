@@ -37,15 +37,15 @@ g = m2d_p
 b = mdense_p
 #mdis_p = mdis/mtotal
 #colors = np.zeros((nmetal_ind,cenergy_ind,3))
-#rgb = np.dstack((r,g,b))
+rgb = np.dstack((r,g,b))
 #print rgb
 #print rgb.shape
 #print rgb
-#im = Image.fromarray(np.uint8(rgb*255.999))
+im = Image.fromarray(np.uint8(rgb*255.999))
 #print im
 plt.figure()
-plt.scatter()
-#plt.imshow(im,extent=[1,19,0,400],aspect="auto")
+#plt.scatter()
+plt.imshow(im,extent=[1,19,0,400],aspect="auto")
 plt.xlabel("Ec/Ev")
 plt.ylabel("number of metals")
 plt.show()
