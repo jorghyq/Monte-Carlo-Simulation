@@ -11,7 +11,7 @@
 using namespace std;
 
 
-int total_run = 100000000;
+int total_run = 1000000;
 const int SECOND_LOOP = 1;
 const int lattice_size = 100;
 const int element_num = 1000;//12 * lattice_size;
@@ -243,14 +243,14 @@ int main(int argc, char *argv[])
 			//	cout<<" old energy: "<<energy_old<<" new energy: "<<energy_new<<" probability: "<<p<<" random: "<<p_temp<<endl;
 
 			//	} 
-			last_energy = energy_sys;
+			//last_energy = energy_sys;
 			//cout<<" system energy: "<<energy_sys<<endl;
-			if((l%(total_run/10)) == 0)
-			{
-				finish = clock();
-				energy_sys = cal_energy_sys();
-				cout<<"current number: "<< l/(total_run/10)<<",time: "<<(finish-start)/CLOCKS_PER_SEC<<" system energy: "<<energy_sys<<endl;
-			}
+			//if((l%(total_run/10)) == 0)
+			//{
+			//	finish = clock();
+			//	energy_sys = cal_energy_sys();
+			//	cout<<"current number: "<< l/(total_run/10)<<",time: "<<(finish-start)/CLOCKS_PER_SEC<<" system energy: "<<energy_sys<<endl;
+			//}
 		}
 	}
 	finish = clock();
@@ -601,15 +601,15 @@ void save_to_txt()
 	string filename;
 	stringstream ss;
 	//ss<<total_run<<"-"<<lattice_size<<"-"<<num_molecule<<"-"<<num_metal<<"-"<<cenergy<<"-"<<venergy<<"-"<<mcenergy<<".txt";
-	ss << "results6\\";
+	ss << "results3\\";
 	ss.precision(1);
 	ss.setf(ios::scientific);
 	ss << double(total_run) << "-" << lattice_size << "-" << num_molecule << "-" << num_metal << "-";
 	ss << cenergy << "-" << venergy << "-" << mcenergy << ".txt";
 	filename = ss.str();
 	cout<<"output to file: "<<filename<<endl;
-	//ofstream file(filename.c_str());
-	ofstream file("latt.txt");
+	ofstream file(filename.c_str());
+	//ofstream file("latt.txt");
 	string line;
 	stringstream linestream;
 	int *bond_num;

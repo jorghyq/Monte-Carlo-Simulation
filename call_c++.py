@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import time
 
 # weired
-total_run = 10000000
+total_run = 1000000
 latt_len = 80
 num_mol = 200
 num_metal = 50
@@ -52,7 +52,7 @@ while num_metal < num_metal_max:
 	while cenergy < cenergy_max:
 		venergy = venergy_initial
 		while venergy < venergy_max:
-			os.system('mc-rect-lattice-func2 -a %d -b %d -c %d -d %d -e %f -f %d' % (total_run,num_mol,num_metal,cenergy,venergy,mcenergy))
+			os.system('mc-rect-lattice-func -a %d -b %d -c %d -d %d -e %f -f %d' % (total_run,num_mol,num_metal,cenergy,venergy,mcenergy))
 			venergy = venergy + venergy_step
 		#lattice = np.loadtxt("results3\%.1e-%d-%d-%d-%d-%d.txt" % (total_run,num_mol,num_metal,cenergy,venergy,mcenergy), delimiter=',')
 		#plt.imsave("results3\%.1e-%d-%d-%d-%d-%d.png" % (total_run,num_mol,num_metal,cenergy,venergy,mcenergy),lattice,[0,2])

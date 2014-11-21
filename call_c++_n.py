@@ -8,29 +8,31 @@ import scipy as sp
 import random as rd
 import matplotlib.pyplot as plt
 import time
-from analyzer import McAnalayzer
+from analyzer import McAnalyzer
 
-run_times = 10
+run_times = 5
 
 total_run = 10000000
-latt_len = 80
+latt_len = 100
 num_mol = 200
-num_metal = 50
+num_metal = 0
 cenergy_initial = 1
 venergy_initial = 1
 mcenergy_initial = 1
 
 num_metal_max = 450
-cenergy_max = 29
+cenergy_max = 35
 num_metal_step = 50
 cenergy_step = 2
 venergy_max = 3
 venergy_step = 2
 
 nmetal_ind = (num_metal_max - num_metal)/num_metal_step + 1
-cenergy_ind = (cenergy_max - num_metal)/cenergy_step + 1
+cenergy_ind = (cenergy_max - cenergy_initial)/cenergy_step + 1
 venergy_ind = (venergy_max - venergy_initial)/venergy_step + 1
-
+print nmetal_ind
+print cenergy_ind
+print venergy_ind
 ########################################################################
 # 0.dim: venergy
 # 1.dim: runtimes
@@ -38,15 +40,15 @@ venergy_ind = (venergy_max - venergy_initial)/venergy_step + 1
 # 3.dim: nmetal
 # 4.dim: total_energy, av_energy, total_coordination, av_coordination, dense, 1d, 2d, disordered
 ##########################################################################
-results = np.zeros((run_times,cenergy_ind,nmetal_ind,8))
+results = np.zeros((venergy_ind,run_times,cenergy_ind,nmetal_ind,8))
 
 ###### generate the log file
 
-dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results6"
-os.chdir(dname)
-f = open('D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results6\logfile.txt', 'w')
+dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results3"
+#os.chdir(dname)
+f = open('D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results3\logfile.txt', 'w')
 f.write('This is the logfile for the following settings.\n')
-f.write('There is no constrained, no is_forbidden function.\n')
+#f.write('There is no constrained, no is_forbidden function.\n')
 f.write('run_times: ' + str(run_times) + '\n')
 f.write('total_run: ' + str(total_run) + '\n')
 f.write('latt_len: ' + str(latt_len) + '\n')
@@ -63,8 +65,10 @@ f.write('venergy_initial: ' + str(venergy_initial) + '\n')
 f.write('venergy_step: ' + str(venergy_step) + '\n')
 f.close()
 
-az = McAnalayzer(dname)
-analyzer.set_initial(nmetal_initial,nmetal_step,cenergy_initial,cenergy_step,venergy_initial,venergy_step)
+az = McAnalyzer(dname)
+az.set_initial(num_metal,num_metal_step,cenergy_initial,cenergy_step,venergy_initial,venergy_step)
+
+
 
 #venergy = venergy_initial
 while num_metal <= num_metal_max:
@@ -73,49 +77,66 @@ while num_metal <= num_metal_max:
 	while cenergy <= cenergy_max:
 		venergy = venergy_initial
 		while venergy <= venergy_max:
-			for i in range(run_times):
-				os.system('mc-rect-lattice-func2 -a %d -b %d -c %d -d %d -e %f -f %d' % (total_run,num_mol,num_metal,cenergy,venergy,mcenergy))
-				
+			i = 0
+			while i < run_times:
+				os.system('mc-rect-lattice-func -a %d -b %d -c %d -d %d -e %f -f %d' % (total_run,num_mol,num_metal,cenergy,venergy,mcenergy))
 				str_venergy = '%.1e'% venergy + str(0)
 				str_total_run = '1.0e+007'
-				line = str_total_run+'-'+str(latt_len)+'-'+str(num_mol)+'-'+str(num_metal)+'-'+str(cenergy)+'-'+str_venergy+'-'+str(mcenergy)
+				line = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results3\\"+str_total_run+'-'+str(latt_len)+'-'+str(num_mol)+'-'+str(num_metal)+'-'+str(cenergy)+'-'+str_venergy+'-'+str(mcenergy)+'.txt'
+				print line
+				#tpath,line = os.path.split(line)
+				#print line
 				az.load_txt(line)
-				results[az.venergy_ind][i][az.cenergy_ind][az.nmetal_ind][0] = az.totalenergy
-				results[az.venergy_ind][i][az.cenergy_ind][az.nmetal_ind][1] = az.totalenergy_av
-				results[az.venergy_ind][i][az.cenergy_ind][az.nmetal_ind][2] = az.cbond_num
-				results[az.venergy_ind][i][az.cenergy_ind][az.nmetal_ind][3] = az.cbond_num_avt
+				print int(az.cenergy_ind)
+				print int(az.venergy_ind)
+				print int(az.nmetal_ind)
+				
+
+				
 				mols0, count0 = az.clustering(0)
 				mols1, count1 = az.clustering(1)
 				mols2, count2 = az.clustering(2)
 				newlist = []
 				count3 = 0
 				mol_list = range(200)
-				for i in range(len(mols0)):
-					for j in range(len(mols0[i])):
-						if mols0[i][j] not in newlist:
-							newlist.append(mols0[i][j])
-				for i in range(len(mols1)):
-					for j in range(len(mols1[i])):
-						if mols1[i][j] not in newlist:
-							newlist.append(mols1[i][j])
-				for i in range(len(mols2)):
-					for j in range(len(mols2[i])):
-						if mols2[i][j] not in newlist:
-							newlist.append(mols2[i][j])
-				for i in range(200):
-					if i not in newlist:
+				for j in range(len(mols0)):
+					for k in range(len(mols0[j])):
+						if mols0[j][k] not in newlist:
+							newlist.append(mols0[j][k])
+				for j in range(len(mols1)):
+					for k in range(len(mols1[j])):
+						if mols1[j][k] not in newlist:
+							newlist.append(mols1[j][k])
+				for j in range(len(mols2)):
+					for k in range(len(mols2[j])):
+						if mols2[j][k] not in newlist:
+							newlist.append(mols2[j][k])
+				for j in range(200):
+					if j not in newlist:
 						count3 = count3 + 1
-				results[az.venergy_ind][i][az.cenergy_ind][az.nmetal_ind][4] = count0
-				results[az.venergy_ind][i][az.cenergy_ind][az.nmetal_ind][5] = count1
-				results[az.venergy_ind][i][az.cenergy_ind][az.nmetal_ind][6] = count2
-				results[az.venergy_ind][i][az.cenergy_ind][az.nmetal_ind][7] = count3
 				
-				venergy = venergy + venergy_step
+				results[int(az.venergy_ind)][i][int(az.cenergy_ind)][int(az.nmetal_ind)][0] = az.total_energy
+				results[int(az.venergy_ind)][i][int(az.cenergy_ind)][int(az.nmetal_ind)][1] = az.energy_av
+				results[int(az.venergy_ind)][i][int(az.cenergy_ind)][int(az.nmetal_ind)][2] = az.cbond_num
+				results[int(az.venergy_ind)][i][int(az.cenergy_ind)][int(az.nmetal_ind)][3] = az.cbond_num_avt
+				results[int(az.venergy_ind)][i][int(az.cenergy_ind)][int(az.nmetal_ind)][4] = count0
+				results[int(az.venergy_ind)][i][int(az.cenergy_ind)][int(az.nmetal_ind)][5] = count1
+				results[int(az.venergy_ind)][i][int(az.cenergy_ind)][int(az.nmetal_ind)][6] = count2
+				results[int(az.venergy_ind)][i][int(az.cenergy_ind)][int(az.nmetal_ind)][7] = count3
+				
+				print "num_mtetal: " + str(num_metal) + " run: " + str(i)  + " cenergy : " + str(cenergy) + " venergy: " + str(venergy)
+				i = i + 1
+			venergy = venergy + venergy_step
 		#lattice = np.loadtxt("results3\%.1e-%d-%d-%d-%d-%d.txt" % (total_run,num_mol,num_metal,cenergy,venergy,mcenergy), delimiter=',')
 		cenergy = cenergy + cenergy_step
 		mcenergy = mcenergy + cenergy_step
 		#print "num_metal = %d, venerg = %d" % (num_metal,venergy)
 		
 	num_metal = num_metal + num_metal_step
-	
 
+
+#print results 
+
+print "Done..."
+np.save("D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results3\\results",results)
+#np.savetxt("results.txt",results,delimiter=',',fmt='%1.3f')	
