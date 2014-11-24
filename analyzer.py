@@ -70,7 +70,7 @@ class McAnalyzer:
 
 if __name__ == "__main__":
 	# go to the working directory
-	dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results13"
+	dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results2"
 	os.chdir(dname)
 	# load the data
 	files = os.listdir(dname)
