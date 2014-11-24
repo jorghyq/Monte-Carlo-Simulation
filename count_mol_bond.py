@@ -36,7 +36,6 @@ def find_neighbour(mode, coor, direct, lattice):
 	x = coor[0]
 	y = coor[1]
 	if mode == 2:
-		
 		for i in range(0,direct.shape[0]):
 			temp_coor1 = [sir(x+direct[i,0],latt_len),sir(y+direct[i,1],latt_len)]
 			if lattice[temp_coor1[0]][temp_coor1[1]] == 1000:
@@ -49,7 +48,6 @@ def find_neighbour(mode, coor, direct, lattice):
 			if lattice[temp_coor1[0]][temp_coor1[1]] != 0 and lattice[temp_coor1[0]][temp_coor1[1]] != 1000:
 				neighbours.append(lattice[temp_coor1[0],temp_coor1[1]]-1)
 	elif mode == 1:
-		
 		direct_dense = direct[0:8,:]
 		direct_2d = direct[8:12,:]
 		for i in range(0,direct_dense.shape[0]):
@@ -63,7 +61,15 @@ def find_neighbour(mode, coor, direct, lattice):
 				temp_coor2 = [sir(temp_coor1[0]+direct_2d[i,0],latt_len),sir(temp_coor1[1]+direct_2d[i,1],latt_len)]
 				if lattice[temp_coor2[0]][temp_coor2[1]] != 0 and lattice[temp_coor2[0]][temp_coor2[1]] != 1000:
 					if len(find_neighbour(2,temp_coor2,direct_2d,lattice)) < 3:
-						neighbours.append(lattice[temp_coor2[0],temp_coor2[1]]-1)					
+						neighbours.append(lattice[temp_coor2[0],temp_coor2[1]]-1)
+	elif mode == 3:
+		for i in range(0,direct.shape[0]):
+			temp_coor1 = [sir(x+direct[i,0],latt_len),sir(y+direct[i,1],latt_len)]
+			if lattice[temp_coor1[0]][temp_coor1[1]] == 1000:
+				for j in range(0,direct.shape[0]):
+					temp_coor2 = [sir(temp_coor1[0]+direct[i,0],latt_len),sir(temp_coor1[1]+direct[i,1],latt_len)]
+					if lattice[temp_coor2[0]][temp_coor2[1]] != 0 and lattice[temp_coor2[0]][temp_coor2[1]] != 1000:
+						neighbours.append(lattice[temp_coor2[0],temp_coor2[1]]-1)			
 	return neighbours
 
 def corr_num(coor, direction, lattice):
@@ -222,6 +228,13 @@ def cluster(mode, lattice):
 		direct[10,:] = [+2,0]
 		direct[11,:] = [0,-2]
 	elif mode == 2:
+		direct = np.zeros((4,2))
+		direct[0,:] = [-2,0]
+		direct[1,:] = [0,+2]
+		direct[2,:] = [+2,0]
+		direct[3,:] = [0,-2]
+	# for the very dense packed coordination bond
+	elif mode == 3:
 		direct = np.zeros((4,2))
 		direct[0,:] = [-2,0]
 		direct[1,:] = [0,+2]
