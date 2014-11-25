@@ -12,22 +12,23 @@ import time
 total_run = 10000000
 latt_len = 100
 num_mol = 200
-num_metal = 400
-cenergy_initial = 1
-venergy_initial = 1
-mcenergy_initial = 1
+num_metal = 50
+cenergy_initial = 5
+venergy_initial = 10
+mcenergy_initial = 5
 
 num_metal_max = 450
-cenergy_max = 29
+cenergy_max = 90
 num_metal_step = 50
-cenergy_step = 2
-venergy_max = 1
-venergy_step = 2
+
+venergy_step = 1
+cenergy_step = 8
+venergy_max = 10
 ###### generate the log file
 
-dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results8"
+dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results9"
 #os.chdir(dname)
-f = open('D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results8\logfile.txt', 'w')
+f = open('D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results9\logfile.txt', 'w')
 f.write('This is the logfile for the following settings.\n')
 f.write('There is no constrained, no is_forbidden function.\n')
 f.write('total_run: ' + str(total_run) + '\n')
@@ -62,4 +63,18 @@ while num_metal <= num_metal_max:
 		
 	num_metal = num_metal + num_metal_step
 	
-
+#while num_metal <= num_metal_max:
+	#venergy = venergy_initial
+	#while venergy <= venergy_max:
+		#cenergy = venergy
+		#mcenergy = venergy
+		#for i in range(10):
+			#os.system('mc-rect-lattice-func2 -a %d -b %d -c %d -d %d -e %f -f %d' % (total_run,num_mol,num_metal,cenergy,venergy,mcenergy))
+			#cenergy = cenergy + cenergy_step
+			#mcenergy = mcenergy + cenergy_step
+		#venergy = venergy + venergy_step
+		##lattice = np.loadtxt("results3\%.1e-%d-%d-%d-%d-%d.txt" % (total_run,num_mol,num_metal,cenergy,venergy,mcenergy), delimiter=',')
+		##plt.imsave("results3\%.1e-%d-%d-%d-%d-%d.png" % (total_run,num_mol,num_metal,cenergy,venergy,mcenergy),lattice,[0,2])
+		
+		##print "num_metal = %d, venerg = %d" % (num_metal,venergy)
+	#num_metal = num_metal + num_metal_step

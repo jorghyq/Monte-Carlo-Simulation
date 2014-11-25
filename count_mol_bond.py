@@ -13,6 +13,7 @@ def sprint(txt, inp):
 	
 def prepro(lattice):
 	latt_len = lattice.shape[0]
+	#print "latt_len (prepro) :" + str(latt_len)
 	mol = np.transpose(np.array(np.where(lattice == 3)))
 	output = np.zeros((latt_len,latt_len))
 	#print mol.shape[0]
@@ -66,10 +67,13 @@ def find_neighbour(mode, coor, direct, lattice):
 		for i in range(0,direct.shape[0]):
 			temp_coor1 = [sir(x+direct[i,0],latt_len),sir(y+direct[i,1],latt_len)]
 			if lattice[temp_coor1[0]][temp_coor1[1]] == 1000:
-				for j in range(0,direct.shape[0]):
-					temp_coor2 = [sir(temp_coor1[0]+direct[i,0],latt_len),sir(temp_coor1[1]+direct[i,1],latt_len)]
+				new_direct = [0,1,2,3]
+				new_direct.remove(sir(i+2,4))
+				#print "i: " + str(i) + " directi left: " + str(new_direct)
+				for j in new_direct:
+					temp_coor2 = [sir(temp_coor1[0]+direct[j,0],latt_len),sir(temp_coor1[1]+direct[j,1],latt_len)]
 					if lattice[temp_coor2[0]][temp_coor2[1]] != 0 and lattice[temp_coor2[0]][temp_coor2[1]] != 1000:
-						neighbours.append(lattice[temp_coor2[0],temp_coor2[1]]-1)			
+						neighbours.append(lattice[temp_coor2[0],temp_coor2[1]]-1)		
 	return neighbours
 
 def corr_num(coor, direction, lattice):
@@ -119,8 +123,6 @@ def auto_correlate(mode, threshold, element, index, lattice):
 		# go through each cluster
 		for i in range(num_mol):
 			temp_count = corr_num(mol[i,:],direction,latt)
-
-			#print "entry " + str(i) + "  temp_count " + str(temp_count)
 			if temp_count > th:
 				mol_count = mol_count + 1
 				mol_list.append(index[i])
@@ -146,9 +148,6 @@ def auto_correlate(mode, threshold, element, index, lattice):
 		direct0[15,:] = [-1,-3]
 		for i in range(num_mol):
 			temp_count = corr_num(mol[i,:],direct0,latt)
-			#if index[i] == 182:
-			#	print "temp_count 108 : " + str(temp_count)
-			#print "entry " + str(i) + "  temp_count " + str(temp_count)
 			if temp_count > th:
 				mol_count = mol_count + 1
 				mol_list.append(index[i])
@@ -191,9 +190,30 @@ def auto_correlate(mode, threshold, element, index, lattice):
 			if temp_count > th:
 				mol_count = mol_count + 1
 				mol_list.append(index[i])
+	elif mode == 3:
+		direction = np.zeros((12,2))
+		direction[0,:] = [-4,0]
+		direction[1,:] = [-4,+4]
+		direction[2,:] = [0,+4]
+		direction[3,:] = [+4,+4]
+		direction[4,:] = [+4,0]
+		direction[5,:] = [+4,-4]
+		direction[6,:] = [0,-4]
+		direction[7,:] = [-4,-4]
+		direction[8,:] = [-2,+2]
+		direction[9,:] = [+2,+2]
+		direction[10,:] = [+2,-2]
+		direction[11,:] = [-2,-2]
+		# go through each cluster
+		for i in range(num_mol):
+			temp_count = corr_num(mol[i,:],direction,latt)
+			if temp_count > th:
+				mol_count = mol_count + 1
+				mol_list.append(index[i])
 	return (mol_count,mol_list)
 				
 def cluster(mode, lattice):
+	threshold = 2
 	latt = deepcopy(lattice)
 	latt = prepro(latt)
 	mol = np.transpose(np.array(np.where(lattice == 3)))
@@ -240,6 +260,7 @@ def cluster(mode, lattice):
 		direct[1,:] = [0,+2]
 		direct[2,:] = [+2,0]
 		direct[3,:] = [0,-2]
+		threshold = 3
 	for i in range(0,num_mol):
 		if output[i] == i+1:
 			temp = [i] # list that store the connected elements
@@ -270,7 +291,7 @@ def cluster(mode, lattice):
 			ind = np.transpose(np.array(output_cluster[i]))
 			ind_num = ind.shape[0]
 			ele = mol[ind,:]
-			count, mols = auto_correlate(mode, 2, ele, ind, lattice)
+			count, mols = auto_correlate(mode, threshold, ele, ind, lattice)
 			if count > 3:
 				new_mol.append(mols)
 				num_count = num_count + len(mols)
@@ -322,13 +343,14 @@ def cal_bond_num(latt):
 	return cbond
 
 if __name__ == "__main__":
-	dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results14"
+	dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results16\\4-fold-ev-3"
 	os.chdir(dname)
-	latt_len = 80
+	latt_len = 100
 	files = os.listdir(dname)
 	line = files[45]
 	print line
 	lattice = np.loadtxt(line, delimiter=',',skiprows=1)
+	lattice = lattice[0:latt_len,0:]
 	mol = np.transpose(np.array(np.where(lattice == 3)))
 	#print mol
 	num_mol = mol.shape[0]
@@ -337,9 +359,10 @@ if __name__ == "__main__":
 	output0, count0 = cluster(0,lattice)
 	output1, count1 = cluster(1,lattice)
 	output2, count2 = cluster(2,lattice)
+	output3, count3 = cluster(3,lattice)
 	newlist = []
 	dislist = []
-	count3 = 0
+	count4 = 0
 	mol_list = range(200)
 	for i in range(len(output0)):
 		for j in range(len(output0[i])):
@@ -353,26 +376,57 @@ if __name__ == "__main__":
 		for j in range(len(output2[i])):
 			if output2[i][j] not in newlist:
 				newlist.append(output2[i][j])
+	for i in range(len(output3)):
+		for j in range(len(output3[i])):
+			if output3[i][j] not in newlist:
+				newlist.append(output3[i][j])
 	for i in range(200):
 		if i not in newlist:
-			count3 = count3 + 1
+			count4 = count4 + 1
 			dislist.append(i)
-	sprint("count3",count3)
-	#for i in range(len(output)):
-	#	if len(output[i]) > 3 :
-	#		print "new: " + str(len(output[i])) + "  " + str(output[i])
+	sprint("count4",count4)
+	for i in range(len(output3)):
+		if len(output3[i]) > 3 :
+			print "new: " + str(len(output3[i])) + "  " + str(output3[i])
 	fig = plt.figure()	
-	a = fig.add_subplot(1,2,1)
+	a = fig.add_subplot(2,3,1)
 	imgplot = plt.imshow(lattice)
 	new_latt1 = np.zeros((lattice.shape[0],lattice.shape[0]))
+	new_latt2 = np.zeros((lattice.shape[0],lattice.shape[0]))
+	new_latt3 = np.zeros((lattice.shape[0],lattice.shape[0]))
+	new_latt4 = np.zeros((lattice.shape[0],lattice.shape[0]))
 	#print " count : " + str(count)
-	#for i in range(len(output)):
-		#if len(output[i]) > 3:
-			#for j in range(len(output[i])):
-				##plt.text(mol[output[i][j]][1],mol[output[i][j]][0], str(output[i][j]),fontsize=8)
-				#new_latt1[mol[output[i][j]][0]][mol[output[i][j]][1]] = (i+1)*3
-	for i in range(len(dislist)):
-		new_latt1[mol[dislist[i]][0]][mol[dislist[i]][1]] = (i+1)*3
-	a = fig.add_subplot(1,2,2)
+	a = fig.add_subplot(2,3,2)
+	for i in range(len(output0)):
+		if len(output0[i]) > 3:
+			for j in range(len(output0[i])):
+				#plt.text(mol[output3[i][j]][1],mol[output3[i][j]][0], str(output3[i][j]),fontsize=8)
+				new_latt1[mol[output0[i][j]][0]][mol[output0[i][j]][1]] = (i+1)*3
 	imgplot = plt.imshow(new_latt1)
+	a = fig.add_subplot(2,3,3)
+	for i in range(len(output1)):
+		if len(output1[i]) > 3:
+			for j in range(len(output1[i])):
+				#plt.text(mol[output3[i][j]][1],mol[output3[i][j]][0], str(output3[i][j]),fontsize=8)
+				new_latt2[mol[output1[i][j]][0]][mol[output1[i][j]][1]] = (i+1)*3
+	imgplot = plt.imshow(new_latt2)
+	a = fig.add_subplot(2,3,4)
+	for i in range(len(output2)):
+		if len(output2[i]) > 3:
+			for j in range(len(output2[i])):
+				#plt.text(mol[output3[i][j]][1],mol[output3[i][j]][0], str(output3[i][j]),fontsize=8)
+				new_latt3[mol[output2[i][j]][0]][mol[output2[i][j]][1]] = (i+1)*3
+	imgplot = plt.imshow(new_latt3)
+	a = fig.add_subplot(2,3,5)
+	for i in range(len(output3)):
+		if len(output3[i]) > 3:
+			for j in range(len(output3[i])):
+				#plt.text(mol[output3[i][j]][1],mol[output3[i][j]][0], str(output3[i][j]),fontsize=8)
+				new_latt4[mol[output3[i][j]][0]][mol[output3[i][j]][1]] = (i+1)*3
+	imgplot = plt.imshow(new_latt4)
+	#a = fig.add_subplot(2,3,4)
+	#for i in range(len(dislist)):
+	#	new_latt1[mol[dislist[i]][0]][mol[dislist[i]][1]] = (i+1)*3
+	
+	#imgplot = plt.imshow(new_latt1)
 	plt.show()

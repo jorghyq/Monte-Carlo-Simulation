@@ -9,7 +9,7 @@ import random as rd
 import matplotlib.pyplot as plt
 from PIL import Image
 
-dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results13"
+dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results16\\4-fold-ev-1"
 os.chdir(dname)
 mdense = np.loadtxt("mdense.txt", delimiter=',')
 m1d = np.loadtxt("m1d.txt", delimiter=',')
@@ -22,7 +22,8 @@ cenergy_ind = mdense.shape[1]
 print nmetal_ind
 print cenergy_ind
 
-mtotal = mdense + m1d + m2d
+mtotal = mdense + m1d + m2d + mdis
+print mtotal
 mdense_p = np.flipud(mdense/mtotal)
 m1d_p = np.flipud(m1d/mtotal)
 m2d_p = np.flipud(m2d/mtotal)
