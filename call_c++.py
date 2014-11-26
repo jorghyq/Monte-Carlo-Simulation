@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import time
 
 # weired
-total_run = 10000000
+total_run = 1000000
 latt_len = 100
 num_mol = 200
 num_metal = 200
