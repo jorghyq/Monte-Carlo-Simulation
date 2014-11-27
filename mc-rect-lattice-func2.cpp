@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 	// e: venergy
 	// f: mcenergy
 	int opt;
-	const char *optstring = "a:b:c:d:e:f:";
+	const char *optstring = "a:b:c:d:e:f:g:";
 	while((opt = getopt(argc, argv, optstring)) != -1)
 	{
 		switch(opt)
@@ -85,6 +85,7 @@ int main(int argc, char *argv[])
 				break;
 			case 'g':
 				ffn = atoi(optarg);
+				break;
 			default:
 				break;
 			}
