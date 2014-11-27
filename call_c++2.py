@@ -9,12 +9,10 @@ import matplotlib.pyplot as plt
 import time
 
 # weired
-total_run = 100000
+total_run = 1000000
 latt_len = 100
 num_mol = 200
 num_metal = 200
-folder_num = 3
-
 venergy_initial = 1
 cenergy_initial = venergy_initial
 mcenergy_initial = cenergy_initial
@@ -29,11 +27,11 @@ cenergy_step = 2*venergy_step
 cenergy_max = 90
 ###### generate the log file
 
-dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results2"
+dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results10"
 #os.chdir(dname)
-f = open('D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results2\logfile.txt', 'w')
+f = open('D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results10\logfile.txt', 'w')
 f.write('This is the logfile for the following settings.\n')
-#f.write('There is no constrained, no is_forbidden function.\n')
+f.write('There is no constrained, no is_forbidden function.\n')
 f.write('total_run: ' + str(total_run) + '\n')
 f.write('latt_len: ' + str(latt_len) + '\n')
 f.write('num_mol: ' + str(num_mol) + '\n')
@@ -56,7 +54,7 @@ venergy = venergy_initial
 	#while cenergy <= cenergy_max:
 		#venergy = venergy_initial
 		#while venergy <= venergy_max:
-			#os.system('mc-rect-lattice-func2 -a %d -b %d -c %d -d %d -e %f -f %d -g %d' % (total_run,num_mol,num_metal,cenergy,venergy,mcenergy,folder_num))
+			#os.system('mc-rect-lattice-func2 -a %d -b %d -c %d -d %d -e %f -f %d' % (total_run,num_mol,num_metal,cenergy,venergy,mcenergy))
 			#venergy = venergy + venergy_step
 		##lattice = np.loadtxt("results3\%.1e-%d-%d-%d-%d-%d.txt" % (total_run,num_mol,num_metal,cenergy,venergy,mcenergy), delimiter=',')
 		##plt.imsave("results3\%.1e-%d-%d-%d-%d-%d.png" % (total_run,num_mol,num_metal,cenergy,venergy,mcenergy),lattice,[0,2])
@@ -75,7 +73,7 @@ while num_metal <= num_metal_max:
 			temp = i+1
 			cenergy = venergy * temp
 			mcenergy = cenergy
-			os.system('mc-rect-lattice-func -a %d -b %d -c %d -d %d -e %f -f %d -g %d' % (total_run,num_mol,num_metal,cenergy,venergy,mcenergy,folder_num))
+			os.system('mc-rect-lattice-func2 -a %d -b %d -c %d -d %d -e %f -f %d' % (total_run,num_mol,num_metal,cenergy,venergy,mcenergy))
 		venergy = venergy + venergy_step
 		#lattice = np.loadtxt("results3\%.1e-%d-%d-%d-%d-%d.txt" % (total_run,num_mol,num_metal,cenergy,venergy,mcenergy), delimiter=',')
 		#plt.imsave("results3\%.1e-%d-%d-%d-%d-%d.png" % (total_run,num_mol,num_metal,cenergy,venergy,mcenergy),lattice,[0,2])
