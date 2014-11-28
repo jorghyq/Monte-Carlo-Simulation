@@ -19,9 +19,9 @@ int ffn = 1; // number of results filefolder
 int num_molecule = 50;
 int num_metal = 50;
 int num_total = num_molecule + num_metal;
-int cenergy = 10;
+double cenergy = 10;
 double venergy = 2;
-int mcenergy = 10;
+double mcenergy = 10;
 int ctemp[2];
 int temp[5][2];
 int ind[5] = {0};
@@ -76,13 +76,13 @@ int main(int argc, char *argv[])
 				num_metal = atoi(optarg);
 				break;
 			case 'd':
-				cenergy = atoi(optarg);
+				cenergy = atof(optarg);
 				break;
 			case 'e':
 				venergy = atof(optarg);
 				break;
 			case 'f':
-				mcenergy = atoi(optarg);
+				mcenergy = atof(optarg);
 				break;
 			case 'g':
 				ffn = atoi(optarg);
