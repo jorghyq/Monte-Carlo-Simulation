@@ -80,9 +80,9 @@ class McRunner:
 
 if __name__ == "__main__":
 	runner = McRunner(2)
-	runner.set_initial(1000000,200,200,3)
-	runner.set_range_cenergy(20,1,20)
-	runner.set_range_venergy(0,2,30)
+	runner.set_initial(1000000,200,200,4)
+	runner.set_range_cenergy(5,1,5)
+	runner.set_range_venergy(0,0.5,10)
 	runner.set_range_nmetal(50,50,450)
 	runner.logfile('This is for the molecule BDS286')
 	runner.run(1)	
