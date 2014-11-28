@@ -609,8 +609,8 @@ void save_to_txt()
 	ss << ffn << "\\";
 	ss.precision(1);
 	ss.setf(ios::scientific);
-	ss << double(total_run) << "-" << lattice_size << "-" << num_molecule << "-" << num_metal << "-";
-	ss << cenergy << "-" << venergy << "-" << mcenergy << ".txt";
+	ss << double(total_run) << "_" << lattice_size << "_" << num_molecule << "_" << num_metal << "_";
+	ss << cenergy << "_" << venergy << "_" << mcenergy << ".txt";
 	filename = ss.str();
 	cout<<"output to file: "<<filename<<endl;
 	ofstream file(filename.c_str());
