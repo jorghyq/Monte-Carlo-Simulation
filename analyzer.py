@@ -9,7 +9,7 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 from count_mol_bond import cal_bond_num, cluster
-
+from PIL import Image
 
 
 def sprint(txt, inp):
@@ -24,36 +24,38 @@ class McAnalyzer:
 		fname = os.path.join(self.path,'logfile.txt')
 		if os.path.isfile(fname):
 			f = open(fname, 'r')
+			print "load logfile!"
 			for line in f:
-				tline = line.split('')
-				if len(tline2) > 1:
-					if tline2[0].strip() == 'total_run':
-						self.total_run = float(tline2[1].strip())
-					elif tline2[0].strip() == 'latt_len':
-						self.latt_len = int(tline2[1].strip())	
-					elif tline2[0].strip() == 'num_mol':
-						self.num_mol = int(tline2[1].strip())
-					elif tline2[0].strip() == 'nmet_init':
-						self.nmet_init = float(tline2[1].strip())
-					elif tline2[0].strip() == 'nmet_step':
-						self.nmetal_step = float(tline2[1].strip())
-					elif tline2[0].strip() == 'nmet_max':
-						self.nmet_max = float(tline2[1].strip())
-					elif tline2[0].strip() == 'cenergy_init':
-						self.cenergy_init = float(tline2[1].strip())
-					elif tline2[0].strip() == 'cenergy_step':
-						self.cenergy_step = float(tline2[1].strip())
-					elif tline2[0].strip() == 'cenergy_max':
-						self.cenergy_max = float(tline2[1].strip())
-					elif tline2[0].strip() == 'venergy_init':
-						self.venergy_init = float(tline2[1].strip())
-					elif tline2[0].strip() == 'venergy_step':
-						self.venergy_step = float(tline2[1].strip())
-					elif tline2[0].strip() == 'venergy_max':
-						self.venergy_max = float(tline2[1].strip())
+				tline = line.split(':')
+				if len(tline) > 1:
+					if tline[0].strip() == 'total_run':
+						self.total_run = float(tline[1].strip())
+					elif tline[0].strip() == 'latt_len':
+						self.latt_len = int(tline[1].strip())	
+					elif tline[0].strip() == 'num_mol':
+						self.num_mol = int(tline[1].strip())
+					elif tline[0].strip() == 'nmet_init':
+						self.nmet_init = float(tline[1].strip())
+					elif tline[0].strip() == 'nmet_step':
+						self.nmet_step = float(tline[1].strip())
+					elif tline[0].strip() == 'nmet_max':
+						self.nmet_max = float(tline[1].strip())
+					elif tline[0].strip() == 'cenergy_init':
+						self.cenergy_init = float(tline[1].strip())
+					elif tline[0].strip() == 'cenergy_step':
+						self.cenergy_step = float(tline[1].strip())
+					elif tline[0].strip() == 'cenergy_max':
+						self.cenergy_max = float(tline[1].strip())
+					elif tline[0].strip() == 'venergy_init':
+						self.venergy_init = float(tline[1].strip())
+					elif tline[0].strip() == 'venergy_step':
+						self.venergy_step = float(tline[1].strip())
+					elif tline[0].strip() == 'venergy_max':
+						self.venergy_max = float(tline[1].strip())
 		else:
 			print "no logfiles!!!!!"
-		self.ind_metal = (self.nmet_max - nmet_init)/nmet_step + 1
+		print "logfile loaded!"
+		self.ind_metal = (self.nmet_max - self.nmet_init)/self.nmet_step + 1
 		self.ind_cenergy = (self.cenergy_max - self.cenergy_init)/self.cenergy_step + 1
 		self.ind_venergy = (self.venergy_max - self.venergy_init)/self.venergy_step + 1
 		
@@ -95,21 +97,39 @@ class McAnalyzer:
 		
 	def run(self,mode):
 		files = os.listdir(self.path)
+		#mdense = np.loadtxt("mdense.txt", delimiter=',')
+		#m1d = np.loadtxt("m1d.txt", delimiter=',')
+		#m2d = np.loadtxt("m2d.txt", delimiter=',')
+		#mdis = np.loadtxt("mdis.txt", delimiter=',')
+		#mtotal = mdense + m1d + m2d + mdis
+		#fname = os.path.join(self.path,filename)
 		os.chdir(dname)
-		if self.cenergy_int == self.cenergy_max:
-			totalenergy = np.zeros((ind_metal,ind_venergy))
-			cbond_num = np.zeros((ind_metal,ind_venergy))
-			vbond_num = np.zeros((ind_metal,ind_venergy))
-			cbond_num_av = np.zeros((ind_metal,ind_venergy))
-			totalenergy_av = np.zeros((ind_metal,ind_venergy))
-			cbond_num_avt = np.zeros((ind_metal,ind_venergy))
-			mdense = np.zeros((ind_metal,ind_venergy))
-			m1d = np.zeros((ind_metal,ind_venergy))
-			m2d = np.zeros((ind_metal,ind_venergy))
-			mdis = np.zeros((ind_metal,ind_venergy))
+		if self.cenergy_init == self.cenergy_max:
+			totalenergy = np.zeros((self.ind_metal,self.ind_venergy))
+			cbond_num = np.zeros((self.ind_metal,self.ind_venergy))
+			vbond_num = np.zeros((self.ind_metal,self.ind_venergy))
+			cbond_num_av = np.zeros((self.ind_metal,self.ind_venergy))
+			totalenergy_av = np.zeros((self.ind_metal,self.ind_venergy))
+			cbond_num_avt = np.zeros((self.ind_metal,self.ind_venergy))
+			mdense = np.zeros((self.ind_metal,self.ind_venergy))
+			m1d = np.zeros((self.ind_metal,self.ind_venergy))
+			m2d = np.zeros((self.ind_metal,self.ind_venergy))
+			mdis = np.zeros((self.ind_metal,self.ind_venergy))
+			if os.path.exists(os.path.join(self.path,"mdense.txt")):
+				mdense = np.loadtxt("mdense.txt", delimiter=',')
+				if os.path.exists(os.path.join(self.path,"mdense.txt")):
+					m1d = np.loadtxt("m1d.txt", delimiter=',')
+					if os.path.exists(os.path.join(self.path,"mdense.txt")):
+						m2d = np.loadtxt("m2d.txt", delimiter=',')
+						if os.path.exists(os.path.join(self.path,"mdense.txt")):
+							mdis = np.loadtxt("mdis.txt", delimiter=',')
+							print "DATA ALREADY EXIST!"
+							return
+			print "Begin to process the data..."
 			for line in files:
+				
 				if line[0] == '1' and line[-4:] == '.txt':
-					self.load_txt(line):
+					self.load_txt(line)
 					totalenergy[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.total_energy
 					cbond_num[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.cbond_num
 					vbond_num[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.vbond_num
@@ -142,6 +162,7 @@ class McAnalyzer:
 							if i not in newlist:
 								count3 = count3 + 1
 						mdis[self.nmetal_ind][self.venergy_ind] = count3
+			mtotal = mdense + m1d + m2d + mdis
 			np.savetxt("totalenergy.txt",totalenergy,delimiter=',')	
 			np.savetxt("cbond_num.txt",cbond_num,delimiter=',')
 			np.savetxt("vbond_num.txt",vbond_num,delimiter=',')
@@ -152,21 +173,54 @@ class McAnalyzer:
 			np.savetxt("m1d.txt",m1d, delimiter=',')
 			np.savetxt("m2d.txt",m2d, delimiter=',')
 			np.savetxt("mdis.txt",mdis, delimiter=',')
+			np.savetxt("mtotal.txt",mtotal, delimiter=',')
+			print "Done, data are saved!"
 	
-	def plot(filename, mode,xlab, ylab):
+	def plot_curve(self,filename, mode,xlab, ylab, prozent):
 		fname = os.path.join(self.path,filename)
 		temp_file = np.loadtxt(fname,delimiter=',')
-		if os.path.exists(temp_file):
+		#print temp_file.shape
+		temp_total = np.loadtxt('mtotal.txt',delimiter=',')
+		if prozent == 1:
+			temp_file = temp_file/temp_total
+		if os.path.exists(fname):
 			if mode == 1:
-				x_axis = np.array(range(cenergy_init,venergy_max+venergy_step,venergy_step))
+				x_axis = np.array(range(int(self.ind_metal)))
+				#print int(self.ind_venergy)
 				for i in range(0,temp_file.shape[1]):
 					plt.plot(x_axis,temp_file[:,i],label = 'cenerg = %d' % (i*2+1))
-					plt.legend(loc=0,fontsize = 8)
+					plt.legend(loc=0,prop={'size':8})
 					plt.xlabel(xlab)
 					plt.ylabel(ylab)
 		else:
 			print "no input file!"
 	
+	def phase_diagram(self,updown,leftright,xlab,ylab):
+		mdense = np.loadtxt("mdense.txt", delimiter=',')
+		m1d = np.loadtxt("m1d.txt", delimiter=',')
+		m2d = np.loadtxt("m2d.txt", delimiter=',')
+		mdis = np.loadtxt("mdis.txt", delimiter=',')
+		mtotal = np.loadtxt('mtotal.txt',delimiter=',')
+		mdense_p = mdense/mtotal
+		m1d_p = m1d/mtotal
+		m2d_p = m2d/mtotal
+		if updown:
+			mdense_p = np.flipud(mdense_p)
+			m1d_p = np.flipud(m1d_p)
+			m2d_p = np.flipud(m2d_p)
+		if leftright:
+			mdense_p = np.fliplr(mdense_p)
+			m1d_p = np.fliplr(m1d_p)
+			m2d_p = np.fliplr(m2d_p)
+		r = m1d_p
+		g = m2d_p
+		b = mdense_p
+		rgb = np.dstack((r,g,b))
+		im = Image.fromarray(np.uint8(rgb*255.999))
+		plt.imshow(im,extent=[0.1,2,50,450],aspect="auto")
+		plt.xlabel(xlab)
+		plt.ylabel(ylab)
+
 	def bond_num(self):
 		temp = cal_bond_num(self.lattice) # 1*5 vector
 		return temp
@@ -175,132 +229,24 @@ class McAnalyzer:
 		mols,count = cluster(mode,self.lattice) # mols: list, count: total number
 		return mols,count 
 
-#class Summarizer:
-#	def __init__(self):
 
 if __name__ == "__main__":
 	# go to the working directory
-	dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results2"
-
-	#######################################
-	# dmol_num: ind_metal * ind_cenergy
-	#   1) dense
-	#   2) 1d
-	#   3) 2d
-	#	4) disordered
-	########################################	
-	np.savetxt("totalenergy.txt",totalenergy,delimiter=',')	
-	np.savetxt("cbond_num.txt",cbond_num,delimiter=',')
-	np.savetxt("vbond_num.txt",vbond_num,delimiter=',')
-	np.savetxt("cbond_num_av.txt",cbond_num_av,delimiter=',')
-	np.savetxt("totalenergy_av.txt",totalenergy_av,delimiter=',')
-	np.savetxt("cbond_num_avt.txt",cbond_num_avt,delimiter=',')
-	
-	#np.savetxt("mdense.txt",mdense, delimiter=',')	
-	#np.savetxt("m1d.txt",m1d, delimiter=',')
-	#np.savetxt("m2d.txt",m2d, delimiter=',')
-	#np.savetxt("mdis.txt",mdis, delimiter=',')
-	#mdense = np.loadtxt("mdense.txt", delimiter=',')
-	#m1d = np.loadtxt("m1d.txt", delimiter=',')
-	#m2d = np.loadtxt("m2d.txt", delimiter=',')
-	#mdis = np.loadtxt("mdis.txt", delimiter=',')
-	#mtotal = mdense + m1d + m2d + mdis
-	#totalenergy_av = np.loadtxt("totalenergy_av.txt",delimiter=',')
-	#cbond_num_avt = np.loadtxt("cbond_num_avt.txt",delimiter=',')
-	
-	
-	#mdense_p = mdense/mtotal
-	#m1d_p = m1d/mtotal
-	#m2d_p = m2d/mtotal
-	#mdis_p = mdis/mtotal
-	xmetal = np.array(range(nmetal_initial,nmetal_final + 10,nmetal_step))
-	##print xmetal.shape
-	#fig = plt.figure()
+	dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results12"
+	analyzer = McAnalyzer(dname)
+	analyzer.load_logfile()
+	analyzer.run(1)
+	fig = plt.figure()
+	analyzer.phase_diagram(0,0,"Ev/Ec","nmetal")
 	#fig.add_subplot(2,2,1)
-	#for i in range(0,mdense.shape[1]):
-		#plt.plot(xmetal,mdense_p[:,i],label = 'cenerg = %d' % (i*2+1))
-		#plt.text(xmetal[int(ind_metal/2)],mdense_p[int(ind_metal/2),i], str(i*2+1),fontsize=8)
-	#plt.legend(loc=0,fontsize = 8)
-	#plt.xlabel('number of metals')
-	#plt.ylabel('number of molecules in dense-packed')
-	
-	
+	#analyzer.plot_curve("mdense.txt",1,"number metals","prozent",1)
+
 	#fig.add_subplot(2,2,2)
-	#for i in range(0,m1d.shape[1]):
-		#plt.plot(xmetal,m1d_p[:,i],label = 'cenerg = %d' % (i*2+1))
-		#plt.text(xmetal[int(ind_metal/2)],m1d_p[int(ind_metal/2),i], str(i*2+1),fontsize=8)
-	#plt.legend(loc=0,fontsize = 8)
-	#plt.xlabel('number of metals')
-	#plt.ylabel('number of molecules in 1d')
+	#analyzer.plot_curve("m1d.txt",1,"number metals","prozent",1)
 	
 	#fig.add_subplot(2,2,3)
-	#for i in range(0,m2d.shape[1]):
-		#plt.plot(xmetal,m2d_p[:,i],label = 'cenerg = %d' % (i*2+1))
-		#plt.text(xmetal[int(ind_metal/2)],m2d_p[int(ind_metal/2),i], str(i*2+1),fontsize=8)
-	#plt.legend(loc=0,fontsize = 8)
-	#plt.xlabel('number of metals')
-	#plt.ylabel('number of molecules in 2d')
+	#analyzer.plot_curve("m2d.txt",1,"number metals","prozent",1)
 	
 	#fig.add_subplot(2,2,4)
-	#for i in range(0,mdis.shape[1]):
-		#plt.plot(xmetal,mdis_p[:,i],label = 'cenerg = %d' % (i*2+1))
-		#plt.text(xmetal[int(ind_metal/2)],mdis_p[int(ind_metal/2),i], str(i*2+1),fontsize=8)
-	#plt.legend(loc=0,fontsize = 8)
-	#plt.xlabel('number of metals')
-	#plt.ylabel('number of molecules in disordered')
-	#plt.show()
-	
-	
-	
-	##################################################################
-	fig = plt.figure()
-	fig.add_subplot(2,3,1)
-	for i in range(0,totalenergy.shape[1]):
-		plt.plot(xmetal,totalenergy[:,i],label = 'cenerg = %d' % (i*2+1))
-		plt.text(xmetal[int(ind_metal/2)],totalenergy[int(ind_metal/2),i], str(i*2+1),fontsize=8)
-	plt.legend(loc=0)
-	plt.xlabel('number of metals')
-	plt.ylabel('total energy')
-	
-	
-	fig.add_subplot(2,3,2)
-	for i in range(0,cbond_num.shape[1]):
-		plt.plot(xmetal,cbond_num[:,i],label = 'cenerg = %d' % (i*2+1))
-		plt.text(xmetal[int(ind_metal/2)],cbond_num[int(ind_metal/2),i], str(i*2+1),fontsize=8)
-	plt.legend(loc=0)
-	plt.xlabel('number of metals')
-	plt.ylabel('number of coordination bond')
-	
-	fig.add_subplot(2,3,3)
-	for i in range(0,vbond_num.shape[1]):
-		plt.plot(xmetal,vbond_num[:,i],label = 'cenerg = %d' % (i*2+1))
-		plt.text(xmetal[int(ind_metal/2)],vbond_num[int(ind_metal/2),i], str(i*2+1),fontsize=8)
-	plt.legend(loc=0)
-	plt.xlabel('number of metals')
-	plt.ylabel('number of vdW bond')
-	
-	fig.add_subplot(2,3,4)
-	for i in range(0,cbond_num_av.shape[1]):
-		plt.plot(xmetal,cbond_num_av[:,i],label = 'cenerg = %d' % (i*2+1))
-		plt.text(xmetal[int(ind_metal/2)],cbond_num_av[int(ind_metal/2),i], str(i*2+1),fontsize=8)
-	plt.legend(loc=0)
-	plt.xlabel('number of metals')
-	plt.ylabel('total coordination bond per metal')
-	
-	fig.add_subplot(2,3,5)
-	for i in range(0,totalenergy_av.shape[1]):
-		plt.plot(xmetal,totalenergy_av[:,i],label = 'cenerg = %d' % (i*2+1))
-		plt.text(xmetal[int(ind_metal/2)],totalenergy_av[int(ind_metal/2),i], str(i*2+1),fontsize=8)
-	plt.legend(loc=0)
-	plt.xlabel('number of metals')
-	plt.ylabel('total energy per element')
-	
-	fig.add_subplot(2,3,6)
-	for i in range(0,cbond_num_avt.shape[1]):
-		plt.plot(xmetal,cbond_num_avt[:,i],label = 'cenerg = %d' % (i*2+1))
-		plt.text(xmetal[int(ind_metal/2)],cbond_num_avt[int(ind_metal/2),i], str(i*2+1),fontsize=8)
-	plt.legend(loc=0)
-	plt.xlabel('number of metals')
-	plt.ylabel('total coordination bond per element')
+	#analyzer.plot_curve("mdis.txt",1,"number metals","prozent",1)
 	plt.show()
-	
