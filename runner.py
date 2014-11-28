@@ -66,7 +66,7 @@ class McRunner:
 		f.write('total_run: ' + str(self.total_run) + '\n')
 		f.write('latt_len: ' + str(self.latt_len) + '\n')
 		f.write('num_mol: ' + str(self.num_mol) + '\n')
-		f.write('nmet_int: ' + str(self.nmet_init) + '\n')
+		f.write('nmet_init: ' + str(self.nmet_init) + '\n')
 		f.write('nmet_setp: ' + str(self.nmet_step) + '\n')
 		f.write('nmet_max: ' + str(self.nmet_max) + '\n')
 		f.write('cenergy_init: ' + str(self.cenergy_init) + '\n')

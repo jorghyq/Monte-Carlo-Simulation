@@ -20,6 +20,43 @@ class McAnalyzer:
 	def __init__(self, wd_path):
 		self.path = wd_path
 		
+	def load_logfile(self):
+		fname = os.path.join(self.path,'logfile.txt')
+		if os.path.isfile(fname):
+			f = open(fname, 'r')
+			for line in f:
+				tline = line.split('')
+				if len(tline2) > 1:
+					if tline2[0].strip() == 'total_run':
+						self.total_run = float(tline2[1].strip())
+					elif tline2[0].strip() == 'latt_len':
+						self.latt_len = int(tline2[1].strip())	
+					elif tline2[0].strip() == 'num_mol':
+						self.num_mol = int(tline2[1].strip())
+					elif tline2[0].strip() == 'nmet_init':
+						self.nmet_init = float(tline2[1].strip())
+					elif tline2[0].strip() == 'nmet_step':
+						self.nmetal_step = float(tline2[1].strip())
+					elif tline2[0].strip() == 'nmet_max':
+						self.nmet_max = float(tline2[1].strip())
+					elif tline2[0].strip() == 'cenergy_init':
+						self.cenergy_init = float(tline2[1].strip())
+					elif tline2[0].strip() == 'cenergy_step':
+						self.cenergy_step = float(tline2[1].strip())
+					elif tline2[0].strip() == 'cenergy_max':
+						self.cenergy_max = float(tline2[1].strip())
+					elif tline2[0].strip() == 'venergy_init':
+						self.venergy_init = float(tline2[1].strip())
+					elif tline2[0].strip() == 'venergy_step':
+						self.venergy_step = float(tline2[1].strip())
+					elif tline2[0].strip() == 'venergy_max':
+						self.venergy_max = float(tline2[1].strip())
+		else:
+			print "no logfiles!!!!!"
+		self.ind_metal = (self.nmet_max - nmet_init)/nmet_step + 1
+		self.ind_cenergy = (self.cenergy_max - self.cenergy_init)/self.cenergy_step + 1
+		self.ind_venergy = (self.venergy_max - self.venergy_init)/self.venergy_step + 1
+		
 	def set_initial(self,nmet_init,nmet_step,cenergy_init,cenergy_step,venergy_init,venergy_step):
 		self.nmet_init = nmet_init
 		self.nmet_step = nmet_step
@@ -36,7 +73,7 @@ class McAnalyzer:
 		namedata = filename[0:-4].strip().split('-')
 		self.latt_len = int(namedata[1])
 		self.num_metal = int(namedata[3])
-		self.num_mol = int(namedata[2])
+		#self.num_mol = int(namedata[2])
 		self.nmetal_ind = (self.num_metal - self.nmet_init)/self.nmet_step
 		self.cenergy = float(namedata[4])
 		self.venergy = float(namedata[5])
@@ -56,6 +93,79 @@ class McAnalyzer:
 		self.lattice = np.loadtxt(txt_name, delimiter=',',skiprows=1)
 		self.lattice = self.lattice[0:self.latt_len,0:]
 		
+	def run(self,mode):
+		files = os.listdir(self.path)
+		os.chdir(dname)
+		if self.cenergy_int == self.cenergy_max:
+			totalenergy = np.zeros((ind_metal,ind_venergy))
+			cbond_num = np.zeros((ind_metal,ind_venergy))
+			vbond_num = np.zeros((ind_metal,ind_venergy))
+			cbond_num_av = np.zeros((ind_metal,ind_venergy))
+			totalenergy_av = np.zeros((ind_metal,ind_venergy))
+			cbond_num_avt = np.zeros((ind_metal,ind_venergy))
+			mdense = np.zeros((ind_metal,ind_venergy))
+			m1d = np.zeros((ind_metal,ind_venergy))
+			m2d = np.zeros((ind_metal,ind_venergy))
+			mdis = np.zeros((ind_metal,ind_venergy))
+			for line in files:
+				if line[0] == '1' and line[-4:] == '.txt':
+					self.load_txt(line):
+					totalenergy[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.total_energy
+					cbond_num[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.cbond_num
+					vbond_num[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.vbond_num
+					cbond_num_av[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.cbond_num_av
+					totalenergy_av[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.energy_av
+					cbond_num_avt[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.cbond_num_avt	
+					if mode == 1:
+						mols0, count0 = self.clustering(0)
+						mdense[self.nmetal_ind][self.venergy_ind] = count0
+						mols1, count1 = self.clustering(1)
+						m1d[analyzer.nmetal_ind][self.venergy_ind] = count1
+						mols2, count2 = self.clustering(2)
+						m2d[self.nmetal_ind][self.venergy_ind] = count2
+						newlist = []
+						count3 = 0
+						mol_list = range(200)
+						for i in range(len(mols0)):
+							for j in range(len(mols0[i])):
+								if mols0[i][j] not in newlist:
+									newlist.append(mols0[i][j])
+						for i in range(len(mols1)):
+							for j in range(len(mols1[i])):
+								if mols1[i][j] not in newlist:
+									newlist.append(mols1[i][j])
+						for i in range(len(mols2)):
+							for j in range(len(mols2[i])):
+								if mols2[i][j] not in newlist:
+									newlist.append(mols2[i][j])
+						for i in range(200):
+							if i not in newlist:
+								count3 = count3 + 1
+						mdis[self.nmetal_ind][self.venergy_ind] = count3
+			np.savetxt("totalenergy.txt",totalenergy,delimiter=',')	
+			np.savetxt("cbond_num.txt",cbond_num,delimiter=',')
+			np.savetxt("vbond_num.txt",vbond_num,delimiter=',')
+			np.savetxt("cbond_num_av.txt",cbond_num_av,delimiter=',')
+			np.savetxt("totalenergy_av.txt",totalenergy_av,delimiter=',')
+			np.savetxt("cbond_num_avt.txt",cbond_num_avt,delimiter=',')
+			np.savetxt("mdense.txt",mdense, delimiter=',')	
+			np.savetxt("m1d.txt",m1d, delimiter=',')
+			np.savetxt("m2d.txt",m2d, delimiter=',')
+			np.savetxt("mdis.txt",mdis, delimiter=',')
+	
+	def plot(filename, mode,xlab, ylab):
+		fname = os.path.join(self.path,filename)
+		temp_file = np.loadtxt(fname,delimiter=',')
+		if os.path.exists(temp_file):
+			if mode == 1:
+				x_axis = np.array(range(cenergy_init,venergy_max+venergy_step,venergy_step))
+				for i in range(0,temp_file.shape[1]):
+					plt.plot(x_axis,temp_file[:,i],label = 'cenerg = %d' % (i*2+1))
+					plt.legend(loc=0,fontsize = 8)
+					plt.xlabel(xlab)
+					plt.ylabel(ylab)
+		else:
+			print "no input file!"
 	
 	def bond_num(self):
 		temp = cal_bond_num(self.lattice) # 1*5 vector
@@ -71,28 +181,7 @@ class McAnalyzer:
 if __name__ == "__main__":
 	# go to the working directory
 	dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results2"
-	os.chdir(dname)
-	# load the data
-	files = os.listdir(dname)
-	nmetal_initial = 50
-	cenergy_initial = 1
-	nmetal_final = 550
-	cenergy_final = 19
-	nmetal_step = 25
-	cenergy_step = 2
-	
-	ind_metal = (nmetal_final - nmetal_initial)/nmetal_step + 1
-	ind_cenergy = (cenergy_final - cenergy_initial)/cenergy_step + 1
-	
-	analyzer = McAnalyzer(dname)
-	analyzer.set_initial(nmetal_initial,nmetal_step,cenergy_initial,cenergy_step,3,1)
-	#sprint("nmetal_intial",nmetal_initial)
-	#sprint("nmetal_final",nmetal_final)
-	#sprint("cenergy_initial",cenergy_initial)
-	#sprint("cenergy_final",cenergy_final)
-	#sprint("ind_metal",ind_metal)
-	#sprint("ind_cenergy",ind_cenergy)
-	
+
 	#######################################
 	# dmol_num: ind_metal * ind_cenergy
 	#   1) dense
@@ -100,66 +189,12 @@ if __name__ == "__main__":
 	#   3) 2d
 	#	4) disordered
 	########################################	
-	
-	
-	#mdense = np.zeros((ind_metal,ind_cenergy))
-	#m1d = np.zeros((ind_metal,ind_cenergy))
-	#m2d = np.zeros((ind_metal,ind_cenergy))
-	#mdis = np.zeros((ind_metal,ind_cenergy))
-	totalenergy = np.zeros((ind_metal,ind_cenergy))
-	cbond_num = np.zeros((ind_metal,ind_cenergy))
-	vbond_num = np.zeros((ind_metal,ind_cenergy))
-	cbond_num_av = np.zeros((ind_metal,ind_cenergy))
-	totalenergy_av = np.zeros((ind_metal,ind_cenergy))
-	cbond_num_avt = np.zeros((ind_metal,ind_cenergy))
-	for line in files:
-		if line[0] == '1':
-			analyzer.load_txt(line)
-			totalenergy[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.total_energy
-			cbond_num[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.cbond_num
-			vbond_num[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.vbond_num
-			cbond_num_av[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.cbond_num_av
-			totalenergy_av[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.energy_av
-			cbond_num_avt[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.cbond_num_avt
-			
 	np.savetxt("totalenergy.txt",totalenergy,delimiter=',')	
 	np.savetxt("cbond_num.txt",cbond_num,delimiter=',')
 	np.savetxt("vbond_num.txt",vbond_num,delimiter=',')
 	np.savetxt("cbond_num_av.txt",cbond_num_av,delimiter=',')
 	np.savetxt("totalenergy_av.txt",totalenergy_av,delimiter=',')
 	np.savetxt("cbond_num_avt.txt",cbond_num_avt,delimiter=',')
-	#print mdense.shape
-	#for line in files:
-		#if line[0] == '1':
-			#analyzer.load_txt(line)
-			#mols0, count0 = analyzer.clustering(0)
-			#mdense[analyzer.nmetal_ind][analyzer.cenergy_ind] = count0
-			#mols1, count1 = analyzer.clustering(1)
-			#m1d[analyzer.nmetal_ind][analyzer.cenergy_ind] = count1
-			#mols2, count2 = analyzer.clustering(2)
-			#m2d[analyzer.nmetal_ind][analyzer.cenergy_ind] = count2
-			#newlist = []
-			#count3 = 0
-			#mol_list = range(200)
-			#for i in range(len(mols0)):
-				#for j in range(len(mols0[i])):
-					#if mols0[i][j] not in newlist:
-						#newlist.append(mols0[i][j])
-			#for i in range(len(mols1)):
-				#for j in range(len(mols1[i])):
-					#if mols1[i][j] not in newlist:
-						#newlist.append(mols1[i][j])
-			#for i in range(len(mols2)):
-				#for j in range(len(mols2[i])):
-					#if mols2[i][j] not in newlist:
-						#newlist.append(mols2[i][j])
-			#for i in range(200):
-				#if i not in newlist:
-					#count3 = count3 + 1
-			#mdis[analyzer.nmetal_ind][analyzer.cenergy_ind] = count3
-			#sprint("count3",count3)
-			#print line + " is done..."
-	
 	
 	#np.savetxt("mdense.txt",mdense, delimiter=',')	
 	#np.savetxt("m1d.txt",m1d, delimiter=',')
