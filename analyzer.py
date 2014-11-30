@@ -86,7 +86,7 @@ class McAnalyzer:
 		headdata = f.readline().strip().split(',')
 		f.close()
 		self.cbond_num = float(headdata[0])
-		self.cbond_num_av = self.cbond_num/float(self.num_metal)
+		#self.cbond_num_av = self.cbond_num/float(self.num_metal)
 		self.cbond_num_avt = self.cbond_num/float(self.num_metal + self.num_mol)	
 		self.vbond_num = float(headdata[1])
 		self.total_energy = float(headdata[2])
@@ -133,7 +133,7 @@ class McAnalyzer:
 					totalenergy[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.total_energy
 					cbond_num[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.cbond_num
 					vbond_num[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.vbond_num
-					cbond_num_av[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.cbond_num_av
+					#cbond_num_av[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.cbond_num_av
 					totalenergy_av[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.energy_av
 					cbond_num_avt[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.cbond_num_avt	
 					if mode == 1:
@@ -232,7 +232,7 @@ class McAnalyzer:
 
 if __name__ == "__main__":
 	# go to the working directory
-	dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results12"
+	dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results4"
 	analyzer = McAnalyzer(dname)
 	analyzer.load_logfile()
 	analyzer.run(1)
