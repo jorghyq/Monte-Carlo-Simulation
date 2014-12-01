@@ -162,6 +162,32 @@ class McAnalyzer:
 							if i not in newlist:
 								count3 = count3 + 1
 						mdis[self.nmetal_ind][self.venergy_ind] = count3
+					if mode == 2:
+						mols0, count0 = self.clustering(0)
+						mdense[self.nmetal_ind][self.venergy_ind] = count0
+						mols1, count1 = self.clustering(1)
+						m1d[analyzer.nmetal_ind][self.venergy_ind] = count1
+						mols2, count2 = self.clustering(3)
+						m2d[self.nmetal_ind][self.venergy_ind] = count2
+						newlist = []
+						count3 = 0
+						mol_list = range(200)
+						for i in range(len(mols0)):
+							for j in range(len(mols0[i])):
+								if mols0[i][j] not in newlist:
+									newlist.append(mols0[i][j])
+						for i in range(len(mols1)):
+							for j in range(len(mols1[i])):
+								if mols1[i][j] not in newlist:
+									newlist.append(mols1[i][j])
+						for i in range(len(mols2)):
+							for j in range(len(mols2[i])):
+								if mols2[i][j] not in newlist:
+									newlist.append(mols2[i][j])
+						for i in range(200):
+							if i not in newlist:
+								count3 = count3 + 1
+						mdis[self.nmetal_ind][self.venergy_ind] = count3
 			mtotal = mdense + m1d + m2d + mdis
 			np.savetxt("totalenergy.txt",totalenergy,delimiter=',')	
 			np.savetxt("cbond_num.txt",cbond_num,delimiter=',')
@@ -232,10 +258,10 @@ class McAnalyzer:
 
 if __name__ == "__main__":
 	# go to the working directory
-	dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results4"
+	dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results5"
 	analyzer = McAnalyzer(dname)
 	analyzer.load_logfile()
-	analyzer.run(1)
+	analyzer.run(2)
 	fig = plt.figure()
 	analyzer.phase_diagram(0,0,"Ev/Ec","nmetal")
 	#fig.add_subplot(2,2,1)
