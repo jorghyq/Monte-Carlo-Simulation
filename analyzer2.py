@@ -72,7 +72,7 @@ class McAnalyzer:
 		#temp,txt_name = os.path.split(txt_name)
 		####### information from the name #######
 		temp, filename = os.path.split(txt_name)
-		namedata = filename[0:-4].strip().split('-')
+		namedata = filename[0:-4].strip().split('_')
 		self.latt_len = int(namedata[1])
 		self.num_metal = int(namedata[3])
 		#self.num_mol = int(namedata[2])
@@ -263,7 +263,7 @@ if __name__ == "__main__":
 	analyzer.load_logfile()
 	analyzer.run(2)
 	fig = plt.figure()
-	analyzer.phase_diagram(0,0,"Ev/Ec","nmetal")
+	analyzer.phase_diagram(1,0,"Ev/Ec","nmetal")
 	#fig.add_subplot(2,2,1)
 	#analyzer.plot_curve("mdense.txt",1,"number metals","prozent",1)
 
