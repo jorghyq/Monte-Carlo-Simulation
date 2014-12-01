@@ -97,12 +97,6 @@ class McAnalyzer:
 		
 	def run(self,mode):
 		files = os.listdir(self.path)
-		#mdense = np.loadtxt("mdense.txt", delimiter=',')
-		#m1d = np.loadtxt("m1d.txt", delimiter=',')
-		#m2d = np.loadtxt("m2d.txt", delimiter=',')
-		#mdis = np.loadtxt("mdis.txt", delimiter=',')
-		#mtotal = mdense + m1d + m2d + mdis
-		#fname = os.path.join(self.path,filename)
 		os.chdir(dname)
 		if self.cenergy_init == self.cenergy_max:
 			totalenergy = np.zeros((self.ind_metal,self.ind_venergy))
@@ -214,7 +208,8 @@ class McAnalyzer:
 				x_axis = np.array(range(int(self.ind_metal)))
 				#print int(self.ind_venergy)
 				for i in range(0,temp_file.shape[1]):
-					plt.plot(x_axis,temp_file[:,i],label = 'cenerg = %d' % (i*2+1))
+					plt.plot(x_axis,temp_file[:,i],label = 'venerg = %d' % (i*3+3))
+					plt.text(x_axis[int(analyzer.ind_metal/2)],temp_file[int(analyzer.ind_metal/2),i], str(i*3+3),fontsize=8)
 					plt.legend(loc=0,prop={'size':8})
 					plt.xlabel(xlab)
 					plt.ylabel(ylab)
@@ -243,7 +238,7 @@ class McAnalyzer:
 		b = mdense_p
 		rgb = np.dstack((r,g,b))
 		im = Image.fromarray(np.uint8(rgb*255.999))
-		plt.imshow(im,extent=[0.1,2,50,450],aspect="auto")
+		plt.imshow(im,extent=[0.1,1.5,50,450],aspect="auto")
 		plt.xlabel(xlab)
 		plt.ylabel(ylab)
 
@@ -263,16 +258,16 @@ if __name__ == "__main__":
 	analyzer.load_logfile()
 	analyzer.run(2)
 	fig = plt.figure()
-	analyzer.phase_diagram(1,0,"Ev/Ec","nmetal")
-	#fig.add_subplot(2,2,1)
-	#analyzer.plot_curve("mdense.txt",1,"number metals","prozent",1)
+	#analyzer.phase_diagram(1,0,"Ev/Ec","nmetal")
+	fig.add_subplot(2,2,1)
+	analyzer.plot_curve("mdense.txt",1,"number metals","prozent",1)
 
-	#fig.add_subplot(2,2,2)
-	#analyzer.plot_curve("m1d.txt",1,"number metals","prozent",1)
+	fig.add_subplot(2,2,2)
+	analyzer.plot_curve("m1d.txt",1,"number metals","prozent",1)
 	
-	#fig.add_subplot(2,2,3)
-	#analyzer.plot_curve("m2d.txt",1,"number metals","prozent",1)
+	fig.add_subplot(2,2,3)
+	analyzer.plot_curve("m2d.txt",1,"number metals","prozent",1)
 	
-	#fig.add_subplot(2,2,4)
-	#analyzer.plot_curve("mdis.txt",1,"number metals","prozent",1)
+	fig.add_subplot(2,2,4)
+	analyzer.plot_curve("mdis.txt",1,"number metals","prozent",1)
 	plt.show()

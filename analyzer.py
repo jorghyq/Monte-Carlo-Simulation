@@ -217,7 +217,7 @@ class McAnalyzer:
 		b = mdense_p
 		rgb = np.dstack((r,g,b))
 		im = Image.fromarray(np.uint8(rgb*255.999))
-		plt.imshow(im,extent=[0.1,2,50,450],aspect="auto")
+		plt.imshow(im,extent=[0.1,1.5,50,450],aspect="auto")
 		plt.xlabel(xlab)
 		plt.ylabel(ylab)
 
@@ -232,12 +232,12 @@ class McAnalyzer:
 
 if __name__ == "__main__":
 	# go to the working directory
-	dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results4"
+	dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results6"
 	analyzer = McAnalyzer(dname)
 	analyzer.load_logfile()
 	analyzer.run(1)
 	fig = plt.figure()
-	analyzer.phase_diagram(0,0,"Ev/Ec","nmetal")
+	analyzer.phase_diagram(1,0,"Ev/Ec","nmetal")
 	#fig.add_subplot(2,2,1)
 	#analyzer.plot_curve("mdense.txt",1,"number metals","prozent",1)
 
