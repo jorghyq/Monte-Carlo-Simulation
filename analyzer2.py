@@ -238,7 +238,7 @@ class McAnalyzer:
 		b = mdense_p
 		rgb = np.dstack((r,g,b))
 		im = Image.fromarray(np.uint8(rgb*255.999))
-		plt.imshow(im,extent=[0.1,1.5,50,450],aspect="auto")
+		plt.imshow(im,extent=[0.125,1.125,self.nmet_init/self.num_mol,self.nmet_max/self.num_mol],aspect="auto")
 		plt.xlabel(xlab)
 		plt.ylabel(ylab)
 
@@ -253,21 +253,21 @@ class McAnalyzer:
 
 if __name__ == "__main__":
 	# go to the working directory
-	dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results5"
+	dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results22"
 	analyzer = McAnalyzer(dname)
 	analyzer.load_logfile()
 	analyzer.run(2)
 	fig = plt.figure()
-	#analyzer.phase_diagram(1,0,"Ev/Ec","nmetal")
-	fig.add_subplot(2,2,1)
-	analyzer.plot_curve("mdense.txt",1,"number metals","prozent",1)
+	analyzer.phase_diagram(1,0,"Ev/Ec","metal/molecule")
+	#fig.add_subplot(2,2,1)
+	#analyzer.plot_curve("mdense.txt",1,"number metals","prozent",1)
 
-	fig.add_subplot(2,2,2)
-	analyzer.plot_curve("m1d.txt",1,"number metals","prozent",1)
+	#fig.add_subplot(2,2,2)
+	#analyzer.plot_curve("m1d.txt",1,"number metals","prozent",1)
 	
-	fig.add_subplot(2,2,3)
-	analyzer.plot_curve("m2d.txt",1,"number metals","prozent",1)
+	#fig.add_subplot(2,2,3)
+	#analyzer.plot_curve("m2d.txt",1,"number metals","prozent",1)
 	
-	fig.add_subplot(2,2,4)
-	analyzer.plot_curve("mdis.txt",1,"number metals","prozent",1)
+	#fig.add_subplot(2,2,4)
+	#analyzer.plot_curve("mdis.txt",1,"number metals","prozent",1)
 	plt.show()
