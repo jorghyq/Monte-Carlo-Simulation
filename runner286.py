@@ -80,7 +80,7 @@ class McRunner:
 
 if __name__ == "__main__":
 	runner = McRunner(1)
-	runner.set_initial(10000000,300,100,18)
+	runner.set_initial(10000000,300,100,28)
 	runner.set_range_cenergy(40,1,40)
 	runner.set_range_venergy(5,5,45)
 	runner.set_range_nmetal(0,50,600)

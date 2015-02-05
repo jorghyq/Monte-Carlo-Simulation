@@ -14,7 +14,7 @@ using namespace std;
 int total_run = 100000;
 const int SECOND_LOOP = 1;
 const int lattice_size = 100;
-const int element_num = 1400;//12 * lattice_size;
+const int element_num = 1600;//12 * lattice_size;
 int ffn = 1; // number of results filefolder
 int num_molecule = 200;
 int num_molecule1 = 100;

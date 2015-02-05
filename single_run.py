@@ -8,10 +8,10 @@ import random as rd
 import matplotlib.pyplot as plt
 import time
 
-total_run = 10000000
+total_run = 100000000
 
-num_mol = 300
-num_metal = 400
+num_mol = 400
+num_metal = 500
 cenergy = 40
 venergy = 5
 mcenergy = 40
