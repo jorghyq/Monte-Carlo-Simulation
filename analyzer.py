@@ -75,7 +75,7 @@ class McAnalyzer:
 		namedata = filename[0:-4].strip().split('_')
 		self.latt_len = int(namedata[1])
 		self.num_metal = int(namedata[3])
-		#self.num_mol = int(namedata[2])
+		self.num_mol = int(namedata[2])
 		self.nmetal_ind = (self.num_metal - self.nmet_init)/self.nmet_step
 		self.cenergy = float(namedata[4])
 		self.venergy = float(namedata[5])
@@ -145,7 +145,7 @@ class McAnalyzer:
 						m2d[self.nmetal_ind][self.venergy_ind] = count2
 						newlist = []
 						count3 = 0
-						mol_list = range(200)
+						mol_list = range(self.num_mol)
 						for i in range(len(mols0)):
 							for j in range(len(mols0[i])):
 								if mols0[i][j] not in newlist:
@@ -158,7 +158,7 @@ class McAnalyzer:
 							for j in range(len(mols2[i])):
 								if mols2[i][j] not in newlist:
 									newlist.append(mols2[i][j])
-						for i in range(200):
+						for i in range(self.num_mol):
 							if i not in newlist:
 								count3 = count3 + 1
 						mdis[self.nmetal_ind][self.venergy_ind] = count3
