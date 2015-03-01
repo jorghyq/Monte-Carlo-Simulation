@@ -73,6 +73,7 @@ class McAnalyzer:
 		####### information from the name #######
 		temp, filename = os.path.split(txt_name)
 		namedata = filename[0:-4].strip().split('_')
+		#print namedata
 		self.latt_len = int(namedata[1])
 		self.num_metal = int(namedata[3])
 		self.num_mol = int(namedata[2])
@@ -123,6 +124,8 @@ class McAnalyzer:
 						m2d = np.loadtxt("m2d.txt", delimiter=',')
 						if os.path.exists(os.path.join(self.path,"mdense.txt")):
 							mdis = np.loadtxt("mdis.txt", delimiter=',')
+							#if os.path.exists(os.path.join(self.path,"mdense.txt")):
+							#	mdis = np.loadtxt("mdis.txt", delimiter=',')
 							print "DATA ALREADY EXIST!"
 							return
 			print "Begin to process the data..."
@@ -130,12 +133,12 @@ class McAnalyzer:
 				
 				if line[0] == '1' and line[-4:] == '.txt':
 					self.load_txt(line)
-					totalenergy[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.total_energy
-					cbond_num[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.cbond_num
-					vbond_num[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.vbond_num
+					totalenergy[self.nmetal_ind][self.venergy_ind] = self.total_energy
+					cbond_num[self.nmetal_ind][self.venergy_ind] = self.cbond_num
+					vbond_num[self.nmetal_ind][self.venergy_ind] = self.vbond_num
 					#cbond_num_av[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.cbond_num_av
-					totalenergy_av[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.energy_av
-					cbond_num_avt[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.cbond_num_avt	
+					totalenergy_av[self.nmetal_ind][self.venergy_ind] = self.energy_av
+					cbond_num_avt[self.nmetal_ind][self.venergy_ind] = self.cbond_num_avt	
 					if mode == 1:
 						mols0, count0 = self.clustering(0)
 						mdense[self.nmetal_ind][self.venergy_ind] = count0
@@ -232,11 +235,14 @@ class McAnalyzer:
 
 if __name__ == "__main__":
 	# go to the working directory
-	dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results15"
-	analyzer = McAnalyzer(dname)
-	analyzer.load_logfile()
-	analyzer.run(1)
-	fig = plt.figure()
+	filenumber = [15,16,18,27,28,29,30,31,33]
+	for filenum in filenumber:
+		dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results"+str(filenum)
+		print "file " + str(filenum) + " in processing"
+		analyzer = McAnalyzer(dname)
+		analyzer.load_logfile()
+		analyzer.run(1)
+	fig = plt.figure()	
 	analyzer.phase_diagram(1,0,"Ev/Ec","metal/molecule")
 	#fig.add_subplot(2,2,1)
 	#analyzer.plot_curve("mdense.txt",1,"number metals","prozent",1)
