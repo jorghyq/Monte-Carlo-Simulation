@@ -8,6 +8,7 @@
 #include <time.h> 
 #include <math.h>
 #include <unistd.h>
+#include <iomanip>
 using namespace std;
 
 
@@ -94,7 +95,7 @@ int main(int argc, char *argv[])
 	cout<<"Program is initialized with: "<<endl;
 	cout<<"total_run = "<< total_run<<", latt_length = "<<lattice_size<<endl;
 	cout<<"num of molecule = "<<num_molecule<<", num of metals = "<<num_metal<<endl;
-	cout<<"cenergy = "<<cenergy<<", venergy = "<<venergy<<", mcenergy = "<<mcenergy<<endl;
+	cout<< "cenergy = "<< fixed << setw(5) << setprecision(3) << cenergy<<", venergy = "<< setprecision(3) << venergy<<", mcenergy = "<< setprecision(3) << mcenergy<<endl;
 	clock_t start, finish; 	
 	srand((unsigned)time(NULL)); 
 	// INITIALIZE THE LATTICE
