@@ -143,7 +143,7 @@ class McAnalyzer:
 						mols0, count0 = self.clustering(0)
 						mdense[self.nmetal_ind][self.venergy_ind] = count0
 						mols1, count1 = self.clustering(1)
-						m1d[analyzer.nmetal_ind][self.venergy_ind] = count1
+						m1d[self.nmetal_ind][self.venergy_ind] = count1
 						mols2, count2 = self.clustering(2)
 						m2d[self.nmetal_ind][self.venergy_ind] = count2
 						newlist = []
@@ -178,6 +178,7 @@ class McAnalyzer:
 			np.savetxt("mdis.txt",mdis, delimiter=',')
 			np.savetxt("mtotal.txt",mtotal, delimiter=',')
 			print "Done, data are saved!"
+		
 	
 	def plot_curve(self,filename, mode,xlab, ylab, prozent):
 		fname = os.path.join(self.path,filename)

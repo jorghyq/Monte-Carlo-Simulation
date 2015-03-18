@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from count_mol_bond import cal_bond_num, cluster
 from PIL import Image
 
-dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results26"
+dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results41"
 os.chdir(dname)
 
 metal_0 =  np.loadtxt("metal_0.txt", delimiter=',')
@@ -17,19 +17,19 @@ metal_200 =  np.loadtxt("metal_200.txt", delimiter=',')
 metal_250 =  np.loadtxt("metal_250.txt", delimiter=',')
 metal_300 =  np.loadtxt("metal_300.txt", delimiter=',')
 metal_350 =  np.loadtxt("metal_350.txt", delimiter=',')
-metal_400 =  np.loadtxt("metal_400.txt", delimiter=',')
-metal_450 =  np.loadtxt("metal_450.txt", delimiter=',')
-metal_500 =  np.loadtxt("metal_500.txt", delimiter=',')
-metal_550 =  np.loadtxt("metal_550.txt", delimiter=',')
-metal_600 =  np.loadtxt("metal_600.txt", delimiter=',')
-metal_650 =  np.loadtxt("metal_650.txt", delimiter=',')
+#metal_400 =  np.loadtxt("metal_400.txt", delimiter=',')
+#metal_450 =  np.loadtxt("metal_450.txt", delimiter=',')
+#metal_500 =  np.loadtxt("metal_500.txt", delimiter=',')
+#metal_550 =  np.loadtxt("metal_550.txt", delimiter=',')
+#metal_600 =  np.loadtxt("metal_600.txt", delimiter=',')
+#metal_650 =  np.loadtxt("metal_650.txt", delimiter=',')
 
-mdense = np.zeros((14,10))
-m1d = np.zeros((14,10))
-m2d = np.zeros((14,10))
-mdis = np.zeros((14,10))
+mdense = np.zeros((8,7))
+m1d = np.zeros((8,7))
+m2d = np.zeros((8,7))
+mdis = np.zeros((8,7))
 
-for i in range(14):
+for i in range(8):
 	filename = "metal_%d.txt" % (i*50)
 	print filename 
 	tmp = np.loadtxt(filename, delimiter=',')
@@ -71,7 +71,7 @@ def phase_diagram(updown,leftright,xlab,ylab):
 	b = mdense_p
 	rgb = np.dstack((r,g,b))
 	im = Image.fromarray(np.uint8(rgb*255.999))
-	plt.imshow(im,extent=[0.05,0.5,0/300,600/300],aspect="auto")
+	plt.imshow(im,extent=[0.025,0.325,0/300,350/300],aspect="auto")
 	plt.xlabel(xlab)
 	plt.ylabel(ylab)
 	plt.show()

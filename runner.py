@@ -48,7 +48,7 @@ class McRunner:
 			while cenergy <= self.cenergy_max:
 				venergy = self.venergy_init
 				while venergy <= self.venergy_max:
-					os.system('mc-rect-lattice-func%d -a %d -b %d -c %d -d %d -e %f -f %d -g %d' % (self.mode,self.total_run,self.num_mol,num_metal,cenergy,venergy,mcenergy,self.folder_num))
+					os.system('mc-rect-lattice-func%d -a %d -b %d -c %d -d %f -e %f -f %f -g %d' % (self.mode,self.total_run,self.num_mol,num_metal,cenergy,venergy,mcenergy,self.folder_num))
 					venergy = venergy + self.venergy_step
 				cenergy = cenergy + self.cenergy_step
 				mcenergy = mcenergy + self.cenergy_step	
@@ -80,8 +80,22 @@ class McRunner:
 
 if __name__ == "__main__":
 	runner = McRunner(2)
-	runner.set_initial(10000000,200,200,14)
-	runner.set_range_cenergy(30,1,30)
-	runner.set_range_venergy(3,2,31)	runner.set_range_nmetal(0,25,300)
-	runner.logfile('This is for the molecule BDS285')
-	runner.run(1)	
+	runner.set_initial(10000000,300,100,41)
+	#runner.set_range_cenergy(30,1,30)
+	#runner.set_range_venergy(3,2,31)	runner.set_range_nmetal(0,25,300)
+	#runner.logfile('This is for the molecule BDS285')
+	#runner.run(1)
+	cenergy = 40
+	venergy = 40
+	kT = 3
+	while kT<14:
+		app_cenergy = float(cenergy)/float(kT)
+		app_venergy = float(app_cenergy/4)
+		#app_venergy_step = float(app_venergy)/8
+		runner.set_range_cenergy(app_cenergy,1,app_cenergy)
+		runner.set_range_venergy(app_venergy,1,app_venergy)
+		print "app_cenergy = " + str(app_cenergy) + " app_venergy = " + str(app_venergy)# +" app_venergy_step = " + str(app_venergy_step)
+		runner.set_range_nmetal(0,50,350)
+		runner.logfile('This is for the molecule BDS286')
+		runner.run(1)
+		kT = kT + 2	

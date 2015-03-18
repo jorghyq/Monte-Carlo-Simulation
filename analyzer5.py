@@ -23,25 +23,25 @@ class McAnalyzer:
 	def load_txt(self,txt_name):
 		self.current_mctext = McText(txt_name)
 	
-	def run(self,num_metal):
+	def run(self,cenergy):
 		lines = os.listdir(self.path)
 		os.chdir(dname)
-		self.result = np.zeros((5,7))
-		self.result2 = np.zeros((5,7))
+		self.result = np.zeros((5,9))
+		self.result2 = np.zeros((5,9))
 		p = 0
 		for line in lines:
 			if line[0] == '1' and line[-4:] == '.txt':
 				
 				self.load_txt(line)
-				if self.current_mctext.num_metal == num_metal:
+				if self.current_mctext.cenergy == cenergy:
 					print line
-					print self.current_mctext.num_metal
+					print self.current_mctext.cenergy
 					self.result[0][p] = self.current_mctext.venergy
 					mols0, count0 = self.current_mctext.clustering(0)
 					self.result[1][p] = count0
 					mols1, count1 = self.current_mctext.clustering(1)
 					self.result[2][p] = count1
-					mols2, count2 = self.current_mctext.clustering(3)
+					mols2, count2 = self.current_mctext.clustering(2)
 					self.result[3][p] = count2
 					newlist = []
 					count3 = 0
@@ -66,7 +66,7 @@ class McAnalyzer:
 		index = np.argsort(-self.result[0,:])
 		for i in range(0,5):
 			self.result2[i,:] = self.result[i,index]
-		np.savetxt("metal_%d.txt" % num_metal,self.result2,delimiter=',')
+		np.savetxt("cenergy_%d.txt" % cenergy,self.result2,delimiter=',')
 				
 			
 class McText:
@@ -107,9 +107,9 @@ class McText:
 
 if __name__ == "__main__":
 	# go to the working directory
-	dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results41"
+	dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results37"
 	analyzer = McAnalyzer(dname)
-	for i in range(0,360,50):
+	for i in [20,10,6.7,5,4,3.3]:
 		analyzer.run(i)
 	#analyzer.run(0)
 	#print analyzer.result
