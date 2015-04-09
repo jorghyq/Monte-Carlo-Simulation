@@ -49,7 +49,7 @@ class McRunner:
 				venergy = self.venergy_init
 				while venergy <= self.venergy_max:
 					#temp_filenme = 'mc-rect-lattice-func%d -a %d -b %d -c %d -d %f -e %f -f %f -g %d' % (self.mode,self.total_run,self.num_mol,num_metal,cenergy,venergy,mcenergy,self.folder_num)
-					os.system('mc-rect-lattice-func%d -a %d -b %d -c %d -d %f -e %f -f %f -g %d' % (self.mode,self.total_run,self.num_mol,num_metal,cenergy,venergy,mcenergy,self.folder_num))
+					os.system('./mc-rect-lattice-func-linux%d -a %d -b %d -c %d -d %f -e %f -f %f -g %d' % (self.mode,self.total_run,self.num_mol,num_metal,cenergy,venergy,mcenergy,self.folder_num))
 					venergy = venergy + self.venergy_step
 				cenergy = cenergy + self.cenergy_step
 				mcenergy = mcenergy + self.cenergy_step	
@@ -81,15 +81,15 @@ class McRunner:
 
 if __name__ == "__main__":
 	runner = McRunner(1)
-	filenumber = [15,16,18,27,28,29,30,31,32,33,34,35,36]
+	filenumber = [42,43,44,45]
 	for filenum in filenumber:
 		runner.set_initial(10000000,300,100,filenum)
 		print "filename " + str(filenum)
 		runner.set_range_cenergy(40,1,40)
 		runner.set_range_venergy(5,5,45)	
-		runner.set_range_nmetal(25,50,575)
+		runner.set_range_nmetal(0,25,600)
 		runner.run(1)
-	#runner.logfile('This is for the molecule BDS286')
+		runner.logfile('This is for the molecule BDS286')
 	#cenergy = 40
 	#venergy = 40
 	#kT = 6
