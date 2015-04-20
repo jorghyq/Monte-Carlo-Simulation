@@ -19,7 +19,10 @@ def sprint(txt, inp):
 class McAnalyzer:
 	def __init__(self, wd_path):
 		self.path = wd_path
-		
+
+        def set_path(self, new_path):
+                self.path = new_path
+
 	def load_logfile(self):
 		fname = os.path.join(self.path,'logfile.txt')
 		if os.path.isfile(fname):
@@ -31,7 +34,7 @@ class McAnalyzer:
 					if tline[0].strip() == 'total_run':
 						self.total_run = float(tline[1].strip())
 					elif tline[0].strip() == 'latt_len':
-						self.latt_len = int(tline[1].strip())	
+						self.latt_len = int(tline[1].strip())
 					elif tline[0].strip() == 'num_mol':
 						self.num_mol = int(tline[1].strip())
 					elif tline[0].strip() == 'nmet_init':
@@ -58,7 +61,7 @@ class McAnalyzer:
 		self.ind_metal = (self.nmet_max - self.nmet_init)/self.nmet_step + 1
 		self.ind_cenergy = (self.cenergy_max - self.cenergy_init)/self.cenergy_step + 1
 		self.ind_venergy = (self.venergy_max - self.venergy_init)/self.venergy_step + 1
-		
+
 	def set_initial(self,nmet_init,nmet_step,cenergy_init,cenergy_step,venergy_init,venergy_step):
 		self.nmet_init = nmet_init
 		self.nmet_step = nmet_step
@@ -66,8 +69,8 @@ class McAnalyzer:
 		self.cenergy_step = cenergy_step
 		self.venergy_init = venergy_init
 		self.venergy_step = venergy_step
-		
-	
+
+
 	def load_txt(self,txt_name):
 		#temp,txt_name = os.path.split(txt_name)
 		####### information from the name #######
@@ -88,14 +91,14 @@ class McAnalyzer:
 		f.close()
 		self.cbond_num = float(headdata[0])
 		#self.cbond_num_av = self.cbond_num/float(self.num_metal)
-		self.cbond_num_avt = self.cbond_num/float(self.num_metal + self.num_mol)	
+		self.cbond_num_avt = self.cbond_num/float(self.num_metal + self.num_mol)
 		self.vbond_num = float(headdata[1])
 		self.total_energy = float(headdata[2])
 		self.energy_av = self.total_energy/float(self.num_metal + self.num_mol)
 		####### information from the matrix #######
 		self.lattice = np.loadtxt(txt_name, delimiter=',',skiprows=1)
 		self.lattice = self.lattice[0:self.latt_len,0:]
-		
+
 	def run(self,mode):
 		files = os.listdir(self.path)
 		#mdense = np.loadtxt("mdense.txt", delimiter=',')
@@ -130,7 +133,7 @@ class McAnalyzer:
 							return
 			print "Begin to process the data..."
 			for line in files:
-				
+
 				if line[0] == '1' and line[-4:] == '.txt':
 					self.load_txt(line)
 					totalenergy[self.nmetal_ind][self.venergy_ind] = self.total_energy
@@ -138,7 +141,7 @@ class McAnalyzer:
 					vbond_num[self.nmetal_ind][self.venergy_ind] = self.vbond_num
 					#cbond_num_av[analyzer.nmetal_ind][analyzer.cenergy_ind] = analyzer.cbond_num_av
 					totalenergy_av[self.nmetal_ind][self.venergy_ind] = self.energy_av
-					cbond_num_avt[self.nmetal_ind][self.venergy_ind] = self.cbond_num_avt	
+					cbond_num_avt[self.nmetal_ind][self.venergy_ind] = self.cbond_num_avt
 					if mode == 1:
 						mols0, count0 = self.clustering(0)
 						mdense[self.nmetal_ind][self.venergy_ind] = count0
@@ -166,20 +169,20 @@ class McAnalyzer:
 								count3 = count3 + 1
 						mdis[self.nmetal_ind][self.venergy_ind] = count3
 			mtotal = mdense + m1d + m2d + mdis
-			np.savetxt("totalenergy.txt",totalenergy,delimiter=',')	
+			np.savetxt("totalenergy.txt",totalenergy,delimiter=',')
 			np.savetxt("cbond_num.txt",cbond_num,delimiter=',')
 			np.savetxt("vbond_num.txt",vbond_num,delimiter=',')
 			np.savetxt("cbond_num_av.txt",cbond_num_av,delimiter=',')
 			np.savetxt("totalenergy_av.txt",totalenergy_av,delimiter=',')
 			np.savetxt("cbond_num_avt.txt",cbond_num_avt,delimiter=',')
-			np.savetxt("mdense.txt",mdense, delimiter=',')	
+			np.savetxt("mdense.txt",mdense, delimiter=',')
 			np.savetxt("m1d.txt",m1d, delimiter=',')
 			np.savetxt("m2d.txt",m2d, delimiter=',')
 			np.savetxt("mdis.txt",mdis, delimiter=',')
 			np.savetxt("mtotal.txt",mtotal, delimiter=',')
 			print "Done, data are saved!"
-		
-	
+
+
 	def plot_curve(self,filename, mode,xlab, ylab, prozent):
 		fname = os.path.join(self.path,filename)
 		temp_file = np.loadtxt(fname,delimiter=',')
@@ -198,7 +201,7 @@ class McAnalyzer:
 					plt.ylabel(ylab)
 		else:
 			print "no input file!"
-	
+
 	def phase_diagram(self,updown,leftright,xlab,ylab):
 		mdense = np.loadtxt("mdense.txt", delimiter=',')
 		m1d = np.loadtxt("m1d.txt", delimiter=',')
@@ -228,10 +231,10 @@ class McAnalyzer:
 	def bond_num(self):
 		temp = cal_bond_num(self.lattice) # 1*5 vector
 		return temp
-	
+
 	def clustering(self,mode):
 		mols,count = cluster(mode,self.lattice) # mols: list, count: total number
-		return mols,count 
+		return mols,count
 
 
 if __name__ == "__main__":
@@ -243,17 +246,17 @@ if __name__ == "__main__":
 		analyzer = McAnalyzer(dname)
 		analyzer.load_logfile()
 		analyzer.run(1)
-	fig = plt.figure()	
+	fig = plt.figure()
 	analyzer.phase_diagram(1,0,"Ev/Ec","metal/molecule")
 	#fig.add_subplot(2,2,1)
 	#analyzer.plot_curve("mdense.txt",1,"number metals","prozent",1)
 
 	#fig.add_subplot(2,2,2)
 	#analyzer.plot_curve("m1d.txt",1,"number metals","prozent",1)
-	
+
 	#fig.add_subplot(2,2,3)
 	#analyzer.plot_curve("m2d.txt",1,"number metals","prozent",1)
-	
+
 	#fig.add_subplot(2,2,4)
 	#analyzer.plot_curve("mdis.txt",1,"number metals","prozent",1)
 	plt.show()

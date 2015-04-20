@@ -81,15 +81,29 @@ class McRunner:
 
 if __name__ == "__main__":
 	runner = McRunner(1)
-	filenumber = [42,43,44,45]
-	for filenum in filenumber:
-		runner.set_initial(10000000,300,100,filenum)
-		print "filename " + str(filenum)
-		runner.set_range_cenergy(40,1,40)
-		runner.set_range_venergy(5,5,45)	
-		runner.set_range_nmetal(0,25,600)
-		runner.run(1)
-		runner.logfile('This is for the molecule BDS286')
+        filenum = 47
+        runner.set_initial(100000000,300,100,filenum)
+        runner.set_range_cenergy(40,1,40)
+        runner.set_range_venergy(5,1,5)
+        runner.set_range_nmetal(0,150,750)
+        runner.run(1)
+
+        filenum = 48
+        runner.set_initial(100000000,300,100,filenum)
+        runner.set_range_cenergy(40,1,40)
+        runner.set_range_venergy(5,1,5)
+        runner.set_range_nmetal(0,150,750)
+        runner.run(2)
+
+	#filenumber = [45]
+	#for filenum in filenumber:
+	#	runner.set_initial(10000000,300,100,filenum)
+	#	print "filename " + str(filenum)
+	#	runner.set_range_cenergy(40,1,40)
+	#	runner.set_range_venergy(5,5,45)	
+	#	runner.set_range_nmetal(0,25,600)
+	#	runner.run(1)
+	#	runner.logfile('This is for the molecule BDS286')
 	#cenergy = 40
 	#venergy = 40
 	#kT = 6
