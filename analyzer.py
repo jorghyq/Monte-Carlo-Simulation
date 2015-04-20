@@ -17,19 +17,21 @@ def sprint(txt, inp):
 
 
 class McAnalyzer:
-	def __init__(self, wd_path):
+    def __init__(self, wd_path):
 		self.path = wd_path
 
-        def set_path(self, new_path):
-                self.path = new_path
+    def set_path(self, new_path):
+        self.path = new_path
 
-	def load_logfile(self):
+    def load_logfile(self):
 		fname = os.path.join(self.path,'logfile.txt')
+		#print fname
 		if os.path.isfile(fname):
 			f = open(fname, 'r')
 			print "load logfile!"
 			for line in f:
 				tline = line.split(':')
+				#print tline
 				if len(tline) > 1:
 					if tline[0].strip() == 'total_run':
 						self.total_run = float(tline[1].strip())
@@ -62,7 +64,7 @@ class McAnalyzer:
 		self.ind_cenergy = (self.cenergy_max - self.cenergy_init)/self.cenergy_step + 1
 		self.ind_venergy = (self.venergy_max - self.venergy_init)/self.venergy_step + 1
 
-	def set_initial(self,nmet_init,nmet_step,cenergy_init,cenergy_step,venergy_init,venergy_step):
+    def set_initial(self,nmet_init,nmet_step,cenergy_init,cenergy_step,venergy_init,venergy_step):
 		self.nmet_init = nmet_init
 		self.nmet_step = nmet_step
 		self.cenergy_init = cenergy_init
@@ -71,7 +73,7 @@ class McAnalyzer:
 		self.venergy_step = venergy_step
 
 
-	def load_txt(self,txt_name):
+    def load_txt(self,txt_name):
 		#temp,txt_name = os.path.split(txt_name)
 		####### information from the name #######
 		temp, filename = os.path.split(txt_name)
@@ -99,7 +101,7 @@ class McAnalyzer:
 		self.lattice = np.loadtxt(txt_name, delimiter=',',skiprows=1)
 		self.lattice = self.lattice[0:self.latt_len,0:]
 
-	def run(self,mode):
+    def run(self,mode):
 		files = os.listdir(self.path)
 		#mdense = np.loadtxt("mdense.txt", delimiter=',')
 		#m1d = np.loadtxt("m1d.txt", delimiter=',')
@@ -107,7 +109,7 @@ class McAnalyzer:
 		#mdis = np.loadtxt("mdis.txt", delimiter=',')
 		#mtotal = mdense + m1d + m2d + mdis
 		#fname = os.path.join(self.path,filename)
-		os.chdir(dname)
+		os.chdir(self.path)
 		if self.cenergy_init == self.cenergy_max:
 			totalenergy = np.zeros((self.ind_metal,self.ind_venergy))
 			cbond_num = np.zeros((self.ind_metal,self.ind_venergy))
@@ -183,7 +185,7 @@ class McAnalyzer:
 			print "Done, data are saved!"
 
 
-	def plot_curve(self,filename, mode,xlab, ylab, prozent):
+    def plot_curve(self,filename, mode,xlab, ylab, prozent):
 		fname = os.path.join(self.path,filename)
 		temp_file = np.loadtxt(fname,delimiter=',')
 		#print temp_file.shape
@@ -202,7 +204,7 @@ class McAnalyzer:
 		else:
 			print "no input file!"
 
-	def phase_diagram(self,updown,leftright,xlab,ylab):
+    def phase_diagram(self,updown,leftright,xlab,ylab):
 		mdense = np.loadtxt("mdense.txt", delimiter=',')
 		m1d = np.loadtxt("m1d.txt", delimiter=',')
 		m2d = np.loadtxt("m2d.txt", delimiter=',')
@@ -228,26 +230,26 @@ class McAnalyzer:
 		plt.xlabel(xlab)
 		plt.ylabel(ylab)
 
-	def bond_num(self):
+    def bond_num(self):
 		temp = cal_bond_num(self.lattice) # 1*5 vector
 		return temp
 
-	def clustering(self,mode):
+    def clustering(self,mode):
 		mols,count = cluster(mode,self.lattice) # mols: list, count: total number
 		return mols,count
 
 
 if __name__ == "__main__":
 	# go to the working directory
-	filenumber = [15,16,18,27,28,29,30,31,33]
+	filenumber = [18,27,28,29,30,31,33]
 	for filenum in filenumber:
 		dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results"+str(filenum)
 		print "file " + str(filenum) + " in processing"
 		analyzer = McAnalyzer(dname)
 		analyzer.load_logfile()
 		analyzer.run(1)
-	fig = plt.figure()
-	analyzer.phase_diagram(1,0,"Ev/Ec","metal/molecule")
+	#fig = plt.figure()
+	#analyzer.phase_diagram(1,0,"Ev/Ec","metal/molecule")
 	#fig.add_subplot(2,2,1)
 	#analyzer.plot_curve("mdense.txt",1,"number metals","prozent",1)
 
