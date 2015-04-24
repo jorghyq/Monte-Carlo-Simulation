@@ -33,8 +33,28 @@ def totrun():
         az.run(1)
 
 
-totrun()
-#def aver():
+#totrun()
+class McAverager:
+    def __init__(self,wd_path):
+        self.path = wd_path
+# read all the files
+        files = os.listdir(self.path)
+# select the files
+        for file in files:
+            if file
+
+
+    def set_path(self, new_path):
+        self.path = new_path
+
+    def init_range(self):
+        os.chdir(self.path)
+        mdense = np.loadtxt("mdense.txt", delimiter=',')
+        totalenergy = np.loadtxt("totalenergy.txt",delimiter=',')
+        self.
+
+
+
 
 
 
