@@ -35,23 +35,50 @@ def totrun():
 
 #totrun()
 class McAverager:
-    def __init__(self,wd_path):
+    def __init__(self,wd_path,analyzer):
         self.path = wd_path
-# read all the files
-        files = os.listdir(self.path)
-# select the files
-        for file in files:
-            if file
+        self.analyzer = analyzer
+        #self.analyzer.set_path(self.path)
+        #self.analyzer.load_logifle()
+
+        # read all the files
+        #files = os.listdir(self.path)
+        # select the files
+        #for file in files:
+        #    if file == "logfile.txt":
+
 
 
     def set_path(self, new_path):
         self.path = new_path
 
+    def set_filenumbers(self,filenumbers):
+        self.filenumbers = filenumbers
+
     def init_range(self):
         os.chdir(self.path)
-        mdense = np.loadtxt("mdense.txt", delimiter=',')
-        totalenergy = np.loadtxt("totalenergy.txt",delimiter=',')
-        self.
+        self.mdense = np.loadtxt("mdense.txt", delimiter=',')
+        self.m1d = np.loadtxt("m1d.txt", delimiter=',')
+        self.m2d = np.loadtxt("m2d.txt", delimiter=',')
+        self.mdis = np.loadtxt("mdis.txt", delimiter=',')
+        self.totalenergy = np.loadtxt("totalenergy.txt",delimiter=',')
+        self.totalenergy_av = np.loadtxt("totalenergy_av.txt",delimiter=',')
+        self.metal_ind = (self.mdense.shape)[0]
+        self.energy_ind = (self.mdense.shape)[1]
+
+    def averg(self):
+        for filenum in filenumbers:
+            fulldir = self.path + str(filenum)
+            os.chdir(fulldir)
+            temp_mdense = np.loadtxt("mdense.txt", delimiter=',')
+            temp_m1d = np.loadtxt("m1d.txt", delimiter=',')
+            temp_m2d = np.loadtxt("m2d.txt", delimiter=',')
+            temp_mdis = np.loadtxt("mdis.txt", delimiter=',')
+            temp_totalenergy = np.loadtxt("totalenergy.txt",delimiter=',')
+            temp_totalenergy_av = np.loadtxt("totalenergy_av.txt",delimiter=',')
+            self.mdense = self.mdense + temp_
+
+
 
 
 
