@@ -187,7 +187,7 @@ int main(int argc, char *argv[])
 						energy_new = cal_energy_mol(&points_new[0],4);
 						//cout<<" old energy: "<<energy_old<<" new energy: "<<energy_new<<endl;
 						p = min(exp(-double(energy_new - energy_old)),double(1));
-						p_temp = (rand()+1)/double(RAND_MAX+1);
+						p_temp = (rand()+1)/(double(RAND_MAX)+1);
 						//cout<<" old energy: "<<energy_old<<" new energy: "<<energy_new<<" probability: "<<p<<" random: "<<temp<<endl;
 						//if (p > (double)rand()/RAND_MAX)
 						if (p > p_temp)
@@ -222,7 +222,7 @@ int main(int argc, char *argv[])
 						//cout<<" old energy: "<<energy_old<<" new energy: "<<energy_new<<endl;
 						p = min(exp(-double(energy_new - energy_old)),double(1));
 						//cout<<"probability: "<<p<<endl;
-						p_temp = (rand()+1)/double(RAND_MAX+1);
+						p_temp = (rand()+1)/(double(RAND_MAX)+1);
 						//cout<<" old energy: "<<energy_old<<" new energy: "<<energy_new<<" probability: "<<p<<" random: "<<temp<<endl;
 						//if(p > (double)rand()/RAND_MAX)
 						if(p > p_temp)
