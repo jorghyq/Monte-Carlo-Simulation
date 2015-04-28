@@ -146,12 +146,13 @@ class McAverager:
 
 
 if __name__ == '__main__':
-    az = McAnalyzer('None')
-    averager = McAverager(temp_path,az)
-    averager.set_filenumbers(filenumbers)
+    totrun(temp_path,[16])
+    #az = McAnalyzer('None')
+    #averager = McAverager(temp_path,az)
+    #averager.set_filenumbers(filenumbers)
     #averager.init_range()
     #averager.averg()
-    averager.process()
+    #averager.process()
     #totrun(temp_path,[33])
 
 
