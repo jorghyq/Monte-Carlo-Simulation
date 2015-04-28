@@ -1,11 +1,11 @@
 # Simply convert all the text files to the image file
 import os
-import platform
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results22"
+#dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results47"
+dname = "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results47"
 os.chdir(dname)
 files = os.listdir(dname)
 

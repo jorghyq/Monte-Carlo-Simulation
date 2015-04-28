@@ -59,10 +59,10 @@ class McAnalyzer:
                         self.venergy_max = float(tline[1].strip())
                     else:
                         print "no logfiles!!!!!"
-                        print "logfile loaded!"
-                        self.ind_metal = (self.nmet_max - self.nmet_init)/self.nmet_step + 1
-                        self.ind_cenergy = (self.cenergy_max - self.cenergy_init)/self.cenergy_step + 1
-                        self.ind_venergy = (self.venergy_max - self.venergy_init)/self.venergy_step + 1
+            print "logfile loaded!"
+            self.ind_metal = (self.nmet_max - self.nmet_init)/self.nmet_step + 1
+            self.ind_cenergy = (self.cenergy_max - self.cenergy_init)/self.cenergy_step + 1
+            self.ind_venergy = (self.venergy_max - self.venergy_init)/self.venergy_step + 1
 
     def set_initial(self,nmet_init,nmet_step,cenergy_init,cenergy_step,venergy_init,venergy_step):
         self.nmet_init = nmet_init
