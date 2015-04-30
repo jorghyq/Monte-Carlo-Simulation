@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
 	// INITIALIZE THE LATTICE
 	memset(lattice, 0, sizeof(lattice[0][0]) * lattice_size * lattice_size);
 	memset(lattice_num, 0, sizeof(lattice_num[0][0]) * lattice_size * lattice_size);
-	memset(elements, 0, sizeof(elements[0][0]) * num_total * 4);
+	memset(elements, 0, sizeof(elements[0][0]) * element_num * 2);
 	// Distribute the molecules and metals on the lattice
 	cout << "Begin to distribute elemenst..." << endl;
 	ind[0] = 0;
