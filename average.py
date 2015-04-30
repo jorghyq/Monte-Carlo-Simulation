@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 from count_mol_bond import cal_bond_num, cluster
 from PIL import Image
 
-filenumbers = [15,16,18,27,28,29,30,31,32,33,34,35,36,42,43,44,45]
-
+#filenumbers = [15,16,18,27,28,29,30,31,32,33,34,35,36,42,43,44,45]
+filenumbers = [15,18,27,28,29,30]
 temp_path = "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results"
 
 #totalenergy = np.zeros((9,13))
@@ -96,7 +96,7 @@ class McAverager:
             self.m1d_percent = self.m1d_percent + temp_m1d/temp_total
             self.m2d_percent = self.m2d_percent + temp_m2d/temp_total
         print "average is done!"
-        self.mdense = self.mdense/self.filenumbers
+        #self.mdense = self.mdense/self.filenumbers
         os.chdir(self.path+str(self.filenumbers[0]))
         np.savetxt("mdense_final.txt",self.mdense,fmt='%0.2e',delimiter=',')
         np.savetxt("m1d_final.txt",self.m1d,fmt='%0.2e',delimiter=',')
@@ -141,19 +141,24 @@ class McAverager:
         np.savetxt("E_mean2.txt",E_mean2,fmt='%0.2e',delimiter=',')
         E_dif = E2_mean - E_mean2
         np.savetxt("E_dif.txt",E_dif,fmt='%0.2e',delimiter=',')
+        E2_mean_av = (self.totalenergy_av.pow(2)).sum(0)/self.totalenergy_av.shape[0]
+        E_mean2_av = ((self.totalenergy_av.sum(0))/self.totalenergy_av.shape[0]).pow(2)
+        np.savetxt("E2_mean_av.txt",E2_mean_av,fmt='%0.2e',delimiter=',')
+        np.savetxt("E_mean2_av.txt",E_mean2_av,fmt='%0.2e',delimiter=',')
+        E_dif_av = E2_mean_av - E_mean2_av
+        np.savetxt("E_dif_av.txt",E_dif_av,fmt='%0.2e',delimiter=',')
         print "Process done"
 
 
 
 if __name__ == '__main__':
-    totrun(temp_path,[16])
-    #az = McAnalyzer('None')
-    #averager = McAverager(temp_path,az)
-    #averager.set_filenumbers(filenumbers)
-    #averager.init_range()
-    #averager.averg()
-    #averager.process()
-    #totrun(temp_path,[33])
+    #totrun(temp_path,[16])
+    az = McAnalyzer('None')
+    averager = McAverager(temp_path,az)
+    averager.set_filenumbers(filenumbers)
+    averager.init_range()
+    averager.averg()
+    averager.process()
 
 
 
