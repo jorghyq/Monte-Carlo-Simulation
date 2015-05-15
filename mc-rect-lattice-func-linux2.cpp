@@ -14,7 +14,7 @@ using namespace std;
 int total_run = 10000;
 const int SECOND_LOOP = 1;
 const int lattice_size = 100;
-const int element_num = 1200;//12 * lattice_size;
+const int element_num = 1800;//12 * lattice_size;
 int ffn = 1; // number of results filefolder
 int num_molecule = 300;
 int num_metal = 400;
@@ -607,6 +607,7 @@ void save_to_txt()
 	//ss<<total_run<<"-"<<lattice_size<<"-"<<num_molecule<<"-"<<num_metal<<"-"<<cenergy<<"-"<<venergy<<"-"<<mcenergy<<".txt";
     //ss << "D:\\Dropbox\\Project\\python\\Monte-Carlo-Simulation\\results";
 	ss << "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results";
+	ss << ffn << "/";
 	ss.precision(1);
 	ss.setf(ios::scientific);
 	ss << double(total_run) << "_" << lattice_size << "_" << num_molecule << "_" << num_metal << "_";
