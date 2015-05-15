@@ -10,8 +10,8 @@ from count_mol_bond import cal_bond_num, cluster
 from PIL import Image
 
 #filenumbers = [15,16,18,27,28,29,30,31,32,33,34,35,36,42,43,44,45]
-filenumbers = [15,18,27,28,29,30]
-temp_path = "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results"
+filenumbers = [15,18,27,28,29,30,42,43,44,45]
+temp_path = "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/BDS286/results"
 
 #totalenergy = np.zeros((9,13))
 #totalenergy_av = np.zeros((9,13))
@@ -38,16 +38,6 @@ class McAverager:
     def __init__(self,wd_path,analyzer):
         self.path = wd_path
         self.analyzer = analyzer
-        #self.analyzer.set_path(self.path)
-        #self.analyzer.load_logifle()
-
-        # read all the files
-        #files = os.listdir(self.path)
-        # select the files
-        #for file in files:
-        #    if file == "logfile.txt":
-
-
 
     def set_path(self, new_path):
         self.path = new_path
@@ -152,7 +142,7 @@ class McAverager:
 
 
 if __name__ == '__main__':
-    #totrun(temp_path,[16])
+    #totrun(temp_path,[42,43,44,45])
     az = McAnalyzer('None')
     averager = McAverager(temp_path,az)
     averager.set_filenumbers(filenumbers)

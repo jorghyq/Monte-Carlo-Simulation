@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from count_mol_bond import cal_bond_num, cluster
 from PIL import Image
 
-dname = "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results38"
+dname = "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results41"
 os.chdir(dname)
 
 metal_0 =  np.loadtxt("metal_0.txt", delimiter=',')
@@ -15,14 +15,14 @@ metal_100 =  np.loadtxt("metal_100.txt", delimiter=',')
 metal_150 =  np.loadtxt("metal_150.txt", delimiter=',')
 metal_200 =  np.loadtxt("metal_200.txt", delimiter=',')
 metal_250 =  np.loadtxt("metal_250.txt", delimiter=',')
-metal_300 =  np.loadtxt("metal_300.txt", delimiter=',')
-metal_350 =  np.loadtxt("metal_350.txt", delimiter=',')
-metal_400 =  np.loadtxt("metal_400.txt", delimiter=',')
-metal_450 =  np.loadtxt("metal_450.txt", delimiter=',')
-metal_500 =  np.loadtxt("metal_500.txt", delimiter=',')
-metal_550 =  np.loadtxt("metal_550.txt", delimiter=',')
-metal_600 =  np.loadtxt("metal_600.txt", delimiter=',')
-metal_650 =  np.loadtxt("metal_650.txt", delimiter=',')
+#metal_300 =  np.loadtxt("metal_300.txt", delimiter=',')
+#metal_350 =  np.loadtxt("metal_350.txt", delimiter=',')
+#metal_400 =  np.loadtxt("metal_400.txt", delimiter=',')
+#metal_450 =  np.loadtxt("metal_450.txt", delimiter=',')
+#metal_500 =  np.loadtxt("metal_500.txt", delimiter=',')
+#metal_550 =  np.loadtxt("metal_550.txt", delimiter=',')
+#metal_600 =  np.loadtxt("metal_600.txt", delimiter=',')
+#metal_650 =  np.loadtxt("metal_650.txt", delimiter=',')
 
 #mdense = np.zeros((14,7))
 #m1d = np.zeros((14,7))
@@ -71,10 +71,10 @@ def phase_diagram(updown,leftright,xlab,ylab):
 	b = mdense_p
 	rgb = np.dstack((r,g,b))
 	im = Image.fromarray(np.uint8(rgb*255.999))
-	plt.imshow(im,extent=[0.025,0.325,0/300,650/300],aspect="auto")
+	plt.imshow(im,extent=[0.025,0.325,0/300,350/300],aspect="auto")
 	plt.xlabel(xlab)
 	plt.ylabel(ylab)
-	out_name='BDS286_nmetal_vs_kT.png'
+	out_name='BDS285_nmetal_vs_kT.png'
 	plt.savefig(out_name,dpi=1000)
 	plt.show()
-phase_diagram(1,0,"kT/Ec","metal/molecule")
+phase_diagram(1,0,"kT/Ec","Metal/Molecule")

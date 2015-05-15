@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 #dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results10"
-dname = "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results46"
+dname = "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results15"
 os.chdir(dname)
 mdense = np.loadtxt("mdense.txt", delimiter=',')
 m1d = np.loadtxt("m1d.txt", delimiter=',')
@@ -24,7 +24,7 @@ print nmetal_ind
 print cenergy_ind
 
 mtotal = mdense + m1d + m2d + mdis
-print mtotal
+#print mtotal
 # left and right
 
 
@@ -35,6 +35,9 @@ m2d_p = m2d/mtotal
 mdense_p = np.flipud(mdense/mtotal)
 m1d_p = np.flipud(m1d/mtotal)
 m2d_p = np.flipud(m2d/mtotal)
+#mdense_p = mdense_p[:,:-1]
+#m1d_p = m1d_p[:,:-1]
+#m2d_p = m2d_p[:,:-1]
 
 #mdense_p = np.fliplr(mdense_p)
 #m1d_p = np.fliplr(m1d_p)
@@ -55,9 +58,9 @@ im = Image.fromarray(np.uint8(rgb*255.999))
 #print im
 plt.figure()
 #plt.scatter()
-plt.imshow(im,extent=[0.125,1.125,0,2],aspect="auto")
+plt.imshow(im,extent=[0.125,1,0,2],aspect="auto")
 plt.xlabel("Eo/Ec")
-plt.ylabel("kT/Ev")
-img = "BDS Phase.png"
+plt.ylabel("Metal/Molecule")
+img = "BDS Phase full.png"
 plt.savefig(img,dpi=1000)
 plt.show()
