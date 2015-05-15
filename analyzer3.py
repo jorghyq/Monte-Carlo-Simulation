@@ -107,7 +107,7 @@ class McText:
 
 if __name__ == "__main__":
 	# go to the working directory
-	dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results41"
+	dname = "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results41"
 	analyzer = McAnalyzer(dname)
 	for i in range(0,360,50):
 		analyzer.run(i)

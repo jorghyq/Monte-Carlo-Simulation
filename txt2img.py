@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 #dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results47"
-dname = "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results47"
+dname = "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results46"
 os.chdir(dname)
 files = os.listdir(dname)
 

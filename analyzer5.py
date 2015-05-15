@@ -66,7 +66,7 @@ class McAnalyzer:
 		index = np.argsort(-self.result[0,:])
 		for i in range(0,5):
 			self.result2[i,:] = self.result[i,index]
-		np.savetxt("cenergy_%d.txt" % cenergy,self.result2,delimiter=',')
+		np.savetxt("cenergy_%0.1f.txt" % cenergy,self.result2,delimiter=',',fmt='%0.3f')
 				
 			
 class McText:
@@ -107,9 +107,9 @@ class McText:
 
 if __name__ == "__main__":
 	# go to the working directory
-	dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results37"
+	dname = "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results54"
 	analyzer = McAnalyzer(dname)
-	for i in [20,10,6.7,5,4,3.3]:
+	for i in [40,20,13,10,8.0,6.7,5.7,5,4.4,4,3.6,3.3]:
 		analyzer.run(i)
 	#analyzer.run(0)
 	#print analyzer.result

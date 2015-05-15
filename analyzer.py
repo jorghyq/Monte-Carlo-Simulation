@@ -170,18 +170,44 @@ class McAnalyzer:
                             if i not in newlist:
                                 count3 = count3 + 1
                         mdis[self.nmetal_ind][self.venergy_ind] = count3
+		    if mode == 2:
+			mols0, count0 = self.clustering(0)
+			mdense[self.nmetal_ind][self.venergy_ind] = count0
+			mols1, count1 = self.clustering(1)
+			m1d[analyzer.nmetal_ind][self.venergy_ind] = count1
+			mols2, count2 = self.clustering(3)
+			m2d[self.nmetal_ind][self.venergy_ind] = count2
+			newlist = []
+			count3 = 0
+			mol_list = range(self.num_mol)
+			for i in range(len(mols0)):
+			    for j in range(len(mols0[i])):
+				if mols0[i][j] not in newlist:
+			   	   newlist.append(mols0[i][j])
+			for i in range(len(mols1)):
+			    for j in range(len(mols1[i])):
+				if mols1[i][j] not in newlist:
+			   	    newlist.append(mols1[i][j])
+			for i in range(len(mols2)):
+			    for j in range(len(mols2[i])):
+				if mols2[i][j] not in newlist:
+				    newlist.append(mols2[i][j])
+			for i in range(self.num_mol):
+			    if i not in newlist:
+				count3 = count3 + 1
+			mdis[self.nmetal_ind][self.venergy_ind] = count3
             mtotal = mdense + m1d + m2d + mdis
-            np.savetxt("totalenergy.txt",totalenergy,delimiter=',')
-            np.savetxt("cbond_num.txt",cbond_num,delimiter=',')
-            np.savetxt("vbond_num.txt",vbond_num,delimiter=',')
-            np.savetxt("cbond_num_av.txt",cbond_num_av,delimiter=',')
-            np.savetxt("totalenergy_av.txt",totalenergy_av,delimiter=',')
-            np.savetxt("cbond_num_avt.txt",cbond_num_avt,delimiter=',')
-            np.savetxt("mdense.txt",mdense, delimiter=',')
-            np.savetxt("m1d.txt",m1d, delimiter=',')
-            np.savetxt("m2d.txt",m2d, delimiter=',')
-            np.savetxt("mdis.txt",mdis, delimiter=',')
-            np.savetxt("mtotal.txt",mtotal, delimiter=',')
+            np.savetxt("totalenergy.txt",totalenergy,delimiter=',',fmt='%0.4f')
+            np.savetxt("cbond_num.txt",cbond_num,delimiter=',',fmt='%0.4f')
+            np.savetxt("vbond_num.txt",vbond_num,delimiter=',',fmt='%0.4f')
+            np.savetxt("cbond_num_av.txt",cbond_num_av,delimiter=',',fmt='%0.4f')
+            np.savetxt("totalenergy_av.txt",totalenergy_av,delimiter=',',fmt='%0.4f')
+            np.savetxt("cbond_num_avt.txt",cbond_num_avt,delimiter=',',fmt='%0.4f')
+            np.savetxt("mdense.txt",mdense, delimiter=',',fmt='%0.4f')
+            np.savetxt("m1d.txt",m1d, delimiter=',',fmt='%0.4f')
+            np.savetxt("m2d.txt",m2d, delimiter=',',fmt='%0.4f')
+            np.savetxt("mdis.txt",mdis, delimiter=',',fmt='%0.4f')
+            np.savetxt("mtotal.txt",mtotal, delimiter=',',fmt='%0.4f')
             print "Done, data are saved!"
 
 
@@ -241,13 +267,13 @@ class McAnalyzer:
 
 if __name__ == "__main__":
     # go to the working directory
-    filenumber = [18,27,28,29,30,31,33]
+    filenumber = [46]#,27,28,29,30,31,33]
     for filenum in filenumber:
-        dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results"+str(filenum)
+        dname = "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results"+str(filenum)
         print "file " + str(filenum) + " in processing"
         analyzer = McAnalyzer(dname)
         analyzer.load_logfile()
-        analyzer.run(1)
+        analyzer.run(2)
         #fig = plt.figure()
         #analyzer.phase_diagram(1,0,"Ev/Ec","metal/molecule")
         #fig.add_subplot(2,2,1)

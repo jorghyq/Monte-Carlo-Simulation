@@ -6,77 +6,31 @@ import matplotlib.pyplot as plt
 from count_mol_bond import cal_bond_num, cluster
 from PIL import Image
 
-dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results37"
+dname = "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results54"
 os.chdir(dname)
+cenergy = [40,20,13,10,8.0,6.7,5.7,5,4.4,4,3.6,3.3]
+cenergy_length = len(cenergy)
+mdense = np.zeros((cenergy_length,9))
+m1d = np.zeros((cenergy_length,9))
+m2d = np.zeros((cenergy_length,9))
+mdis = np.zeros((cenergy_length,9))
 
-cenergy_20 =  np.loadtxt("cenergy_20.txt", delimiter=',')
-cenergy_10 =  np.loadtxt("cenergy_10.txt", delimiter=',')
-cenergy_6 =  np.loadtxt("cenergy_6.txt", delimiter=',')
-cenergy_5 =  np.loadtxt("cenergy_5.txt", delimiter=',')
-cenergy_4 =  np.loadtxt("cenergy_4.txt", delimiter=',')
-cenergy_3 =  np.loadtxt("cenergy_3.txt", delimiter=',')
-#metal_650 =  np.loadtxt("metal_650.txt", delimiter=',')
+for i in range(cenergy_length):
+	t_filename = 'cenergy_%0.1f.txt' % cenergy[i]
+	tmp = np.loadtxt(t_filename, delimiter=',')
+	mdense[i,:] = tmp[1,:]
+	m1d[i,:] = tmp[2,:]
+	m2d[i,:] = tmp[3,:]
+	mdis[i,:] = tmp[4,:]
+	print t_filename + " readed!"
 
-mdense = np.zeros((6,9))
-m1d = np.zeros((6,9))
-m2d = np.zeros((6,9))
-mdis = np.zeros((6,9))
-i = 0
-filename = "cenergy_20.txt"
-print filename 
-tmp = np.loadtxt(filename, delimiter=',')
-mdense[i,:] = tmp[1,:]
-m1d[i,:] = tmp[2,:]
-m2d[i,:] = tmp[3,:]
-mdis[i,:] = tmp[4,:]
-i = i + 1
-filename = "cenergy_10.txt"
-print filename 
-tmp = np.loadtxt(filename, delimiter=',')
-mdense[i,:] = tmp[1,:]
-m1d[i,:] = tmp[2,:]
-m2d[i,:] = tmp[3,:]
-mdis[i,:] = tmp[4,:]
-i = i + 1
-filename = "cenergy_6.txt"
-print filename 
-tmp = np.loadtxt(filename, delimiter=',')
-mdense[i,:] = tmp[1,:]
-m1d[i,:] = tmp[2,:]
-m2d[i,:] = tmp[3,:]
-mdis[i,:] = tmp[4,:]
-i = i + 1
-filename = "cenergy_5.txt"
-print filename 
-tmp = np.loadtxt(filename, delimiter=',')
-mdense[i,:] = tmp[1,:]
-m1d[i,:] = tmp[2,:]
-m2d[i,:] = tmp[3,:]
-mdis[i,:] = tmp[4,:]
-i = i + 1
-filename = "cenergy_4.txt"
-print filename 
-tmp = np.loadtxt(filename, delimiter=',')
-mdense[i,:] = tmp[1,:]
-m1d[i,:] = tmp[2,:]
-m2d[i,:] = tmp[3,:]
-mdis[i,:] = tmp[4,:]
-i = i + 1
-filename = "cenergy_3.txt"
-print filename 
-tmp = np.loadtxt(filename, delimiter=',')
-mdense[i,:] = tmp[1,:]
-m1d[i,:] = tmp[2,:]
-m2d[i,:] = tmp[3,:]
-mdis[i,:] = tmp[4,:]
-	
-np.savetxt("mdense.txt",mdense, delimiter=',')	
-np.savetxt("m1d.txt",m1d, delimiter=',')
-np.savetxt("m2d.txt",m2d, delimiter=',')
-np.savetxt("mdis.txt",mdis, delimiter=',')
+np.savetxt("mdense.txt",mdense, delimiter=',',fmt='%0.4f')	
+np.savetxt("m1d.txt",m1d, delimiter=',',fmt='%0.4f')
+np.savetxt("m2d.txt",m2d, delimiter=',',fmt='%0.4f')
+np.savetxt("mdis.txt",mdis, delimiter=',',fmt='%0.4f')
 
 mtotal = mdense + m1d + m2d + mdis
-np.savetxt("mtotal.txt",mtotal, delimiter=',')
+np.savetxt("mtotal.txt",mtotal, delimiter=',',fmt='%0.4f')
 print "Done, data are saved!"
 	
 
@@ -103,9 +57,12 @@ def phase_diagram(updown,leftright,xlab,ylab):
 	b = mdense_p
 	rgb = np.dstack((r,g,b))
 	im = Image.fromarray(np.uint8(rgb*255.999))
-	plt.imshow(im,extent=[0.0,1,0.05,0.3],aspect="auto")
+	plt.imshow(im,extent=[0.0,1,0.025,0.3],aspect="auto")
 	plt.xlabel(xlab)
 	plt.ylabel(ylab)
+	out_name = 'BDS285_kT_vs_Eo.png'
+	plt.savefig(out_name,dpi=500)
 	plt.show()
 
-phase_diagram(1,1,"Ev/Ec","kT/Ec")
+phase_diagram(1,1,"Eo/Ec","kT/Ec")
+
