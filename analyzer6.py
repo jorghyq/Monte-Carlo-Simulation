@@ -60,7 +60,7 @@ def phase_diagram(updown,leftright,xlab,ylab):
 	plt.imshow(im,extent=[0.0,1,0.025,0.3],aspect="auto")
 	plt.xlabel(xlab)
 	plt.ylabel(ylab)
-	out_name = 'BDS285_kT_vs_Eo.png'
+	out_name = 'BDS286_kT_vs_Eo.png'
 	plt.savefig(out_name,dpi=500)
 	plt.show()
 

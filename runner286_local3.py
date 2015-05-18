@@ -88,7 +88,7 @@ if __name__ == "__main__":
         #runner.set_range_nmetal(0,150,750)
         #runner.run(1)
 	
-	runner = McRunner(2)
+	runner = McRunner(1)
         #filenum = 46
         #runner.set_initial(10000000,300,100,filenum)
         #runner.set_range_cenergy(40,1,40)
@@ -96,7 +96,7 @@ if __name__ == "__main__":
         #runner.set_range_nmetal(0,25,600)
         #runner.run(1)
 
-	filenumber = [50,51,52,53,54]
+	filenumber = [59,60,61,62]
 	for filenum in filenumber:
 		runner.set_initial(10000000,300,100,filenum)
 		print "filename " + str(filenum)
@@ -104,7 +104,7 @@ if __name__ == "__main__":
 		runner.set_range_venergy(5,5,45)	
 		runner.set_range_nmetal(0,25,600)
 		runner.run(1)
-		runner.logfile('This is for the molecule BDS285')
+		runner.logfile('This is for the molecule BDS286')
 	#cenergy = 40
 	#venergy = 40
 	#kT = 6

@@ -41,7 +41,7 @@ class McAnalyzer:
 					self.result[1][p] = count0
 					mols1, count1 = self.current_mctext.clustering(1)
 					self.result[2][p] = count1
-					mols2, count2 = self.current_mctext.clustering(2)
+					mols2, count2 = self.current_mctext.clustering(3)
 					self.result[3][p] = count2
 					newlist = []
 					count3 = 0
