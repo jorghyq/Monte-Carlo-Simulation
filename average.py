@@ -130,13 +130,17 @@ class McAverager:
         np.savetxt("E2_mean.txt",E2_mean,fmt='%0.2e',delimiter=',')
         np.savetxt("E_mean2.txt",E_mean2,fmt='%0.2e',delimiter=',')
         E_dif = E2_mean - E_mean2
+        E_dif_av_n = np.zeros(E_dif.shape)
+        for i in range(E_dif.shape[0]):
+            E_dif_av_n[i,:] = E_dif[i,:]/(300 + i*25)
         np.savetxt("E_dif.txt",E_dif,fmt='%0.2e',delimiter=',')
+        np.savetxt("E_dif_av_n.txt",E_dif_av_n,fmt='%0.2e',delimiter=',')
         E2_mean_av = (self.totalenergy_av.pow(2)).sum(0)/self.totalenergy_av.shape[0]
         E_mean2_av = ((self.totalenergy_av.sum(0))/self.totalenergy_av.shape[0]).pow(2)
         np.savetxt("E2_mean_av.txt",E2_mean_av,fmt='%0.2e',delimiter=',')
         np.savetxt("E_mean2_av.txt",E_mean2_av,fmt='%0.2e',delimiter=',')
-        E_dif_av = E2_mean_av - E_mean2_av
-        np.savetxt("E_dif_av.txt",E_dif_av,fmt='%0.2e',delimiter=',')
+        E_dif_av_n2 = E2_mean_av - E_mean2_av
+        np.savetxt("E_dif_av_n2.txt",E_dif_av_n2,fmt='%0.2e',delimiter=',')
         print "Process done"
 
 
@@ -147,7 +151,7 @@ if __name__ == '__main__':
     averager = McAverager(temp_path,az)
     averager.set_filenumbers(filenumbers)
     averager.init_range()
-    averager.averg()
+    #averager.averg()
     averager.process()
 
 
