@@ -10,7 +10,7 @@ from copy import deepcopy
 ##################################################
 def sprint(txt, inp):
 	print txt + " : " + str(inp)
-	
+
 def prepro(lattice):
 	latt_len = lattice.shape[0]
 	#print "latt_len (prepro) :" + str(latt_len)
@@ -73,7 +73,7 @@ def find_neighbour(mode, coor, direct, lattice):
 				for j in new_direct:
 					temp_coor2 = [sir(temp_coor1[0]+direct[j,0],latt_len),sir(temp_coor1[1]+direct[j,1],latt_len)]
 					if lattice[temp_coor2[0]][temp_coor2[1]] != 0 and lattice[temp_coor2[0]][temp_coor2[1]] != 1000:
-						neighbours.append(lattice[temp_coor2[0],temp_coor2[1]]-1)		
+						neighbours.append(lattice[temp_coor2[0],temp_coor2[1]]-1)
 	return neighbours
 
 def corr_num(coor, direction, lattice):
@@ -90,8 +90,8 @@ def corr_num(coor, direction, lattice):
 		if temp == 3:
 			count = count + 1
 	return count
-			
-# auto-correlation for different mode: 0 for dense-packed, 1 for 1D, 2 for 2D		
+
+# auto-correlation for different mode: 0 for dense-packed, 1 for 1D, 2 for 2D
 def auto_correlate(mode, threshold, element, index, lattice):
 	# 1. cluster
 	#output,latt = cluster(lattice)
@@ -211,7 +211,7 @@ def auto_correlate(mode, threshold, element, index, lattice):
 				mol_count = mol_count + 1
 				mol_list.append(index[i])
 	return (mol_count,mol_list)
-				
+
 def cluster(mode, lattice):
 	threshold = 2
 	latt = deepcopy(lattice)
@@ -281,7 +281,7 @@ def cluster(mode, lattice):
 						# add it to the temp list contains all the elements of this cluster
 						temp.append(int(connected_neighbours[j]))
 						# change the label of these elements to the current_index
-						#latt[mol[connected_neighbours[j]][0]][mol[connected_neighbours[j]][1]] = i+1			
+						#latt[mol[connected_neighbours[j]][0]][mol[connected_neighbours[j]][1]] = i+1
 			output_cluster.append(temp)
 	#print output_cluster
 	new_mol = []
@@ -327,20 +327,24 @@ def cal_bond_num(latt):
 	for i in range(0,num_mol):
 		pos_around0 = get_coor_mol(mol[i],latt_len)[1:5]
 		pos_around1 = pos_around0 + direct
-		pos_around2 = pos_around1 + direct
-		pos_around3 = pos_around2 + direct
+		#pos_around2 = pos_around1 + direct
+		#pos_around3 = pos_around2 + direct
 		count = 0
 		for i in range(0,4):
 			if latt[sir(pos_around1[i,0],latt_len),sir(pos_around1[i,1],latt_len)] == 1:
-				if latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)] == 2 and \
-						latt[sir(pos_around3[i,0],latt_len),sir(pos_around3[i,1],latt_len)] == 3:
-							count = count + 1
+                #count = count + 1
+				count = count + 1
+				#if latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)] == 2 and \
+				#		latt[sir(pos_around3[i,0],latt_len),sir(pos_around3[i,1],latt_len)] == 3:
+				#			count = count + 1
 			#elif latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] != 0:
 				#if latt[sir(pos_around[i,0],latt_len),sir(pos_around[i,1],latt_len)] != \
-						#latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)]: 
+						#latt[sir(pos_around2[i,0],latt_len),sir(pos_around2[i,1],latt_len)]:
 				#energy = energy - venergy
 		cbond[count] = cbond[count] + 1
 	return cbond
+
+
 
 if __name__ == "__main__":
 	dname = "D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results16\\4-fold-ev-3"
@@ -388,7 +392,7 @@ if __name__ == "__main__":
 	for i in range(len(output3)):
 		if len(output3[i]) > 3 :
 			print "new: " + str(len(output3[i])) + "  " + str(output3[i])
-	fig = plt.figure()	
+	fig = plt.figure()
 	a = fig.add_subplot(2,3,1)
 	imgplot = plt.imshow(lattice)
 	new_latt1 = np.zeros((lattice.shape[0],lattice.shape[0]))
@@ -427,6 +431,6 @@ if __name__ == "__main__":
 	#a = fig.add_subplot(2,3,4)
 	#for i in range(len(dislist)):
 	#	new_latt1[mol[dislist[i]][0]][mol[dislist[i]][1]] = (i+1)*3
-	
+
 	#imgplot = plt.imshow(new_latt1)
 	plt.show()

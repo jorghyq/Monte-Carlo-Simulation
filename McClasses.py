@@ -12,7 +12,7 @@ class McText:
         self.mol_type = 0  # default BDS286 = 0, BDS285 = 1
         pass
 
-    def loadtxt(self, full_path):
+    def load_text(self, full_path):
         # TODO: Automatic identify the species
         self.full_path = full_path
         self.path, self.txt_name = os.path.split(self.full_path)
@@ -24,7 +24,7 @@ class McText:
         self.cenergy = float(namedata[4])
         self.venergy = float(namedata[5])
         # information from the header #######
-        f = open(self.txt_name, 'r')
+        f = open(self.full_path, 'r')
         headdata = f.readline().strip().split(',')
         f.close()
         self.cbond_num = float(headdata[0])
@@ -33,7 +33,7 @@ class McText:
         self.total_energy = float(headdata[2])
         self.energy_av = self.total_energy/float(self.num_metal + self.num_mol)
         # information from the matrix #######
-        self.lattice = np.loadtxt(self.txt_name, delimiter=',', skiprows=1)
+        self.lattice = np.loadtxt(self.full_path, delimiter=',', skiprows=1)
         self.lattice = self.lattice[0:self.latt_len, 0:]
 
     def bond_num(self):
@@ -93,7 +93,7 @@ class McText:
                 if i not in newlist:
                     count3 = count3 + 1
             self.mdis = count3
-        mtotal = mdense + m1d + m2d + mdis
+        self.mtotal = self.mdense + self.m1d + self.m2d + self.mdis
         self.mdense_p = self.mdense / self.mtotal
         self.m1d_p = self.m1d / self.mtotal
         self.m2d_p = self.m2d / self.mtotal
@@ -190,4 +190,4 @@ class McLog:
             f.write('venergy_init: ' + str(self.venergy_init) + '\n')
             f.write('venergy_step: ' + str(self.venergy_step) + '\n')
             f.write('venergy_max: ' + str(self.venergy_max) + '\n')
-            print "logfile saved to" + os.path.join(self.path,'logfile.txt')""
+            print "logfile saved to" + os.path.join(self.path,'logfile.txt')
