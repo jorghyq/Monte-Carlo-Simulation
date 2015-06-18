@@ -19,10 +19,10 @@ def sprint(txt, inp):
 class McAnalyzer:
 	def __init__(self, wd_path):
 		self.path = wd_path
-		
+
 	def load_txt(self,txt_name):
 		self.current_mctext = McText(txt_name)
-	
+
 	def run(self,cenergy):
 		lines = os.listdir(self.path)
 		os.chdir(dname)
@@ -31,7 +31,7 @@ class McAnalyzer:
 		p = 0
 		for line in lines:
 			if line[0] == '1' and line[-4:] == '.txt':
-				
+
 				self.load_txt(line)
 				if self.current_mctext.cenergy == cenergy:
 					print line
@@ -41,7 +41,7 @@ class McAnalyzer:
 					self.result[1][p] = count0
 					mols1, count1 = self.current_mctext.clustering(1)
 					self.result[2][p] = count1
-					mols2, count2 = self.current_mctext.clustering(3)
+					mols2, count2 = self.current_mctext.clustering(2)
 					self.result[3][p] = count2
 					newlist = []
 					count3 = 0
@@ -67,8 +67,8 @@ class McAnalyzer:
 		for i in range(0,5):
 			self.result2[i,:] = self.result[i,index]
 		np.savetxt("cenergy_%0.1f.txt" % cenergy,self.result2,delimiter=',',fmt='%0.3f')
-				
-			
+
+
 class McText:
 	def __init__(self,txt_name):
 		self.txt_name = txt_name
@@ -87,7 +87,7 @@ class McText:
 		headdata = f.readline().strip().split(',')
 		f.close()
 		#self.cbond_num = float(headdata[0])
-		#self.cbond_num_avt = self.cbond_num/float(self.num_metal + self.num_mol)	
+		#self.cbond_num_avt = self.cbond_num/float(self.num_metal + self.num_mol)
 		#self.vbond_num = float(headdata[1])
 		#self.total_energy = float(headdata[2])
 		#self.energy_av = self.total_energy/float(self.num_metal + self.num_mol)
@@ -99,15 +99,15 @@ class McText:
 	def bond_num(self):
 		temp = cal_bond_num(self.lattice) # 1*5 vector
 		return temp
-	
+
 	def clustering(self,mode):
 		mols,count = cluster(mode,self.lattice) # mols: list, count: total number
 		return mols,count
-				
+
 
 if __name__ == "__main__":
 	# go to the working directory
-	dname = "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results54"
+	dname = "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results63"
 	analyzer = McAnalyzer(dname)
 	for i in [40,20,13,10,8.0,6.7,5.7,5,4.4,4,3.6,3.3]:
 		analyzer.run(i)

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from count_mol_bond import cal_bond_num, cluster
 from PIL import Image
 
-dname = "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results54"
+dname = "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results63"
 os.chdir(dname)
 cenergy = [40,20,13,10,8.0,6.7,5.7,5,4.4,4,3.6,3.3]
 cenergy_length = len(cenergy)
@@ -24,7 +24,7 @@ for i in range(cenergy_length):
 	mdis[i,:] = tmp[4,:]
 	print t_filename + " readed!"
 
-np.savetxt("mdense.txt",mdense, delimiter=',',fmt='%0.4f')	
+np.savetxt("mdense.txt",mdense, delimiter=',',fmt='%0.4f')
 np.savetxt("m1d.txt",m1d, delimiter=',',fmt='%0.4f')
 np.savetxt("m2d.txt",m2d, delimiter=',',fmt='%0.4f')
 np.savetxt("mdis.txt",mdis, delimiter=',',fmt='%0.4f')
@@ -32,7 +32,7 @@ np.savetxt("mdis.txt",mdis, delimiter=',',fmt='%0.4f')
 mtotal = mdense + m1d + m2d + mdis
 np.savetxt("mtotal.txt",mtotal, delimiter=',',fmt='%0.4f')
 print "Done, data are saved!"
-	
+
 
 
 def phase_diagram(updown,leftright,xlab,ylab):

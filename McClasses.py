@@ -12,6 +12,9 @@ class McText:
         self.mol_type = 0  # default BDS286 = 0, BDS285 = 1
         pass
 
+    def set_init(self):
+        pass
+
     def load_text(self, full_path):
         # TODO: Automatic identify the species
         self.full_path = full_path
@@ -50,7 +53,7 @@ class McText:
             self.m2d = count2
             newlist = []
             count3 = 0
-            mol_list = range(self.num_mol)
+            # mol_list = range(self.num_mol)
             for i in range(len(mols0)):
                 for j in range(len(mols0[i])):
                     if mols0[i][j] not in newlist:
@@ -76,7 +79,7 @@ class McText:
             self.m2d = count2
             newlist = []
             count3 = 0
-            mol_list = range(self.num_mol)
+            # mol_list = range(self.num_mol)
             for i in range(len(mols0)):
                 for j in range(len(mols0[i])):
                     if mols0[i][j] not in newlist:

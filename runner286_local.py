@@ -94,13 +94,13 @@ if __name__ == "__main__":
         #runner.set_range_nmetal(0,150,750)
         #runner.run(2)
 
-	filenumber = [33,34,35,36]
+	filenumber = [65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80]
 	for filenum in filenumber:
 		runner.set_initial(10000000,300,100,filenum)
 		print "filename " + str(filenum)
 		runner.set_range_cenergy(40,1,40)
 		runner.set_range_venergy(5,5,45)
-		runner.set_range_nmetal(25,50,600)
+		runner.set_range_nmetal(0,25,600)
 		runner.run(1)
 		#runner.logfile('This is for the molecule BDS286')
 	#cenergy = 40
