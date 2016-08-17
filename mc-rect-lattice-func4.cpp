@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
 		{
 			int ind_x = rand()%(lattice_size);
 			int ind_y = rand()%(lattice_size);
-            int angle = rand()%2;
+            int angle = rand()%2+1;// angle = 1 or 2
 			int (*points_t1)[2];
 			int points_temp[5][2];
 			if (i < num_molecule1)
@@ -131,6 +131,10 @@ int main(int argc, char *argv[])
 				if ((is_occupied(&points_temp[0],5)) == 0 && (is_forbidden(&points_temp[0],4)) == 0)
 				{
 					set_element(&points_temp[0],5,5,i);
+                    /* mol1: 5
+                     *      565
+                     *       5
+                     * */
 					state = 0;
 					//reg2 = reg2 + 1;
 				}
@@ -141,9 +145,23 @@ int main(int argc, char *argv[])
 				points_t1 = det_neighbour(ind_x,ind_y,ind,5);
 				p2a(points_t1,&points_temp[0],5);
 				//print_array(points_t1,5);
+                if (angle == 1):
+                {
+                    points_temp[0][2] = 1;
+                    points_temp[2][2] = 1;
+                }
+                if (angle == 2):
+                {
+                    points_temp[1][2] = 2;
+                    points_temp[3][2] = 2;
+                }
 				if ((is_occupied(&points_temp[0],5)) == 0)// && (is_forbidden(&points_temp[0],4)) == 0)
 				{
 					set_element(&points_temp[0],5,3,i);
+                    /*mol2:           3      or           2
+                     *      amgle=1  242       angle=2   343
+                     *                3                   2
+                     * */
 					state = 0;
 					//reg2 = reg2 + 1;
 				}
@@ -182,11 +200,13 @@ int main(int argc, char *argv[])
 			int points_old[5][2];
 			int (*points_t2)[2];
 			int points_new[5][2];
+            int old_angle = 0;
 			if(ind_ele < num_molecule1)
 			{
 				//disp_array(1);
 				//cout << "number of elements " << ind_ele << endl;
 				points_t1 = det_neighbour(elements[ind_ele][0],elements[ind_ele][1],ind,5);
+                old_angle = elements[ind_ele][2];
 				p2a(points_t1,points_old,5);
 				//print_array(points_t1,5,"points_t1");
 				//print_array(&points_old[0],5, "points_old");
@@ -195,6 +215,7 @@ int main(int argc, char *argv[])
 				{
 					//cout << "Enters the loop..."<<endl;
 					int new_pos[2] = {rand()%lattice_size,rand()%lattice_size};
+                    //int new_angle = rand()%2 + 1;
 					//cout << new_pos[0] <<" "<<new_pos[1]<<endl;
 					points_t2 = det_neighbour(new_pos[0],new_pos[1],ind,5);
 					p2a(points_t2,points_new,5);
@@ -235,10 +256,21 @@ int main(int argc, char *argv[])
 				{
 					//cout << "Enters the loop..."<<endl;
 					int new_pos[2] = {rand()%lattice_size,rand()%lattice_size};
-					//cout << new_pos[0] <<" "<<new_pos[1]<<endl;
+					int new_angle = rand()%2 + 1;
+                    //cout << new_pos[0] <<" "<<new_pos[1]<<endl;
 					points_t2 = det_neighbour(new_pos[0],new_pos[1],ind,5);
 					p2a(points_t2,points_new,5);
-					//print_array(points_t2,5);
+					if (new_angle == 1):
+                    {
+                        points_new[0][2] = 1;
+                        points_new[2][2] = 1;
+                    }
+                    if (new_angle == 2):
+                    {
+                        points_new[1][2] = 2;
+                        points_new[3][2] = 2;
+                    }
+//print_array(points_t2,5);
 					if ((is_occupied(&points_new[0],5)) == 0)// && (is_forbidden(&points_new[0],4)) == 0)
 					{
 						energy_old = cal_energy_mol(&points_old[0],4);
@@ -358,7 +390,7 @@ void print_array(int (*ar)[3], int length, string name)
 }
 
 // ind is a pointer to a 1d array, where the indexex of wanted points are stored
-int (*det_neighbour(int ind_x, int ind_y, int *ind, int length))[2]
+int (*det_neighbour(int ind_x, int ind_y, int *ind, int length))[3]
 {
 	int ind_num;	
 	//cout<<"temp value:"<<endl;
@@ -367,19 +399,21 @@ int (*det_neighbour(int ind_x, int ind_y, int *ind, int length))[2]
 		ind_num = ind[i];
 		temp[i][0] = kwn(lattice_size, ind_x + direct[ind_num][0]);
 		temp[i][1] = kwn(lattice_size, ind_y + direct[ind_num][1]);
+        temp[i][2] = 0;
 		//cout<<temp[i][0]<<" "<<temp[i][1]<<endl;
 		}
 	return temp;
 }
 
-void set_element(int (*co)[3], int length, int op,int ind_ele)
+void set_element(int (*co)[3], int length, int angle, int op,int ind_ele)
 {
 	for (int i=0;i<length;i++)
 	{
 		lattice[*co[i]][*(co[i]+1)] = op;
 		if (length == 5 && i == 4 && op != 0) lattice[*co[i]][*(co[i]+1)] = op+1;
+        if (*(co[i]+2) == 1 && (i == 0 || i == 2)) lattice[*co[i]][*(co[i]+1)] = op-1;
+        if (*(co[i]+2) == 2 && (i == 1 || i == 3)) lattice[*co[i]][*(co[i]+1)] = op-1;
 		//cout<<"point in "<<*co[i]<<" "<<*(co[i]+1)<<" is set to "<<op<<endl;
-        //if (*(co[i]+2) != 0)
 		if (op == 0)
 		{
 			lattice_num[*co[i]][*(co[i]+1)] = op;
@@ -525,7 +559,7 @@ int is_forbidden(int (*co)[3], int length)
 			pos_around2[i][0] = kwn(lattice_size, pos_around[i][0] + direct[i][0]);
 			pos_around2[i][1] = kwn(lattice_size, pos_around[i][1] + direct[i][1]);
 			if (lattice_num[pos_around[i][0]][pos_around[i][1]] == (num_total+1)) return 1;
-			else if ((lattice_num[pos_around[i][0]][pos_around[i][1]] != 0) && (lattice_num[pos_around[i][0]][pos_around[i][1]] != (num_total+1)))
+			else if ((lattice_num[pos_around[i][0]][pos_around[i][1]] != 0) && (lattice[pos_around[i][0]][pos_around[i][1]] != 2))
 			{
 				if (lattice_num[pos_around[i][0]][pos_around[i][1]] == lattice_num[pos_around2[i][0]][pos_around2[i][1]])
 				{
@@ -547,9 +581,11 @@ int is_forbidden(int (*co)[3], int length)
 	else
 	{
 		int pos_around[4][3];
+        if (*(co[i]+2))
 		//int pos_around2[4][2];
 		for (int i=0;i<4;i++)
 		{
+            if (lattice[*co[i]][*(co[i]+1)] == 2) continue;
 			pos_around[i][0] = kwn(lattice_size, *co[i] + direct[i][0]);
 			pos_around[i][1] = kwn(lattice_size, *(co[i]+1) + direct[i][1]);
 			//pos_around2[i][0] = kwn(lattice_size, pos_around[i][0] + direct[i][0]);
