@@ -57,3 +57,4 @@ docs/_build/
 # Python Compiled file
 *.pyc
 *.txt
+test

@@ -13,13 +13,13 @@ using namespace std;
 
 int total_run = 100000;
 const int SECOND_LOOP = 1;
-const int lattice_size = 100;
-const int element_num = 1600;//12 * lattice_size;
+const int lattice_size = 30;
+const int element_num = 100;//12 * lattice_size;
 int ffn = 1; // number of results filefolder
-int num_molecule = 200;
-int num_molecule1 = 100;
-int num_molecule2 = 100;
-int num_metal = 400;
+int num_molecule = 40;
+int num_molecule1 = 20;
+int num_molecule2 = 20;
+int num_metal = 0;
 int num_total = num_molecule + num_metal;
 double cenergy = 10;
 double venergy = 3;
@@ -36,8 +36,8 @@ double last_energy =  0;
 double p = 0;
 double p_temp = 0;
 int kwn(int n, int var);
-void p2a(int (*ptr)[2], int arr[][3], int length);
-int (*det_neighbour(int ind_x, int ind_y, int *ind, int length))[2];
+void p2a(int (*ptr)[3], int arr[][3], int length);
+int (*det_neighbour(int ind_x, int ind_y, int *ind, int length))[3];
 int is_occupied(int (*co)[3], int length);
 int is_forbidden(int (*co)[3], int length);
 void set_element(int (*co)[3], int length, int op,int ind_ele);
@@ -121,8 +121,8 @@ int main(int argc, char *argv[])
 			int ind_x = rand()%(lattice_size);
 			int ind_y = rand()%(lattice_size);
             int angle = rand()%2+1;// angle = 1 or 2
-			int (*points_t1)[2];
-			int points_temp[5][2];
+			int (*points_t1)[3];
+			int points_temp[5][3];
 			if (i < num_molecule1)
 			{
 				points_t1 = det_neighbour(ind_x,ind_y,ind,5);
@@ -145,12 +145,12 @@ int main(int argc, char *argv[])
 				points_t1 = det_neighbour(ind_x,ind_y,ind,5);
 				p2a(points_t1,&points_temp[0],5);
 				//print_array(points_t1,5);
-                if (angle == 1):
+                if (angle == 1)
                 {
                     points_temp[0][2] = 1;
                     points_temp[2][2] = 1;
                 }
-                if (angle == 2):
+                if (angle == 2)
                 {
                     points_temp[1][2] = 2;
                     points_temp[3][2] = 2;
@@ -196,10 +196,10 @@ int main(int argc, char *argv[])
 		{
 			int ind_ele = rand()%(num_molecule + num_metal);
 			//cout << "number of elements " << ind_ele << endl;
-			int (*points_t1)[2];
-			int points_old[5][2];
-			int (*points_t2)[2];
-			int points_new[5][2];
+			int (*points_t1)[3];
+			int points_old[5][3];
+			int (*points_t2)[3];
+			int points_new[5][3];
             int old_angle = 0;
 			if(ind_ele < num_molecule1)
 			{
@@ -226,7 +226,7 @@ int main(int argc, char *argv[])
 						energy_new = cal_energy_mol(&points_new[0],4);
 						//cout<<" old energy: "<<energy_old<<" new energy: "<<energy_new<<endl;
 						p = min(exp(-double(energy_new - energy_old)),double(1));
-						p_temp = (rand()+1)/double(RAND_MAX+1);
+						p_temp = (rand()+1)/(double(RAND_MAX)+1);
 						//cout<<" old energy: "<<energy_old<<" new energy: "<<energy_new<<" probability: "<<p<<" random: "<<temp<<endl;
 						//if (p > (double)rand()/RAND_MAX)
 						if (p > p_temp)
@@ -260,12 +260,12 @@ int main(int argc, char *argv[])
                     //cout << new_pos[0] <<" "<<new_pos[1]<<endl;
 					points_t2 = det_neighbour(new_pos[0],new_pos[1],ind,5);
 					p2a(points_t2,points_new,5);
-					if (new_angle == 1):
+					if (new_angle == 1)
                     {
                         points_new[0][2] = 1;
                         points_new[2][2] = 1;
                     }
-                    if (new_angle == 2):
+                    if (new_angle == 2)
                     {
                         points_new[1][2] = 2;
                         points_new[3][2] = 2;
@@ -277,7 +277,7 @@ int main(int argc, char *argv[])
 						energy_new = cal_energy_mol(&points_new[0],4);
 						//cout<<" old energy: "<<energy_old<<" new energy: "<<energy_new<<endl;
 						p = min(exp(-double(energy_new - energy_old)),double(1));
-						p_temp = (rand()+1)/double(RAND_MAX+1);
+						p_temp = (rand()+1)/(double(RAND_MAX)+1);
 						//cout<<" old energy: "<<energy_old<<" new energy: "<<energy_new<<" probability: "<<p<<" random: "<<temp<<endl;
 						//if (p > (double)rand()/RAND_MAX)
 						if (p > p_temp)
@@ -312,7 +312,7 @@ int main(int argc, char *argv[])
 						//cout<<" old energy: "<<energy_old<<" new energy: "<<energy_new<<endl;
 						p = min(exp(-double(energy_new - energy_old)),double(1));
 						//cout<<"probability: "<<p<<endl;
-						p_temp = (rand()+1)/double(RAND_MAX+1);
+						p_temp = (rand()+1)/(double(RAND_MAX)+1);
 						//cout<<" old energy: "<<energy_old<<" new energy: "<<energy_new<<" probability: "<<p<<" random: "<<temp<<endl;
 						//if(p > (double)rand()/RAND_MAX)
 						if(p > p_temp)
@@ -376,7 +376,7 @@ void p2a(int (*ptr)[3], int arr[][3], int length)
 	{
 		arr[i][0] = *ptr[i];
 		arr[i][1] = *(ptr[i]+1);
-        arr[i][2] = *(ptr[i]+2)
+        arr[i][2] = *(ptr[i]+2);
 	}
 }
 void print_array(int (*ar)[3], int length, string name)
@@ -384,7 +384,7 @@ void print_array(int (*ar)[3], int length, string name)
 	cout<<"Print array: "<<name<<endl;
 	for (int i=0;i<length;i++)
 	{
-		cout<<*ar[i]<<" "<<*(ar[i]+1)<<" "<<*(ar[i]+2)endl;
+		cout<<*ar[i]<<" "<<*(ar[i]+1)<<" "<<*(ar[i]+2)<<endl;
 	}
 
 }
@@ -405,7 +405,7 @@ int (*det_neighbour(int ind_x, int ind_y, int *ind, int length))[3]
 	return temp;
 }
 
-void set_element(int (*co)[3], int length, int angle, int op,int ind_ele)
+void set_element(int (*co)[3], int length, int op,int ind_ele)
 {
 	for (int i=0;i<length;i++)
 	{
@@ -439,7 +439,7 @@ void set_element(int (*co)[3], int length, int angle, int op,int ind_ele)
 	{
 		elements[ind_ele][0] = *co[length-1];
 		elements[ind_ele][1] = *(co[length-1]+1);
-        elements[ind_ele][2] = *(co[length-1]+2)
+        elements[ind_ele][2] = *(co[length-1]+2);
 	}
 }
 
@@ -468,6 +468,7 @@ double cal_energy_mol(int (*co)[3], int length)
 	int pos_around2[4][3];
 	for (int i=0;i<length;i++)
 	{
+        if (lattice[*co[i]][*(co[i]+1)] == 2) continue;
 		pos_around[i][0] = kwn(lattice_size, *co[i] + direct[i][0]);
 		pos_around[i][1] = kwn(lattice_size, *(co[i]+1) + direct[i][1]);
 		pos_around2[i][0] = kwn(lattice_size, pos_around[i][0] + direct[i][0]);
@@ -488,18 +489,18 @@ double cal_energy_mol(int (*co)[3], int length)
 	return energy;
 }
 
-double cal_energy_metal(int (*co)[2], int length)
+double cal_energy_metal(int (*co)[3], int length)
 {
 	double energy = 0;
-	int pos_around[4][2];
-	int pos_around2[4][2];
+	int pos_around[4][3];
+	int pos_around2[4][3];
 	for (int i=0;i<length;i++)
 	{
 		pos_around[i][0] = *co[i];
 		pos_around[i][1] = *(co[i]+1);
 		pos_around2[i][0] = kwn(lattice_size, pos_around[i][0] + direct[i][0]);
 		pos_around2[i][1] = kwn(lattice_size, pos_around[i][1] + direct[i][1]);
-		if ((lattice_num[pos_around[i][0]][pos_around[i][1]] != 0) && (lattice_num[pos_around[i][0]][pos_around[i][1]] != num_total+1))
+		if ((lattice_num[pos_around[i][0]][pos_around[i][1]] != 0) && (lattice[pos_around[i][0]][pos_around[i][1]] != 2))
 		{
 			if (lattice_num[pos_around[i][0]][pos_around[i][1]] == lattice_num[pos_around2[i][0]][pos_around2[i][1]])
 			{
@@ -517,7 +518,7 @@ double cal_energy_sys(void)
 	//int cbond_count = 0;
 	//int vbond_count = 0;
 	//int temp = 0;
-	int (*points_t1)[2];
+	int (*points_t1)[3];
 	for (int i=0;i<num_total;i++)
 	{
 		energy_temp = 0;
@@ -581,7 +582,7 @@ int is_forbidden(int (*co)[3], int length)
 	else
 	{
 		int pos_around[4][3];
-        if (*(co[i]+2))
+        //if (*(co[i]+2))
 		//int pos_around2[4][2];
 		for (int i=0;i<4;i++)
 		{
@@ -639,9 +640,9 @@ int *cal_bond_num(void)
 {
 	int cbond = 0;
 	int vbond = 0;
-	int (*points_t1)[2];
-	int pos_around[4][2];
-	int pos_around2[4][2];
+	int (*points_t1)[3];
+	int pos_around[4][3];
+	int pos_around2[4][3];
 	for (int i=0;i<num_molecule;i++)
 	{
 		points_t1 = det_neighbour(elements[i][0],elements[i][1],ind,5);
@@ -705,17 +706,18 @@ void save_to_txt()
 {
 	string filename;
 	stringstream ss;
-	//<<total_run<<"-"<<lattice_size<<"-"<<num_molecule<<"-"<<num_metal<<"-"<<cenergy<<"-"<<venergy<<"-"<<mcenergy<<".txt";
-	ss << "D:\\Dropbox\\Project\\python\\Monte-Carlo-Simulation\\results";
-	ss << ffn << "\\";
+	//ss<<total_run<<"-"<<lattice_size<<"-"<<num_molecule<<"-"<<num_metal<<"-"<<cenergy<<"-"<<venergy<<"-"<<mcenergy<<".txt";
+	//ss << "D:\\Dropbox\\Project\\python\\Monte-Carlo-Simulation\\results";
+	ss << "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results";
+	ss << ffn << "/";
 	ss.precision(1);
 	ss.setf(ios::scientific);
 	ss << double(total_run) << "_" << lattice_size << "_" << num_molecule << "_" << num_metal << "_";
 	ss << cenergy << "_" << venergy << "_" << mcenergy << ".txt";
 	filename = ss.str();
 	cout<<"output to file: "<<filename<<endl;
-	//ofstream file(filename.c_str());
-	ofstream file("latt.txt");
+	ofstream file(filename.c_str());
+	//ofstream file("latt.txt");
 	string line;
 	stringstream linestream;
 	int *bond_num;
@@ -788,7 +790,7 @@ void save_to_txt()
 				//cout<<line<<",";
 			}
 				
-			
+				
 		}
 		file<<"\r\n";
 	}
