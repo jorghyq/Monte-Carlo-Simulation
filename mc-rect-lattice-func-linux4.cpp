@@ -13,8 +13,8 @@ using namespace std;
 
 int total_run = 100000;
 const int SECOND_LOOP = 1;
-const int lattice_size = 30;
-const int element_num = 100;//12 * lattice_size;
+const int lattice_size = 100;
+const int element_num = 1000;//12 * lattice_size;
 int ffn = 1; // number of results filefolder
 int num_molecule = 40;
 int num_molecule1 = 20;
@@ -112,6 +112,13 @@ int main(int argc, char *argv[])
 	ind[4] = 4;
 	num_molecule1 = num_molecule/4*3;
 	num_molecule2 = num_molecule/4*1;
+    /*
+     * molecular components at meso positions
+     * 2: non-reactive
+     * 3: 2-fold allowed
+     * 5: fourfold allowed
+     *
+     * */
 	cout<<"molecules1 "<<num_molecule1 << " molecules2 "<<num_molecule2<<endl; 
 	for(int i = 0; i < num_molecule + num_metal; i++)
 	{
@@ -155,7 +162,7 @@ int main(int argc, char *argv[])
                     points_temp[1][2] = 2;
                     points_temp[3][2] = 2;
                 }
-				if ((is_occupied(&points_temp[0],5)) == 0)// && (is_forbidden(&points_temp[0],4)) == 0)
+				if ((is_occupied(&points_temp[0],5)) == 0 && (is_forbidden(&points_temp[0],4)) == 0)
 				{
 					set_element(&points_temp[0],5,3,i);
                     /*mol2:           3      or           2
@@ -172,7 +179,7 @@ int main(int argc, char *argv[])
 				points_t1 = det_neighbour(ind_x,ind_y,ind,5);
 				p2a(points_t1,&points_temp[0],5);
 				//print_array(points_t1,4);
-				if (is_occupied(&points_temp[0],1) == 0)// && is_forbidden(&points_temp[0],1) == 0)
+				if (is_occupied(&points_temp[0],1) == 0 && is_forbidden(&points_temp[0],1) == 0)
 				{
 					set_element(&points_temp[4],1,1,i);
 					state = 0;
@@ -236,7 +243,7 @@ int main(int argc, char *argv[])
 							set_element(&points_old[0],5,0,ind_ele);
 							//print_array(points_t1,5,"points_t1");
 							//print_array(&points_old[0],5,"points_old");
-							set_element(&points_new[0],5,4,ind_ele);
+							set_element(&points_new[0],5,5,ind_ele);
 						}
 						state = 0;
 						//cout <<ind_ele<< " is done"<<endl;
@@ -271,7 +278,7 @@ int main(int argc, char *argv[])
                         points_new[3][2] = 2;
                     }
 //print_array(points_t2,5);
-					if ((is_occupied(&points_new[0],5)) == 0)// && (is_forbidden(&points_new[0],4)) == 0)
+					if ((is_occupied(&points_new[0],5)) == 0 && (is_forbidden(&points_new[0],4)) == 0)
 					{
 						energy_old = cal_energy_mol(&points_old[0],4);
 						energy_new = cal_energy_mol(&points_new[0],4);
@@ -287,7 +294,7 @@ int main(int argc, char *argv[])
 							set_element(&points_old[0],5,0,ind_ele);
 							//print_array(points_t1,5,"points_t1");
 							//print_array(&points_old[0],5,"points_old");
-							set_element(&points_new[0],5,2,ind_ele);
+							set_element(&points_new[0],5,3,ind_ele);
 						}
 						state = 0;
 						//cout <<ind_ele<< " is done"<<endl;
@@ -305,7 +312,7 @@ int main(int argc, char *argv[])
 					int new_pos[2] = {rand()%lattice_size,rand()%lattice_size};
 					points_t2 = det_neighbour(new_pos[0],new_pos[1],ind,5);
 					p2a(points_t2,&points_new[0],5);
-					if (is_occupied(&points_new[0],1) == 0)// && is_forbidden(&points_new[0],1) == 0)
+					if (is_occupied(&points_new[0],1) == 0 && is_forbidden(&points_new[0],1) == 0)
 					{
 						energy_old = cal_energy_metal(&points_old[0],4);
 						energy_new = cal_energy_metal(&points_new[0],4);
@@ -468,24 +475,28 @@ double cal_energy_mol(int (*co)[3], int length)
 	int pos_around2[4][3];
 	for (int i=0;i<length;i++)
 	{
-        if (lattice[*co[i]][*(co[i]+1)] == 2) continue;
+        //if (lattice[*co[i]][*(co[i]+1)] == 2) continue;
 		pos_around[i][0] = kwn(lattice_size, *co[i] + direct[i][0]);
 		pos_around[i][1] = kwn(lattice_size, *(co[i]+1) + direct[i][1]);
 		pos_around2[i][0] = kwn(lattice_size, pos_around[i][0] + direct[i][0]);
 		pos_around2[i][1] = kwn(lattice_size, pos_around[i][1] + direct[i][1]);
-		if (lattice_num[pos_around[i][0]][pos_around[i][1]] == (num_total+1))
+		if (lattice[pos_around[i][0]][pos_around[i][1]] == 1 && lattice[*co[i]][*(co[i]+1)] != 2)
 		{
 			energy = energy - double(cenergy);
-			
-			}
-		else if (lattice_num[pos_around[i][0]][pos_around[i][1]] != 0)
-		{
-			if (lattice_num[pos_around[i][0]][pos_around[i][1]] != lattice_num[pos_around2[i][0]][pos_around2[i][1]])
-			{
-				energy = energy - double(venergy);
-				}
-			}
 		}
+		else if (lattice[pos_around[i][0]][pos_around[i][1]] == 3 && lattice[pos_around2[i][0]][pos_around2[i][1]] != 4)
+		{
+            energy = energy - double(venergy);
+        }
+		else if (lattice[pos_around[i][0]][pos_around[i][1]] == 2 && lattice[pos_around2[i][0]][pos_around2[i][1]] != 4)
+		{
+            energy = energy - double(venergy);
+        }
+        else if (lattice[pos_around[i][0]][pos_around[i][1]] == 5 && lattice[pos_around2[i][0]][pos_around2[i][1]] != 6)
+		{
+			energy = energy - double(venergy);
+		}
+	}
 	return energy;
 }
 
@@ -500,14 +511,14 @@ double cal_energy_metal(int (*co)[3], int length)
 		pos_around[i][1] = *(co[i]+1);
 		pos_around2[i][0] = kwn(lattice_size, pos_around[i][0] + direct[i][0]);
 		pos_around2[i][1] = kwn(lattice_size, pos_around[i][1] + direct[i][1]);
-		if ((lattice_num[pos_around[i][0]][pos_around[i][1]] != 0) && (lattice[pos_around[i][0]][pos_around[i][1]] != 2))
+		if ((lattice[pos_around[i][0]][pos_around[i][1]] == 3) || lattice[pos_around[i][0]][pos_around[i][1]] == 5)
 		{
-			if (lattice_num[pos_around[i][0]][pos_around[i][1]] == lattice_num[pos_around2[i][0]][pos_around2[i][1]])
+			if (lattice[pos_around2[i][0]][pos_around2[i][1]] == 4 || lattice_num[pos_around2[i][0]][pos_around2[i][1]] == 6)
 			{
 				energy = energy - double(mcenergy);
-				}
 			}
 		}
+	}
 	return energy;
 }
 
@@ -559,16 +570,19 @@ int is_forbidden(int (*co)[3], int length)
 			pos_around[i][1] = *(co[i]+1);
 			pos_around2[i][0] = kwn(lattice_size, pos_around[i][0] + direct[i][0]);
 			pos_around2[i][1] = kwn(lattice_size, pos_around[i][1] + direct[i][1]);
-			if (lattice_num[pos_around[i][0]][pos_around[i][1]] == (num_total+1)) return 1;
-			else if ((lattice_num[pos_around[i][0]][pos_around[i][1]] != 0) && (lattice[pos_around[i][0]][pos_around[i][1]] != 2))
+			// metals can not form cluster
+            if (lattice[pos_around[i][0]][pos_around[i][1]] == 1) return 1;
+            // check if the linear 2-fold coordination condition is violated
+			else if ((lattice[pos_around[i][0]][pos_around[i][1]] == 3))// || (lattice[pos_around[i][0]][pos_around[i][1]] = 5))
 			{
-				if (lattice_num[pos_around[i][0]][pos_around[i][1]] == lattice_num[pos_around2[i][0]][pos_around2[i][1]])
-				{
+				//if (lattice_num[pos_around[i][0]][pos_around[i][1]] == lattice_num[pos_around2[i][0]][pos_around2[i][1]])
+				if (lattice[pos_around2[i][0]][pos_around2[i][1]] == 4)
+                {
 					count[i] = 1;
 					count_num = count_num +1;
-					}
 				}
 			}
+		}
 		//cout<<"num of count: "<<count_num<<" "<<count[0]<<" "<<count[1]<<" "<<count[2]<<" "<<count[3]<<endl;
 		if (count_num > 2) return 1;
 		else if (count_num == 2)
@@ -576,7 +590,7 @@ int is_forbidden(int (*co)[3], int length)
 			if ((count[0] == 1) && (count[2] == 1)) return 0;
 			else if ((count[1] == 1) && (count[3] == 1)) return 0;
 			else return 1;
-			}
+		}
 		else return 0;
 	}
 	else
@@ -586,54 +600,54 @@ int is_forbidden(int (*co)[3], int length)
 		//int pos_around2[4][2];
 		for (int i=0;i<4;i++)
 		{
+            // if the meso substituent is non active, just continue
             if (lattice[*co[i]][*(co[i]+1)] == 2) continue;
-			pos_around[i][0] = kwn(lattice_size, *co[i] + direct[i][0]);
-			pos_around[i][1] = kwn(lattice_size, *(co[i]+1) + direct[i][1]);
-			//pos_around2[i][0] = kwn(lattice_size, pos_around[i][0] + direct[i][0]);
-			//pos_around2[i][1] = kwn(lattice_size, pos_around[i][1] + direct[i][1]);
-			//if ((lattice_num[pos_around[i][0]][pos_around[i][1]] != 0) && (lattice_num[pos_around[i][0]][pos_around[i][1]] == lattice_num[pos_around2[i][0]][pos_around2[i][1]])) return 1;
-			int plus1[2] = {0};
-			int plus2[2] = {0};
-			int minus1[2] = {0};
-			int minus2[2] = {0};
-			if (lattice_num[pos_around[i][0]][pos_around[i][1]] == (num_total+1))
-			{
-				int plus = kwn(4,i+1);
-				int minus = kwn(4,i-1);
-				//cout<<"i: "<<i<<" plus: "<<plus<<" minus: "<<minus<<endl;
-				
-				//cout<<"minus"<<minus<<endl;
-				// points 
-				plus1[0] = kwn(lattice_size, pos_around[i][0] + direct[plus][0]);
-				plus1[1] = kwn(lattice_size, pos_around[i][1] + direct[plus][1]);
-				//cout<<"plus1x: "<<plus1[0]<<" plus1y: "<<plus1[1]<<endl;
-				plus2[0] = kwn(lattice_size, plus1[0] + direct[plus][0]);
-				plus2[1] = kwn(lattice_size, plus1[1] + direct[plus][1]);
-				//cout<<"plus2x: "<<plus2[0]<<" plus2y: "<<plus2[1]<<endl;
-				// points
-				minus1[0] = kwn(lattice_size, pos_around[i][0] + direct[minus][0]);
-				minus1[1] = kwn(lattice_size, pos_around[i][1] + direct[minus][1]);
-				minus2[0] = kwn(lattice_size, minus1[0] + direct[minus][0]);
-				minus2[1] = kwn(lattice_size, minus1[1] + direct[minus][1]);
-				if (lattice_num[plus1[0]][plus1[1]] < num_molecule1)
-				{
-					if ((lattice_num[plus1[0]][plus1[1]] != 0) && (lattice_num[plus1[0]][plus1[1]] == lattice_num[plus2[0]][plus2[1]]))
-					{
-						return 1;
-					}
-					if ((lattice_num[minus1[0]][minus1[1]] != 0) && (lattice_num[minus1[0]][minus1[1]] == lattice_num[minus2[0]][minus2[1]]))
-					{
-						return 1;
-					}
-				}
-				
-						
-			}
-				//else return 0;
+            // if the meso substituent is only allowed for two-fold coordination
+            else if(lattice[*co[i]][*(co[i]+1)] == 3)
+            {
+                pos_around[i][0] = kwn(lattice_size, *co[i] + direct[i][0]);
+                pos_around[i][1] = kwn(lattice_size, *(co[i]+1) + direct[i][1]);
+                //pos_around2[i][0] = kwn(lattice_size, pos_around[i][0] + direct[i][0]);
+                //pos_around2[i][1] = kwn(lattice_size, pos_around[i][1] + direct[i][1]);
+                int plus1[2] = {0};
+                int plus2[2] = {0};
+                int minus1[2] = {0};
+                int minus2[2] = {0};
+				if (lattice[pos_around[i][0]][pos_around[i][1]] == 1)
+                {
+                    int plus = kwn(4,i+1);
+                    int minus = kwn(4,i-1);
+                    //cout<<"i: "<<i<<" plus: "<<plus<<" minus: "<<minus<<endl;
+                    //cout<<"minus"<<minus<<endl;
+                    // points 
+                    plus1[0] = kwn(lattice_size, pos_around[i][0] + direct[plus][0]);
+                    plus1[1] = kwn(lattice_size, pos_around[i][1] + direct[plus][1]);
+                    //cout<<"plus1x: "<<plus1[0]<<" plus1y: "<<plus1[1]<<endl;
+                    plus2[0] = kwn(lattice_size, plus1[0] + direct[plus][0]);
+                    plus2[1] = kwn(lattice_size, plus1[1] + direct[plus][1]);
+                    //cout<<"plus2x: "<<plus2[0]<<" plus2y: "<<plus2[1]<<endl;
+                    // points
+                    minus1[0] = kwn(lattice_size, pos_around[i][0] + direct[minus][0]);
+                    minus1[1] = kwn(lattice_size, pos_around[i][1] + direct[minus][1]);
+                    minus2[0] = kwn(lattice_size, minus1[0] + direct[minus][0]);
+                    minus2[1] = kwn(lattice_size, minus1[1] + direct[minus][1]);
+                    // 4-fold not allowed, here 2-fold coordination could also
+                    // have 4-fold at its neighbour coordination positions
+                    if ((lattice[plus1[0]][plus1[1]] == 3) && lattice[plus2[0]][plus2[1]] == 4)
+                    {
+                        return 1;
+                    }
+                    if ((lattice[minus1[0]][minus1[1]] == 3) && lattice[minus2[0]][minus2[1]] == 4)
+                    {
+                        return 1;
+                    }
+                }
+            }
+            // if 4-fold no restrictions
+            else continue;   
 		}
 		return 0;
 	}
-	
 }
 
 int *cal_bond_num(void)
