@@ -13,7 +13,7 @@ using namespace std;
 
 int total_run = 100000;
 const int SECOND_LOOP = 1;
-const int lattice_size = 100;
+const int lattice_size = 30;
 const int element_num = 1000;//12 * lattice_size;
 int ffn = 1; // number of results filefolder
 int num_molecule = 40;
@@ -53,13 +53,14 @@ int main(int argc, char *argv[])
 {
 	// SET THE COMMANDLINE ARGUMENTS
 	// a: total_run
-	// b: num_mol
-	// c: num_metal
-	// d: cenergy
-	// e: venergy
-	// f: mcenergy
+	// b: num_mol1
+    // c: num_mol2
+	// d: num_metal
+	// e: cenergy
+	// f: venergy
+	// g: mcenergy
 	int opt;
-	const char *optstring = "a:b:c:d:e:f:g:";
+	const char *optstring = "a:b:c:d:e:f:g:h:";
 	while((opt = getopt(argc, argv, optstring)) != -1)
 	{
 		switch(opt)
@@ -71,31 +72,34 @@ int main(int argc, char *argv[])
 			//	lattice_size = atoi(optarg);
 			//	break;
 			case 'b':
-				num_molecule = atoi(optarg);
+				num_molecule1 = atoi(optarg);
 				break;
-			case 'c':
+            case 'c':
+                num_molecule2 = atoi(optarg);
+			case 'd':
 				num_metal = atoi(optarg);
 				break;
-			case 'd':
+			case 'e':
 				cenergy = atof(optarg);
 				break;
-			case 'e':
+			case 'f':
 				venergy = atof(optarg);
 				break;
-			case 'f':
+			case 'g':
 				mcenergy = atof(optarg);
 				break;
-			case 'g':
+			case 'h':
 				ffn = atoi(optarg);
 				break;
 			default:
 				break;
 			}
 	}
+    num_molecule = num_molecule1 + num_molecule2;
 	num_total = num_molecule + num_metal;
 	cout<<"Program is initialized with: "<<endl;
 	cout<<"total_run = "<< total_run<<", latt_length = "<<lattice_size<<endl;
-	cout<<"num of molecule = "<<num_molecule<<", num of metals = "<<num_metal<<endl;
+	cout<<"num mol1 = "<<num_molecule1<< " ,num mol2 = "<<num_molecule2<<", num mol = "<<num_molecule<<", num metals = "<<num_metal<<endl;
 	cout<<"cenergy = "<<cenergy<<", venergy = "<<venergy<<", mcenergy = "<<mcenergy<<endl;
 	clock_t start, finish; 	
 	srand((unsigned)time(NULL)); 
@@ -110,13 +114,14 @@ int main(int argc, char *argv[])
 	ind[2] = 2;
 	ind[3] = 3;
 	ind[4] = 4;
-	num_molecule1 = num_molecule/4*3;
-	num_molecule2 = num_molecule/4*1;
+	//num_molecule1 = num_molecule/4*3;
+	//num_molecule2 = num_molecule/4*1;
     /*
      * molecular components at meso positions
-     * 2: non-reactive
+     * 2: non-reactive，still vdW
      * 3: 2-fold allowed
      * 5: fourfold allowed
+     * 7：non-reactive, no vdW
      *
      * */
 	cout<<"molecules1 "<<num_molecule1 << " molecules2 "<<num_molecule2<<endl; 
@@ -277,7 +282,7 @@ int main(int argc, char *argv[])
                         points_new[1][2] = 2;
                         points_new[3][2] = 2;
                     }
-//print_array(points_t2,5);
+                    //print_array(points_t2,5);
 					if ((is_occupied(&points_new[0],5)) == 0 && (is_forbidden(&points_new[0],4)) == 0)
 					{
 						energy_old = cal_energy_mol(&points_old[0],4);
@@ -414,12 +419,21 @@ int (*det_neighbour(int ind_x, int ind_y, int *ind, int length))[3]
 
 void set_element(int (*co)[3], int length, int op,int ind_ele)
 {
+    int angle = 0;
 	for (int i=0;i<length;i++)
 	{
 		lattice[*co[i]][*(co[i]+1)] = op;
 		if (length == 5 && i == 4 && op != 0) lattice[*co[i]][*(co[i]+1)] = op+1;
-        if (*(co[i]+2) == 1 && (i == 0 || i == 2)) lattice[*co[i]][*(co[i]+1)] = op-1;
-        if (*(co[i]+2) == 2 && (i == 1 || i == 3)) lattice[*co[i]][*(co[i]+1)] = op-1;
+        if (*(co[i]+2) == 1 && (i == 0 || i == 2))
+        {
+            lattice[*co[i]][*(co[i]+1)] = op-1;
+            angle = 1;
+        }
+        if (*(co[i]+2) == 2 && (i == 1 || i == 3))
+        {
+            lattice[*co[i]][*(co[i]+1)] = op-1;
+            angle = 2;
+        }
 		//cout<<"point in "<<*co[i]<<" "<<*(co[i]+1)<<" is set to "<<op<<endl;
 		if (op == 0)
 		{
@@ -441,12 +455,13 @@ void set_element(int (*co)[3], int length, int op,int ind_ele)
 	{
 		elements[ind_ele][0] = *co[0];
 		elements[ind_ele][1] = *(co[0]+1);
+        elements[ind_ele][2] = 0;
 	}
 	else
 	{
 		elements[ind_ele][0] = *co[length-1];
 		elements[ind_ele][1] = *(co[length-1]+1);
-        elements[ind_ele][2] = *(co[length-1]+2);
+        elements[ind_ele][2] = angle;
 	}
 }
 
@@ -480,19 +495,26 @@ double cal_energy_mol(int (*co)[3], int length)
 		pos_around[i][1] = kwn(lattice_size, *(co[i]+1) + direct[i][1]);
 		pos_around2[i][0] = kwn(lattice_size, pos_around[i][0] + direct[i][0]);
 		pos_around2[i][1] = kwn(lattice_size, pos_around[i][1] + direct[i][1]);
+        // non-reactive end-group
 		if (lattice[pos_around[i][0]][pos_around[i][1]] == 1 && lattice[*co[i]][*(co[i]+1)] != 2)
 		{
 			energy = energy - double(cenergy);
 		}
-		else if (lattice[pos_around[i][0]][pos_around[i][1]] == 3 && lattice[pos_around2[i][0]][pos_around2[i][1]] != 4)
+        // non-reactive end-group
+        if (lattice[pos_around[i][0]][pos_around[i][1]] == 1 && lattice[*co[i]][*(co[i]+1)] != 7)
+		{
+			energy = energy - double(cenergy);
+		}
+        //
+		if (lattice[pos_around[i][0]][pos_around[i][1]] == 3 && lattice[pos_around2[i][0]][pos_around2[i][1]] != 4)
 		{
             energy = energy - double(venergy);
         }
-		else if (lattice[pos_around[i][0]][pos_around[i][1]] == 2 && lattice[pos_around2[i][0]][pos_around2[i][1]] != 4)
+		if (lattice[pos_around[i][0]][pos_around[i][1]] == 2 && lattice[pos_around2[i][0]][pos_around2[i][1]] != 4)
 		{
             energy = energy - double(venergy);
         }
-        else if (lattice[pos_around[i][0]][pos_around[i][1]] == 5 && lattice[pos_around2[i][0]][pos_around2[i][1]] != 6)
+        if (lattice[pos_around[i][0]][pos_around[i][1]] == 5 && lattice[pos_around2[i][0]][pos_around2[i][1]] != 6)
 		{
 			energy = energy - double(venergy);
 		}
@@ -513,7 +535,7 @@ double cal_energy_metal(int (*co)[3], int length)
 		pos_around2[i][1] = kwn(lattice_size, pos_around[i][1] + direct[i][1]);
 		if ((lattice[pos_around[i][0]][pos_around[i][1]] == 3) || lattice[pos_around[i][0]][pos_around[i][1]] == 5)
 		{
-			if (lattice[pos_around2[i][0]][pos_around2[i][1]] == 4 || lattice_num[pos_around2[i][0]][pos_around2[i][1]] == 6)
+			if (lattice[pos_around2[i][0]][pos_around2[i][1]] == 4 || lattice[pos_around2[i][0]][pos_around2[i][1]] == 6)
 			{
 				energy = energy - double(mcenergy);
 			}
@@ -602,6 +624,7 @@ int is_forbidden(int (*co)[3], int length)
 		{
             // if the meso substituent is non active, just continue
             if (lattice[*co[i]][*(co[i]+1)] == 2) continue;
+            else if(lattice[*co[i]][*(co[i]+1)] == 7) continue;
             // if the meso substituent is only allowed for two-fold coordination
             else if(lattice[*co[i]][*(co[i]+1)] == 3)
             {
