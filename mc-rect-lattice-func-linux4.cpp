@@ -27,6 +27,11 @@ double mcenergy = 10;
 int ctemp[3];
 int temp[5][3];
 int ind[5] = {0};
+int mol_conf1[5] = {0};
+int mol_conf2[5] = {0};
+int mol_conf3[5] = {0};
+int mol_conf4[5] = {0};
+int metal_conf[5] = {0};
 int lattice[lattice_size][lattice_size];
 int lattice_num[lattice_size][lattice_size];
 int elements[element_num][3];// third column for the angle, 1 means horizontal and 2 means vertical
@@ -37,10 +42,10 @@ double p = 0;
 double p_temp = 0;
 int kwn(int n, int var);
 void p2a(int (*ptr)[3], int arr[][3], int length);
-int (*det_neighbour(int ind_x, int ind_y, int *ind, int length))[3];
+int (*det_neighbour(int ind_x, int ind_y, int *ind, int *conf,int length))[3];
 int is_occupied(int (*co)[3], int length);
 int is_forbidden(int (*co)[3], int length);
-void set_element(int (*co)[3], int length, int op,int ind_ele);
+void set_element(int (*co)[3], int length, int angle,int ind_ele);
 double cal_energy_mol(int (*co)[3], int length);
 double cal_energy_metal(int (*co)[3], int length);
 void print_array(int (*ar)[3], int length, string name);
@@ -114,8 +119,38 @@ int main(int argc, char *argv[])
 	ind[2] = 2;
 	ind[3] = 3;
 	ind[4] = 4;
-	//num_molecule1 = num_molecule/4*3;
-	//num_molecule2 = num_molecule/4*1;
+    // Initialize the molecular and metal configuration
+    metal_conf[0] = 0;
+    metal_conf[1] = 0;
+    metal_conf[2] = 0;
+    metal_conf[3] = 0;
+    metal_conf[4] = 0;
+    // mol1 only one configuration
+    // angle = 1
+    mol_conf1[0] = 5;
+	mol_conf1[1] = 5;
+    mol_conf1[2] = 5;
+    mol_conf1[3] = 5;
+    mol_conf1[4] = 6;
+    // angle = 2
+    mol_conf1[0] = 5;
+	mol_conf1[1] = 5;
+    mol_conf1[2] = 5;
+    mol_conf1[3] = 5;
+    mol_conf1[4] = 6;
+    // mol2, two configurations
+    // angle = 1
+    mol_conf3[0] = 2;
+	mol_conf3[1] = 3;
+    mol_conf3[2] = 2;
+    mol_conf3[3] = 3;
+    mol_conf3[4] = 4;
+    // angle = 2
+    mol_conf4[0] = 3;
+	mol_conf4[1] = 2;
+    mol_conf4[2] = 3;
+    mol_conf4[3] = 2;
+    mol_conf4[4] = 4;
     /*
      * molecular components at meso positions
      * 2: non-reactive，still vdW
@@ -137,12 +172,24 @@ int main(int argc, char *argv[])
 			int points_temp[5][3];
 			if (i < num_molecule1)
 			{
-				points_t1 = det_neighbour(ind_x,ind_y,ind,5);
+                if (angle == 1)
+                {
+                    points_t1 = det_neighbour(ind_x,ind_y,ind,mol_conf1,5);
+                }
+                else if (angle == 2)
+                {
+                    points_t1 = det_neighbour(ind_x,ind_y,ind,mol_conf2,5);
+                }
+                else
+                {
+                    cout<<"ERROR GET NEIGHBOURING COORDINATES"<<endl;
+                }
+				//points_t1 = det_neighbour(ind_x,ind_y,ind,mol_conf1,5);
 				p2a(points_t1,&points_temp[0],5);
 				//print_array(points_t1,5);
 				if ((is_occupied(&points_temp[0],5)) == 0 && (is_forbidden(&points_temp[0],4)) == 0)
 				{
-					set_element(&points_temp[0],5,5,i);
+					set_element(&points_temp[0],5,angle,i);
                     /* mol1: 5
                      *      565
                      *       5
@@ -154,22 +201,23 @@ int main(int argc, char *argv[])
 			}
 			else if (i < num_molecule)
 			{
-				points_t1 = det_neighbour(ind_x,ind_y,ind,5);
-				p2a(points_t1,&points_temp[0],5);
-				//print_array(points_t1,5);
                 if (angle == 1)
                 {
-                    points_temp[0][2] = 1;
-                    points_temp[2][2] = 1;
+                    points_t1 = det_neighbour(ind_x,ind_y,ind,mol_conf3,5);
                 }
-                if (angle == 2)
+                else if (angle == 2)
                 {
-                    points_temp[1][2] = 2;
-                    points_temp[3][2] = 2;
+                    points_t1 = det_neighbour(ind_x,ind_y,ind,mol_conf4,5);
                 }
+				else
+                {
+                    cout<<"ERROR GET NEIGHBOURING COORDINATES"<<endl;
+                }
+				p2a(points_t1,&points_temp[0],5);
+				//print_array(points_t1,5);
 				if ((is_occupied(&points_temp[0],5)) == 0 && (is_forbidden(&points_temp[0],4)) == 0)
 				{
-					set_element(&points_temp[0],5,3,i);
+					set_element(&points_temp[0],5,angle,i);
                     /*mol2:           3      or           2
                      *      amgle=1  242       angle=2   343
                      *                3                   2
@@ -181,12 +229,12 @@ int main(int argc, char *argv[])
 			}
 			else
 			{
-				points_t1 = det_neighbour(ind_x,ind_y,ind,5);
+				points_t1 = det_neighbour(ind_x,ind_y,ind,metal_conf,5);
 				p2a(points_t1,&points_temp[0],5);
 				//print_array(points_t1,4);
 				if (is_occupied(&points_temp[0],1) == 0 && is_forbidden(&points_temp[0],1) == 0)
 				{
-					set_element(&points_temp[4],1,1,i);
+					set_element(&points_temp[4],1,0,i);
 					state = 0;
 					//reg = reg + 1;
 				}
@@ -202,23 +250,40 @@ int main(int argc, char *argv[])
 	cout << "Begin to simulate..." << endl;
 	double energy_old;
 	double energy_new;
+    int old_angle;
+    int new_angle;
 	for(int m = 0; m < SECOND_LOOP;m = m + 1)
 	{
 		for(int l = 0; l < total_run; l = l + 1)
 		{
 			int ind_ele = rand()%(num_molecule + num_metal);
+            new_angle = rand()%2 + 1;
 			//cout << "number of elements " << ind_ele << endl;
 			int (*points_t1)[3];
 			int points_old[5][3];
 			int (*points_t2)[3];
 			int points_new[5][3];
-            int old_angle = 0;
+            old_angle = 0;
 			if(ind_ele < num_molecule1)
 			{
 				//disp_array(1);
-				//cout << "number of elements " << ind_ele << endl;
-				points_t1 = det_neighbour(elements[ind_ele][0],elements[ind_ele][1],ind,5);
                 old_angle = elements[ind_ele][2];
+                //cout<<"old angle "<<old_angle<<endl;
+				if (old_angle == 1)
+                {
+                    points_t1 = det_neighbour(elements[ind_ele][0],elements[ind_ele][1],ind,mol_conf1,5);
+                }
+                else if (old_angle == 2)
+                {
+                    points_t1 = det_neighbour(elements[ind_ele][0],elements[ind_ele][1],ind,mol_conf2,5);
+                }
+                else
+                {
+                    cout<<"ERROR GET NEIGHBOURING COORDINATES"<<endl;
+                }
+                //cout << "number of elements " << ind_ele << endl;
+                //cout<<"test0"<<endl;
+				//points_t1 = det_neighbour(elements[ind_ele][0],elements[ind_ele][1],ind,mol_conf1,5);
 				p2a(points_t1,points_old,5);
 				//print_array(points_t1,5,"points_t1");
 				//print_array(&points_old[0],5, "points_old");
@@ -228,14 +293,28 @@ int main(int argc, char *argv[])
 					//cout << "Enters the loop..."<<endl;
 					int new_pos[2] = {rand()%lattice_size,rand()%lattice_size};
                     //int new_angle = rand()%2 + 1;
-					//cout << new_pos[0] <<" "<<new_pos[1]<<endl;
-					points_t2 = det_neighbour(new_pos[0],new_pos[1],ind,5);
+					if (new_angle == 1)
+                    {
+                        points_t2 = det_neighbour(new_pos[0],new_pos[1],ind,mol_conf1,5);
+                    }
+                    else if (new_angle == 2)
+                    {
+                        points_t2 = det_neighbour(new_pos[0],new_pos[1],ind,mol_conf2,5);
+                    }
+                    else
+                    {
+                        cout<<"ERROR GET NEIGHBOURING COORDINATES"<<endl;
+                    }
+                    //cout << new_pos[0] <<" "<<new_pos[1]<<endl;
+					//points_t2 = det_neighbour(new_pos[0],new_pos[1],ind,5);
 					p2a(points_t2,points_new,5);
 					//print_array(points_t2,5);
 					if ((is_occupied(&points_new[0],5)) == 0 && (is_forbidden(&points_new[0],4)) == 0)
 					{
+                        //cout<<"test1"<<endl;
 						energy_old = cal_energy_mol(&points_old[0],4);
 						energy_new = cal_energy_mol(&points_new[0],4);
+                        //cout<<"test2"<<endl;
 						//cout<<" old energy: "<<energy_old<<" new energy: "<<energy_new<<endl;
 						p = min(exp(-double(energy_new - energy_old)),double(1));
 						p_temp = (rand()+1)/(double(RAND_MAX)+1);
@@ -248,7 +327,7 @@ int main(int argc, char *argv[])
 							set_element(&points_old[0],5,0,ind_ele);
 							//print_array(points_t1,5,"points_t1");
 							//print_array(&points_old[0],5,"points_old");
-							set_element(&points_new[0],5,5,ind_ele);
+							set_element(&points_new[0],5,new_angle,ind_ele);
 						}
 						state = 0;
 						//cout <<ind_ele<< " is done"<<endl;
@@ -258,8 +337,20 @@ int main(int argc, char *argv[])
 			else if(ind_ele < num_molecule)
 			{
 				//disp_array(1);
-				//cout << "number of elements " << ind_ele << endl;
-				points_t1 = det_neighbour(elements[ind_ele][0],elements[ind_ele][1],ind,5);
+				if (old_angle == 1)
+                {
+                    points_t1 = det_neighbour(elements[ind_ele][0],elements[ind_ele][1],ind,mol_conf3,5);
+                }
+                else if (old_angle == 2)
+                {
+                    points_t1 = det_neighbour(elements[ind_ele][0],elements[ind_ele][1],ind,mol_conf4,5);
+                }
+                else
+                {
+                    cout<<"ERROR GET NEIGHBOURING COORDINATES"<<endl;
+                }
+//cout << "number of elements " << ind_ele << endl;
+				//points_t1 = det_neighbour(elements[ind_ele][0],elements[ind_ele][1],ind,5);
 				p2a(points_t1,points_old,5);
 				//print_array(points_t1,5,"points_t1");
 				//print_array(&points_old[0],5, "points_old");
@@ -268,20 +359,22 @@ int main(int argc, char *argv[])
 				{
 					//cout << "Enters the loop..."<<endl;
 					int new_pos[2] = {rand()%lattice_size,rand()%lattice_size};
-					int new_angle = rand()%2 + 1;
+					//int new_angle = rand()%2 + 1;
                     //cout << new_pos[0] <<" "<<new_pos[1]<<endl;
-					points_t2 = det_neighbour(new_pos[0],new_pos[1],ind,5);
-					p2a(points_t2,points_new,5);
 					if (new_angle == 1)
                     {
-                        points_new[0][2] = 1;
-                        points_new[2][2] = 1;
+                        points_t2 = det_neighbour(new_pos[0],new_pos[1],ind,mol_conf1,5);
                     }
-                    if (new_angle == 2)
+                    else if (new_angle == 2)
                     {
-                        points_new[1][2] = 2;
-                        points_new[3][2] = 2;
+                        points_t2 = det_neighbour(new_pos[0],new_pos[1],ind,mol_conf2,5);
                     }
+                    else
+                    {
+                        cout<<"ERROR GET NEIGHBOURING COORDINATES"<<endl;
+                    }
+                    //points_t2 = det_neighbour(new_pos[0],new_pos[1],ind,5);
+					p2a(points_t2,points_new,5);
                     //print_array(points_t2,5);
 					if ((is_occupied(&points_new[0],5)) == 0 && (is_forbidden(&points_new[0],4)) == 0)
 					{
@@ -299,7 +392,7 @@ int main(int argc, char *argv[])
 							set_element(&points_old[0],5,0,ind_ele);
 							//print_array(points_t1,5,"points_t1");
 							//print_array(&points_old[0],5,"points_old");
-							set_element(&points_new[0],5,3,ind_ele);
+							set_element(&points_new[0],5,new_angle,ind_ele);
 						}
 						state = 0;
 						//cout <<ind_ele<< " is done"<<endl;
@@ -310,12 +403,12 @@ int main(int argc, char *argv[])
 			//if (ind_ele > num_molecule-1)
 			{
 				int state = 1;
-				points_t1 = det_neighbour(elements[ind_ele][0],elements[ind_ele][1],ind,5);
+				points_t1 = det_neighbour(elements[ind_ele][0],elements[ind_ele][1],ind,metal_conf,5);
 				p2a(points_t1,&points_old[0],5);
 				while(state == 1)
 				{
 					int new_pos[2] = {rand()%lattice_size,rand()%lattice_size};
-					points_t2 = det_neighbour(new_pos[0],new_pos[1],ind,5);
+					points_t2 = det_neighbour(new_pos[0],new_pos[1],ind,metal_conf,5);
 					p2a(points_t2,&points_new[0],5);
 					if (is_occupied(&points_new[0],1) == 0 && is_forbidden(&points_new[0],1) == 0)
 					{
@@ -332,7 +425,7 @@ int main(int argc, char *argv[])
 							//cout<<"energy lowered by "<<energy_new-energy_old<<endl;
 							//cout<< "NEW METAL POSITION!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
 							set_element(&points_old[4],1,0,ind_ele);
-							set_element(&points_new[4],1,1,ind_ele);
+							set_element(&points_new[4],1,0,ind_ele);
 						}
 						state = 0;
 						//cout<<ind_ele<<" is done"<<endl;
@@ -402,7 +495,7 @@ void print_array(int (*ar)[3], int length, string name)
 }
 
 // ind is a pointer to a 1d array, where the indexex of wanted points are stored
-int (*det_neighbour(int ind_x, int ind_y, int *ind, int length))[3]
+int (*det_neighbour(int ind_x, int ind_y, int *ind, int *conf, int length))[3]
 {
 	int ind_num;	
 	//cout<<"temp value:"<<endl;
@@ -411,58 +504,54 @@ int (*det_neighbour(int ind_x, int ind_y, int *ind, int length))[3]
 		ind_num = ind[i];
 		temp[i][0] = kwn(lattice_size, ind_x + direct[ind_num][0]);
 		temp[i][1] = kwn(lattice_size, ind_y + direct[ind_num][1]);
-        temp[i][2] = 0;
+        temp[i][2] = conf[ind_num];
 		//cout<<temp[i][0]<<" "<<temp[i][1]<<endl;
 		}
 	return temp;
 }
 
-void set_element(int (*co)[3], int length, int op,int ind_ele)
+void set_element(int (*co)[3], int length, int angle,int ind_ele)
 {
-    int angle = 0;
-	for (int i=0;i<length;i++)
-	{
-		lattice[*co[i]][*(co[i]+1)] = op;
-		if (length == 5 && i == 4 && op != 0) lattice[*co[i]][*(co[i]+1)] = op+1;
-        if (*(co[i]+2) == 1 && (i == 0 || i == 2))
+    //int angle = 0;
+    if (angle == 0)
+    {
+        for (int i=0;i<length;i++)
         {
-            lattice[*co[i]][*(co[i]+1)] = op-1;
-            angle = 1;
+            lattice[*co[i]][*(co[i]+1)] = 0;
         }
-        if (*(co[i]+2) == 2 && (i == 1 || i == 3))
+    }
+    else
+    {
+        for (int i=0;i<length;i++)
         {
-            lattice[*co[i]][*(co[i]+1)] = op-1;
-            angle = 2;
+            lattice[*co[i]][*(co[i]+1)] = *(co[i]+2);
+            /*lattice[*co[i]][*(co[i]+1)] = op;
+            if (length == 5 && i == 4 && op != 0) lattice[*co[i]][*(co[i]+1)] = op+1;
+            if (*(co[i]+2) == 1 && (i == 0 || i == 2))
+            {
+                lattice[*co[i]][*(co[i]+1)] = op-1;
+                angle = 1;
+            }
+            if (*(co[i]+2) == 2 && (i == 1 || i == 3))
+            {
+                lattice[*co[i]][*(co[i]+1)] = op-1;
+                angle = 2;
+            }*/
+            //cout<<"point in "<<*co[i]<<" "<<*(co[i]+1)<<" is set to "<<op<<endl;
         }
-		//cout<<"point in "<<*co[i]<<" "<<*(co[i]+1)<<" is set to "<<op<<endl;
-		if (op == 0)
-		{
-			lattice_num[*co[i]][*(co[i]+1)] = op;
-			}
-		else
-		{
-			if (ind_ele < num_molecule)
-			{
-				lattice_num[*co[i]][*(co[i]+1)] = ind_ele+1;
-				}
-			else
-			{
-				lattice_num[*co[i]][*(co[i]+1)] = num_total+1;
-				}
-			}
-		}
-	if (length == 1)
-	{
-		elements[ind_ele][0] = *co[0];
-		elements[ind_ele][1] = *(co[0]+1);
+    }
+    if (length == 1)
+    {
+        elements[ind_ele][0] = *co[0];
+        elements[ind_ele][1] = *(co[0]+1);
         elements[ind_ele][2] = 0;
-	}
-	else
-	{
-		elements[ind_ele][0] = *co[length-1];
-		elements[ind_ele][1] = *(co[length-1]+1);
+    }
+    else
+    {
+        elements[ind_ele][0] = *co[length-1];
+        elements[ind_ele][1] = *(co[length-1]+1);
         elements[ind_ele][2] = angle;
-	}
+    }
 }
 
 
@@ -496,12 +585,12 @@ double cal_energy_mol(int (*co)[3], int length)
 		pos_around2[i][0] = kwn(lattice_size, pos_around[i][0] + direct[i][0]);
 		pos_around2[i][1] = kwn(lattice_size, pos_around[i][1] + direct[i][1]);
         // non-reactive end-group
-		if (lattice[pos_around[i][0]][pos_around[i][1]] == 1 && lattice[*co[i]][*(co[i]+1)] != 2)
+		if (lattice[pos_around[i][0]][pos_around[i][1]] == 1 && *(co[i]+2) != 2)//lattice[*co[i]][*(co[i]+1)] != 2)
 		{
 			energy = energy - double(cenergy);
 		}
         // non-reactive end-group
-        if (lattice[pos_around[i][0]][pos_around[i][1]] == 1 && lattice[*co[i]][*(co[i]+1)] != 7)
+        if (lattice[pos_around[i][0]][pos_around[i][1]] == 1 && *(co[i]+2) != 7)//l)attice[*co[i]][*(co[i]+1)] != 7)
 		{
 			energy = energy - double(cenergy);
 		}
@@ -552,24 +641,44 @@ double cal_energy_sys(void)
 	//int vbond_count = 0;
 	//int temp = 0;
 	int (*points_t1)[3];
+    int angle = 0;
 	for (int i=0;i<num_total;i++)
 	{
 		energy_temp = 0;
-		if (i < num_molecule)
+        angle = elements[i][2];
+		if (i < num_molecule1)
 		{
-			points_t1 = det_neighbour(elements[i][0],elements[i][1],ind,5);
+			if (angle == 1)
+            {
+                points_t1 = det_neighbour(elements[i][0],elements[i][1],ind,mol_conf1,5);
+            }
+            else if (angle == 2)
+            {
+                points_t1 = det_neighbour(elements[i][0],elements[i][1],ind,mol_conf2,5);
+            }
+            //points_t1 = det_neighbour(elements[i][0],elements[i][1],ind,5);
 			energy_temp = cal_energy_mol(points_t1,4);
-			//if (energy_temp/cenergy != 0)
-			//{
-			//	cbond_count = cbond_count+
-			//	}
-			}
+		}
+        else if(i < num_molecule)
+        {
+            if (angle == 1)
+            {
+                points_t1 = det_neighbour(elements[i][0],elements[i][1],ind,mol_conf3,5);
+            }
+            else if (angle == 2)
+            {
+                points_t1 = det_neighbour(elements[i][0],elements[i][1],ind,mol_conf4,5);
+            }
+            //points_t1 = det_neighbour(elements[i][0],elements[i][1],ind,5);
+			energy_temp = cal_energy_mol(points_t1,4);
+
+        }
 		else
 		{
-			points_t1 = det_neighbour(elements[i][0],elements[i][1],ind,5);
+			points_t1 = det_neighbour(elements[i][0],elements[i][1],ind,metal_conf,5);
 			energy_temp = cal_energy_metal(points_t1,4);
 			
-			}
+		}
 		energy = energy + energy_temp;
 		//cout<<"energy change: "<<energy_temp<<" energy total: "<<energy<<endl;
 	}
@@ -622,11 +731,8 @@ int is_forbidden(int (*co)[3], int length)
 		//int pos_around2[4][2];
 		for (int i=0;i<4;i++)
 		{
-            // if the meso substituent is non active, just continue
-            if (lattice[*co[i]][*(co[i]+1)] == 2) continue;
-            else if(lattice[*co[i]][*(co[i]+1)] == 7) continue;
             // if the meso substituent is only allowed for two-fold coordination
-            else if(lattice[*co[i]][*(co[i]+1)] == 3)
+            if (*(co[i]+2) == 3)
             {
                 pos_around[i][0] = kwn(lattice_size, *co[i] + direct[i][0]);
                 pos_around[i][1] = kwn(lattice_size, *(co[i]+1) + direct[i][1]);
@@ -656,17 +762,21 @@ int is_forbidden(int (*co)[3], int length)
                     minus2[1] = kwn(lattice_size, minus1[1] + direct[minus][1]);
                     // 4-fold not allowed, here 2-fold coordination could also
                     // have 4-fold at its neighbour coordination positions
-                    if ((lattice[plus1[0]][plus1[1]] == 3) && lattice[plus2[0]][plus2[1]] == 4)
+                    if (lattice[plus1[0]][plus1[1]] == 3 && lattice[plus2[0]][plus2[1]] == 4)
                     {
                         return 1;
                     }
-                    if ((lattice[minus1[0]][minus1[1]] == 3) && lattice[minus2[0]][minus2[1]] == 4)
+                    if (lattice[minus1[0]][minus1[1]] == 3 && lattice[minus2[0]][minus2[1]] == 4)
                     {
                         return 1;
                     }
                 }
             }
-            // if 4-fold no restrictions
+            // if the meso substituent is non active, just continue
+            //else if (*(co[i]+2) == 2) continue;
+            //else if (*(co[i]+2) == 7) continue;
+            //else if (*(co[i]+2) == 5) continue;
+            // if 4-fold no restrictions, *(co[i]+2) == 5
             else continue;   
 		}
 		return 0;
@@ -680,28 +790,53 @@ int *cal_bond_num(void)
 	int (*points_t1)[3];
 	int pos_around[4][3];
 	int pos_around2[4][3];
+    int angle = 0;
 	for (int i=0;i<num_molecule;i++)
 	{
-		points_t1 = det_neighbour(elements[i][0],elements[i][1],ind,5);
+        angle = elements[i][2];
+        if (i < num_molecule1)
+		{
+			if (angle == 1)
+            {
+                points_t1 = det_neighbour(elements[i][0],elements[i][1],ind,mol_conf1,5);
+            }
+            else if (angle == 2)
+            {
+                points_t1 = det_neighbour(elements[i][0],elements[i][1],ind,mol_conf2,5);
+            }
+            //points_t1 = det_neighbour(elements[i][0],elements[i][1],ind,5);
+		}
+        else if(i < num_molecule)
+        {
+            if (angle == 1)
+            {
+                points_t1 = det_neighbour(elements[i][0],elements[i][1],ind,mol_conf3,5);
+            }
+            else if (angle == 2)
+            {
+                points_t1 = det_neighbour(elements[i][0],elements[i][1],ind,mol_conf4,5);
+            }
+        }
+		//points_t1 = det_neighbour(elements[i][0],elements[i][1],ind,5);
 		for (int i=0;i<4;i++)
 		{
 			pos_around[i][0] = kwn(lattice_size,*points_t1[i] + direct[i][0]);
 			pos_around[i][1] = kwn(lattice_size,*(points_t1[i]+1) + direct[i][1]);
 			pos_around2[i][0] = kwn(lattice_size, pos_around[i][0] + direct[i][0]);
 			pos_around2[i][1] = kwn(lattice_size, pos_around[i][1] + direct[i][1]);
-			if (lattice_num[pos_around[i][0]][pos_around[i][1]] == (num_total+1))
+			if (lattice[pos_around[i][0]][pos_around[i][1]] == 1 && *(points_t1[i]+2) != 2 && *(points_t1[i]+2) != 7)
 			{
 				cbond = cbond + 1;
-				}
-			else if (lattice_num[pos_around[i][0]][pos_around[i][1]] != 0)
+			}
+			else if (lattice[pos_around[i][0]][pos_around[i][1]] != 0)
 			{
-				if (lattice_num[pos_around[i][0]][pos_around[i][1]] != lattice_num[pos_around2[i][0]][pos_around2[i][1]])
+				if (lattice[pos_around[i][0]][pos_around[i][1]] != lattice[pos_around2[i][0]][pos_around2[i][1]])
 				{
 					vbond = vbond + 1;
-					}
 				}
 			}
 		}
+	}
 	ctemp[0] = cbond;
 	ctemp[1] = vbond/2;
 	return ctemp;
