@@ -24,6 +24,7 @@ int num_total = num_molecule + num_metal;
 double cenergy = 10;
 double venergy = 3;
 double mcenergy = 10;
+int output[2][5];
 int ctemp[3];
 int temp[5][3];
 int ind[5] = {0,1,2,3,4};
@@ -37,6 +38,7 @@ double p = 0;
 double p_temp = 0;
 int kwn(int n, int var);
 void p2a(int (*ptr)[3], int arr[][3], int length);
+void p2a2(int (*ptr)[5], int arr [][5]);
 int (*det_neighbour(int ind_x, int ind_y, int *ind, int *conf,int length))[3];
 int is_occupied(int (*co)[3], int length);
 int is_forbidden(int (*co)[3], int length);
@@ -48,6 +50,7 @@ void save_to_txt();
 void disp_array(int i);
 double cal_energy_sys(void);
 int *cal_bond_num(void);
+int (*read_conf(int ind))[5];
 /*********************************************************** 
  * molecular macrocycle
  * 9: mol1, light blue
@@ -68,8 +71,6 @@ int *cal_bond_num(void);
 int mol_conf1[2][5] = {{3,3,3,3,9},{3,3,3,3,9}};
 int mol_conf2[2][5] = {{2,2,2,2,10},{2,2,2,2,10}};
 int metal_conf[5] = {1,1,1,1,1};
-
-
 int main(int argc, char *argv[])
 {
 	// SET THE COMMANDLINE ARGUMENTS
@@ -129,7 +130,27 @@ int main(int argc, char *argv[])
 	memset(lattice_num, 0, sizeof(lattice_num[0][0]) * lattice_size * lattice_size);
 	memset(elements, 0, sizeof(elements[0][0]) * num_total * 3);
 	// Distribute the molecules and metals on the lattice
-	cout << "Begin to distribute elemenst..." << endl;
+    cout<<"Loading molecular configurations...";
+    int (*conf_temp)[5];
+    conf_temp = read_conf(1);
+    p2a2(conf_temp, &mol_conf1[0]);
+    conf_temp = read_conf(2);
+    p2a2(conf_temp, &mol_conf2[0]);
+    cout<<"molecule1: ";
+    for(int i=0;i<2;i++)
+    {
+        for(int j=0;j<5;j++)
+            cout<<mol_conf1[i][j]<<",";
+    }
+    cout<<endl;
+	cout<<"molecule2: ";
+    for(int i=0;i<2;i++)
+    {
+        for(int j=0;j<5;j++)
+            cout<<mol_conf2[i][j]<<",";
+    }
+    cout<<endl;
+    cout << "Begin to distribute elemenst..." << endl;
     cout<<"molecules1 "<<num_molecule1 << " molecules2 "<<num_molecule2<<endl; 
 	for(int i = 0; i < num_molecule + num_metal; i++)
 	{
@@ -384,6 +405,15 @@ void p2a(int (*ptr)[3], int arr[][3], int length)
 		arr[i][1] = *(ptr[i]+1);
         arr[i][2] = *(ptr[i]+2);
 	}
+}
+
+void p2a2(int (*ptr)[5], int arr [][5])
+{
+    for (int i=0;i<2;i++)
+    {
+        for (int j=0;j<5;j++)
+            arr[i][j] = *(ptr[i]+j);
+    }
 }
 void print_array(int (*ar)[3], int length, string name)
 {
@@ -845,4 +875,37 @@ void save_to_txt()
 		}
 		file<<"\r\n";
 	}*/
+}
+int (*read_conf(int ind))[5]
+{
+    fstream infile;
+    int i=0;
+    int j=0;
+    char cNum[256] ;
+    if (ind == 1) infile.open ("mol1.txt", ifstream::in);
+    else if (ind == 2) infile.open ("mol2.txt", ifstream::in);
+    else cout<<"ERROR WHEN LOADING MOL CONFIGURATION"<<endl;
+    if (infile.is_open())
+    {
+         while (infile.good())
+             {
+                  infile.getline(cNum, 256, ',');
+                  output[j][i]= atoi(cNum) ;
+                  //cout<<j<<"  "<<i<<"  "<<output[j][i]<<" ";
+                  //cout <<"string "<< cNum <<endl;
+                  i++;
+                  if (i == 5)
+                  {
+                      j++;
+                      i=0;
+                  }
+
+             }
+             infile.close();
+    }
+    else
+    {
+        cout << "Error opening file";
+    }
+    return output;
 }
