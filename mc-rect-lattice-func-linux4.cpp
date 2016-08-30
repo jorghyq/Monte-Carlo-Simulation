@@ -13,18 +13,21 @@ using namespace std;
 
 int total_run = 100000;
 const int SECOND_LOOP = 1;
+int RESTART = 0;
 const int lattice_size = 80;
 const int element_num = 1000;//12 * lattice_size;
 int ffn = 1; // number of results filefolder
 int num_molecule = 40;
 int num_molecule1 = 20;
 int num_molecule2 = 20;
+int angle_mol1 = 2;
+int angle_mol2 = 2;
 int num_metal = 0;
 int num_total = num_molecule + num_metal;
 double cenergy = 10;
 double venergy = 3;
 double mcenergy = 10;
-int output[2][5];
+int output[4][5];
 int ctemp[3];
 int temp[5][3];
 int ind[5] = {0,1,2,3,4};
@@ -68,8 +71,8 @@ int (*read_conf(int ind))[5];
  * 7: non-reactive, next to the metal forbidden, no vdW\
  * 8: saved
  * **********************************************************/
-int mol_conf1[2][5] = {{3,3,3,3,9},{3,3,3,3,9}};
-int mol_conf2[2][5] = {{2,2,2,2,10},{2,2,2,2,10}};
+int mol_conf1[4][5] = {{3,3,3,3,9},{3,3,3,3,9},{0,0,0,0,0},{0,0,0,0,0}};
+int mol_conf2[4][5] = {{2,2,2,2,10},{2,2,2,2,10},{0,0,0,0,0},{0,0,0,0,0}};
 int metal_conf[5] = {1,1,1,1,1};
 int main(int argc, char *argv[])
 {
@@ -82,7 +85,7 @@ int main(int argc, char *argv[])
 	// f: venergy
 	// g: mcenergy
 	int opt;
-	const char *optstring = "a:b:c:d:e:f:g:h:";
+	const char *optstring = "a:b:c:d:e:f:g:h:i:";
 	while((opt = getopt(argc, argv, optstring)) != -1)
 	{
 		switch(opt)
@@ -113,6 +116,8 @@ int main(int argc, char *argv[])
 			case 'h':
 				ffn = atoi(optarg);
 				break;
+            case 'i':
+                RESTART = atoi(optarg);
 			default:
 				break;
 			}
@@ -130,90 +135,110 @@ int main(int argc, char *argv[])
 	memset(lattice_num, 0, sizeof(lattice_num[0][0]) * lattice_size * lattice_size);
 	memset(elements, 0, sizeof(elements[0][0]) * num_total * 3);
 	// Distribute the molecules and metals on the lattice
-    cout<<"Loading molecular configurations...";
+    cout<<"Loading molecular configurations..."<<endl;
     int (*conf_temp)[5];
     conf_temp = read_conf(1);
     p2a2(conf_temp, &mol_conf1[0]);
     conf_temp = read_conf(2);
     p2a2(conf_temp, &mol_conf2[0]);
     cout<<"molecule1: ";
-    for(int i=0;i<2;i++)
+    int i = 0;
+    //memset(output, 0, sizeof(output[0][0]) * 4 * 5);
+    while(mol_conf1[i][0] != 0)
     {
         for(int j=0;j<5;j++)
             cout<<mol_conf1[i][j]<<",";
+        i = i + 1;
     }
-    cout<<endl;
+    angle_mol1 = i;
+    cout<<"angle_mol1: "<<angle_mol1<<endl;
 	cout<<"molecule2: ";
-    for(int i=0;i<2;i++)
+    i = 0;
+	//memset(output, 0, sizeof(output[0][0]) * 4 * 5);
+    while(mol_conf2[i][0] != 0)
     {
         for(int j=0;j<5;j++)
             cout<<mol_conf2[i][j]<<",";
+        i = i + 1;
     }
+    angle_mol2 = i;
+    cout<<"angle_mol2: "<<angle_mol2<<endl;
     cout<<endl;
-    cout << "Begin to distribute elemenst..." << endl;
-    cout<<"molecules1 "<<num_molecule1 << " molecules2 "<<num_molecule2<<endl; 
-	for(int i = 0; i < num_molecule + num_metal; i++)
-	{
-		int state = 1;
-		while (state == 1)
-		{
-			int ind_x = rand()%(lattice_size);
-			int ind_y = rand()%(lattice_size);
-            int angle = rand()%2+1;// angle = 1 or 2
-			//if (angle != 1 and angle != 2) cout<<"ERROR wrong angle number!"<<endl;
-            int (*points_t1)[3];
-			int points_temp[5][3];
-			if (i < num_molecule1)
-			{
-				points_t1 = det_neighbour(ind_x,ind_y,ind,mol_conf1[angle-1],5);
-				p2a(points_t1,&points_temp[0],5);
-				//print_array(points_t1,5);
-				if ((is_occupied(&points_temp[0],5)) == 0 && (is_forbidden(&points_temp[0],4)) == 0)
-				{
-					set_element(&points_temp[0],5,angle,i);
-                    /* mol1: 5
-                     *      565
-                     *       5
-                     * */
-					state = 0;
-					//reg2 = reg2 + 1;
-				}
-				//disp_array(1);
-			}
-			else if (i < num_molecule)
-			{
-				points_t1 = det_neighbour(ind_x,ind_y,ind,mol_conf2[angle-1],5);
-				p2a(points_t1,&points_temp[0],5);
-				//print_array(points_t1,5);
-				if ((is_occupied(&points_temp[0],5)) == 0 && (is_forbidden(&points_temp[0],4)) == 0)
-				{
-					set_element(&points_temp[0],5,angle,i);
-                    /*mol2:           3      or           2
-                     *      amgle=1  242       angle=2   343
-                     *                3                   2
-                     * */
-					state = 0;
-					//reg2 = reg2 + 1;
-				}
-				//disp_array(1);
-			}
-			else
-			{
-				points_t1 = det_neighbour(ind_x,ind_y,ind,metal_conf,5);
-				p2a(points_t1,&points_temp[0],5);
-			    //print_array(points_t1,4,"points_t1");
-				if (is_occupied(&points_temp[4],1) == 0 && is_forbidden(&points_temp[0],1) == 0)
-				{
-					set_element(&points_temp[4],1,1,i);
-					state = 0;
-					//reg = reg + 1;
-				}
-				//disp_array(1);		
-			}
-		}
-		//cout << "The" << i << "is done..."<< endl;
-	}
-	cout << "Elements are distributed..." << endl;
+    if (RESTART == 0)
+    {
+        cout << "Begin to distribute elemenst..." << endl;
+        cout<<"molecules1 "<<num_molecule1 << " molecules2 "<<num_molecule2<<endl; 
+        for(int i = 0; i < num_molecule + num_metal; i++)
+        {
+            int state = 1;
+            while (state == 1)
+            {
+                int ind_x = rand()%(lattice_size);
+                int ind_y = rand()%(lattice_size);
+                //int angle = rand()%2+1;// angle = 1 or 2
+                //if (angle != 1 and angle != 2) cout<<"ERROR wrong angle number!"<<endl;
+                int (*points_t1)[3];
+                int points_temp[5][3];
+                int angle = 1;
+                if (i < num_molecule1)
+                {
+                    angle = rand()%angle_mol1+1;// angle = 1 or 2
+                    points_t1 = det_neighbour(ind_x,ind_y,ind,mol_conf1[angle-1],5);
+                    p2a(points_t1,&points_temp[0],5);
+                    //print_array(points_t1,5);
+                    if ((is_occupied(&points_temp[0],5)) == 0 && (is_forbidden(&points_temp[0],4)) == 0)
+                    {
+                        set_element(&points_temp[0],5,angle,i);
+                        /* mol1: 5
+                         *      565
+                         *       5
+                         * */
+                        state = 0;
+                        //reg2 = reg2 + 1;
+                    }
+                    //disp_array(1);
+                }
+                else if (i < num_molecule)
+                {
+                    angle = rand()%angle_mol2+1;// angle = 1 or 2
+                    points_t1 = det_neighbour(ind_x,ind_y,ind,mol_conf2[angle-1],5);
+                    p2a(points_t1,&points_temp[0],5);
+                    //print_array(points_t1,5);
+                    if ((is_occupied(&points_temp[0],5)) == 0 && (is_forbidden(&points_temp[0],4)) == 0)
+                    {
+                        set_element(&points_temp[0],5,angle,i);
+                        /*mol2:           3      or           2
+                         *      amgle=1  242       angle=2   343
+                         *                3                   2
+                         * */
+                        state = 0;
+                        //reg2 = reg2 + 1;
+                    }
+                    //disp_array(1);
+                }
+                else
+                {
+                    points_t1 = det_neighbour(ind_x,ind_y,ind,metal_conf,5);
+                    p2a(points_t1,&points_temp[0],5);
+                    //print_array(points_t1,4,"points_t1");
+                    if (is_occupied(&points_temp[4],1) == 0 && is_forbidden(&points_temp[0],1) == 0)
+                    {
+                        set_element(&points_temp[4],1,1,i);
+                        state = 0;
+                        //reg = reg + 1;
+                    }
+                    //disp_array(1);		
+                }
+            }
+            //cout << "The" << i << "is done..."<< endl;
+        }
+        cout << "Elements are distributed..." << endl;
+    }
+    else
+    {
+        cout << "Loading configuration from the file" << endl;
+
+    }
 	start = clock();
 	//disp_array(1);
 	// Begin to simulatte
@@ -227,7 +252,7 @@ int main(int argc, char *argv[])
 		for(int l = 0; l < total_run; l = l + 1)
 		{
 			int ind_ele = rand()%(num_molecule + num_metal);
-            new_angle = rand()%2 + 1;
+            //new_angle = rand()%2 + 1;
             //if (new_angle != 1 && new_angle != 2 ) cout<<"ERROR: WRONG angle number!"<<endl;
 			//cout << "number of elements " << ind_ele << endl;
 			int (*points_t1)[3];
@@ -242,6 +267,7 @@ int main(int argc, char *argv[])
                 //cout<<"old angle "<<old_angle<<endl;
                 //cout << "number of elements " << ind_ele << endl;
                 //cout<<"test0"<<endl;
+                new_angle = rand()%angle_mol1 + 1;
 				points_t1 = det_neighbour(elements[ind_ele][0],elements[ind_ele][1],ind,mol_conf1[old_angle-1],5);
 				p2a(points_t1,points_old,5);
 				//print_array(points_t1,5,"points_t1");
@@ -283,6 +309,7 @@ int main(int argc, char *argv[])
 			else if(ind_ele < num_molecule)
 			{
 				//disp_array(1);
+                new_angle = rand()%angle_mol2 + 1;
                 //cout << "number of elements " << ind_ele << endl;
 				points_t1 = det_neighbour(elements[ind_ele][0],elements[ind_ele][1],ind,mol_conf2[old_angle-1],5);
 				p2a(points_t1,points_old,5);
