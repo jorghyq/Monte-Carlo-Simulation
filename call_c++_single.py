@@ -44,7 +44,7 @@ else:
     pass
 
 print total_run, num_mol1, num_mol2, num_metal
-command = '/home/jorghyq/Monte-Carlo-Simulation/mc-rect-lattice-func-linux4 -a %d -b %d -c %d -d %d -e %f -f %f -g %f -h %d' % (total_run,num_mol1,num_mol2,num_metal,cenergy,venergy,mcenergy,ffn)
+command = './mc-rect-lattice-func-linux4 -a %d -b %d -c %d -d %d -e %f -f %f -g %f -h %d' % (total_run,num_mol1,num_mol2,num_metal,cenergy,venergy,mcenergy,ffn)
 args = shlex.split(command)
 print args
 #p = subprocess.check_call(args,shell=True)
