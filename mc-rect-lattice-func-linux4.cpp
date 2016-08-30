@@ -49,7 +49,8 @@ void set_element(int (*co)[3], int length, int angle,int ind_ele);
 double cal_energy_mol(int (*co)[3], int length);
 double cal_energy_metal(int (*co)[3], int length);
 void print_array(int (*ar)[3], int length, string name);
-void save_to_txt();
+void save_lattice_to_txt();
+void save_element_to_txt();
 void disp_array(int i);
 double cal_energy_sys(void);
 int *cal_bond_num(void);
@@ -404,13 +405,14 @@ int main(int argc, char *argv[])
 	finish = clock();
 	energy_sys = cal_energy_sys();
 	cout<<"costed time: " << (finish-start)/CLOCKS_PER_SEC<<" system energy: "<<energy_sys<<endl;
-	save_to_txt();
+    save_element_to_txt();
 	int *bond_num;
 	bond_num = cal_bond_num();
 	cout<<"cbond: "<<bond_num[0]<<" vbond: "<<bond_num[1]<<endl;
 	//disp_array(1);
 	//cout<<endl;
 	//disp_array(2);
+	save_lattice_to_txt();
 	return 0;
 }
 
@@ -784,7 +786,7 @@ void disp_array(int i)
 	}
 }
 
-void save_to_txt()
+void save_lattice_to_txt()
 {
 	string filename;
 	stringstream ss;
@@ -850,6 +852,72 @@ void save_to_txt()
 		file<<"\r\n";
 	}
 	file<<"\r\n";
+}
+
+void save_element_to_txt()
+{
+	string filename;
+	stringstream ss;
+	//ss<<total_run<<"-"<<lattice_size<<"-"<<num_molecule<<"-"<<num_metal<<"-"<<cenergy<<"-"<<venergy<<"-"<<mcenergy<<".txt";
+	//ss << "D:\\Dropbox\\Project\\python\\Monte-Carlo-Simulation\\results";
+	ss << "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results";
+	ss << ffn << "/";
+	ss.precision(1);
+	ss.setf(ios::scientific);
+	ss << double(total_run) << "_" << lattice_size << "_" << num_molecule1 << "_" << num_molecule2 << "_";
+	ss << num_metal << "_"<< cenergy << "_" << venergy << "_" << mcenergy << "_element.txt";
+	filename = ss.str();
+	cout<<"output to file: "<<filename<<endl;
+	ofstream file(filename.c_str());
+	//ofstream file("latt.txt");
+	string line;
+	stringstream linestream;
+	/*int *bond_num;
+	double enersys;
+	bond_num = cal_bond_num();
+	linestream<<bond_num[0];
+	linestream>>line;
+	file<<line<<",";
+	linestream.clear();
+	linestream<<bond_num[1];
+	linestream>>line;
+	file<<line<<",";
+	linestream.clear();
+	enersys = cal_energy_sys();
+	linestream<<enersys;
+	linestream>>line;
+	file<<line<<",";
+	linestream.clear();
+	linestream<<lattice_size;
+	linestream>>line;
+	file<<line<<"\n";
+	linestream.clear();*/
+	for(int i = 0; i < num_total; i = i+1)
+	{
+		 for(int j = 0; j < 3; j = j+1)
+		{
+			
+			//string line;
+			//stringstream linestream;
+			linestream<<elements[i][j];
+			linestream>>line;
+			linestream.clear();
+			if(j == 2)
+			{
+				file<<line;
+				//cout<<line<<",";
+				
+				}
+			else
+			{
+				file<<line<<",";
+				//cout<<line<<",";
+			}				
+		}
+		file<<"\r\n";
+	}
+}
+
 	/*for(int i = 0; i < num_total; i = i+1)
 	{
 		 for(int j = 0; j < 3; j = j+1)
@@ -902,7 +970,6 @@ void save_to_txt()
 		}
 		file<<"\r\n";
 	}*/
-}
 int (*read_conf(int ind))[5]
 {
     fstream infile;
