@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
 	srand((unsigned)time(NULL)); 
 	// INITIALIZE THE LATTICE
 	memset(lattice, 0, sizeof(lattice[0][0]) * lattice_size * lattice_size);
-	memset(lattice_num, 0, sizeof(lattice_num[0][0]) * lattice_size * lattice_size);
+	//memset(lattice_num, 0, sizeof(lattice_num[0][0]) * lattice_size * lattice_size);
 	memset(elements, 0, sizeof(elements[0][0]) * num_total * 3);
 	// Distribute the molecules and metals on the lattice
     cout<<"Loading molecular configurations..."<<endl;
@@ -235,9 +235,21 @@ int main(int argc, char *argv[])
         }
         cout << "Elements are distributed..." << endl;
     }
+    // IF continue with an old configuration
     else
     {
         cout << "Loading configuration from the file" << endl;
+        string filename;
+        string filename_element;
+        stringstream ss;
+        ss << "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results";
+        ss << ffn << "/";
+        ss.precision(1);
+        ss.setf(ios::scientific);
+        ss << double(total_run) << "_" << lattice_size << "_" << num_molecule1 << "_" << num_molecule2 << "_";
+        ss << num_metal << "_"<< cenergy << "_" << venergy << "_" << mcenergy;// << "_element.txt";
+        filename = ss.str() + ".txt";
+        filename_element = ss.str() + "_element.txt";
 
     }
 	start = clock();
@@ -854,12 +866,76 @@ void save_lattice_to_txt()
 	file<<"\r\n";
 }
 
+
+void read_lattice_from_txt(string file)
+{
+    fstream infile;
+    int i=0;
+    int j=0;
+    char cNum[256];
+    int skip = 4;
+    infile.open (file, ifstream::in);
+    if (infile.is_open())
+    {
+         infile.getline(cNum, 256);
+         while (infile.good())
+             {
+                  infile.getline(cNum, 256, ',');
+                  output[j][i]= atoi(cNum) ;
+                  //cout<<j<<"  "<<i<<"  "<<output[j][i]<<" ";
+                  //cout <<"string "<< cNum <<endl;
+                  i++;
+                  if (i == lattice_size)
+                  {
+                      j++;
+                      i=0;
+                  }
+
+             }
+             infile.close();
+    }
+    else
+    {
+        cout << "Error opening file";
+    }
+
+}
+
+void read_element_from_txt(string file)
+{
+    fstream infile;
+    int i=0;
+    int j=0;
+    char cNum[256] ;
+    infile.open (file, ifstream::in);
+    if (infile.is_open())
+    {
+         while (infile.good())
+             {
+                  infile.getline(cNum, 256, ',');
+                  elements[j][i]= atoi(cNum) ;
+                  //cout<<j<<"  "<<i<<"  "<<output[j][i]<<" ";
+                  //cout <<"string "<< cNum <<endl;
+                  i++;
+                  if (i == 3)
+                  {
+                      j++;
+                      i=0;
+                  }
+
+             }
+             infile.close();
+    }
+    else
+    {
+        cout << "Error opening file";
+    }
+
+}
 void save_element_to_txt()
 {
 	string filename;
 	stringstream ss;
-	//ss<<total_run<<"-"<<lattice_size<<"-"<<num_molecule<<"-"<<num_metal<<"-"<<cenergy<<"-"<<venergy<<"-"<<mcenergy<<".txt";
-	//ss << "D:\\Dropbox\\Project\\python\\Monte-Carlo-Simulation\\results";
 	ss << "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results";
 	ss << ffn << "/";
 	ss.precision(1);
@@ -872,26 +948,6 @@ void save_element_to_txt()
 	//ofstream file("latt.txt");
 	string line;
 	stringstream linestream;
-	/*int *bond_num;
-	double enersys;
-	bond_num = cal_bond_num();
-	linestream<<bond_num[0];
-	linestream>>line;
-	file<<line<<",";
-	linestream.clear();
-	linestream<<bond_num[1];
-	linestream>>line;
-	file<<line<<",";
-	linestream.clear();
-	enersys = cal_energy_sys();
-	linestream<<enersys;
-	linestream>>line;
-	file<<line<<",";
-	linestream.clear();
-	linestream<<lattice_size;
-	linestream>>line;
-	file<<line<<"\n";
-	linestream.clear();*/
 	for(int i = 0; i < num_total; i = i+1)
 	{
 		 for(int j = 0; j < 3; j = j+1)
@@ -918,58 +974,6 @@ void save_element_to_txt()
 	}
 }
 
-	/*for(int i = 0; i < num_total; i = i+1)
-	{
-		 for(int j = 0; j < 3; j = j+1)
-		{
-			
-			//string line;
-			//stringstream linestream;
-			linestream<<elements[i][j];
-			linestream>>line;
-			linestream.clear();
-			if(j == 2)
-			{
-				file<<line;
-				//cout<<line<<",";
-				
-				}
-			else
-			{
-				file<<line<<",";
-				//cout<<line<<",";
-			}
-				
-				
-		}
-		file<<"\r\n";
-	}*/
-    /*for(int i = 0; i < lattice_size; i = i+1)
-	{
-		 for(int j = 0; j < lattice_size; j = j+1)
-		{
-			
-			//string line;
-			//stringstream linestream;
-			linestream<<lattice_num[i][j];
-			linestream>>line;
-			linestream.clear();
-			if(j == (lattice_size-1))
-			{
-				file<<line;
-				//cout<<line<<",";
-				
-				}
-			else
-			{
-				file<<line<<",";
-				//cout<<line<<",";
-			}
-				
-				
-		}
-		file<<"\r\n";
-	}*/
 int (*read_conf(int ind))[5]
 {
     fstream infile;
