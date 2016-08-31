@@ -51,6 +51,8 @@ double cal_energy_metal(int (*co)[3], int length);
 void print_array(int (*ar)[3], int length, string name);
 void save_lattice_to_txt();
 void save_element_to_txt();
+void read_lattice_from_txt(const char* file);
+void read_element_from_txt(const char* file);
 void disp_array(int i);
 double cal_energy_sys(void);
 int *cal_bond_num(void);
@@ -238,7 +240,7 @@ int main(int argc, char *argv[])
     // IF continue with an old configuration
     else
     {
-        cout << "Loading configuration from the file" << endl;
+        cout << "Loading configuration from the previous files..." << endl;
         string filename;
         string filename_element;
         stringstream ss;
@@ -250,7 +252,12 @@ int main(int argc, char *argv[])
         ss << num_metal << "_"<< cenergy << "_" << venergy << "_" << mcenergy;// << "_element.txt";
         filename = ss.str() + ".txt";
         filename_element = ss.str() + "_element.txt";
-
+        const char * f_lattice = filename.c_str();
+        const char * f_element = filename_element.c_str();
+        read_lattice_from_txt(f_lattice);
+        read_element_from_txt(f_element);
+        cout << "Loaded lattice from " << filename << endl;
+        cout << "Loaded lattice from " << filename_element <<endl;
     }
 	start = clock();
 	//disp_array(1);
@@ -866,72 +873,6 @@ void save_lattice_to_txt()
 	file<<"\r\n";
 }
 
-
-void read_lattice_from_txt(string file)
-{
-    fstream infile;
-    int i=0;
-    int j=0;
-    char cNum[256];
-    int skip = 4;
-    infile.open (file, ifstream::in);
-    if (infile.is_open())
-    {
-         infile.getline(cNum, 256);
-         while (infile.good())
-             {
-                  infile.getline(cNum, 256, ',');
-                  output[j][i]= atoi(cNum) ;
-                  //cout<<j<<"  "<<i<<"  "<<output[j][i]<<" ";
-                  //cout <<"string "<< cNum <<endl;
-                  i++;
-                  if (i == lattice_size)
-                  {
-                      j++;
-                      i=0;
-                  }
-
-             }
-             infile.close();
-    }
-    else
-    {
-        cout << "Error opening file";
-    }
-
-}
-
-void read_element_from_txt(string file)
-{
-    fstream infile;
-    int i=0;
-    int j=0;
-    char cNum[256] ;
-    infile.open (file, ifstream::in);
-    if (infile.is_open())
-    {
-         while (infile.good())
-             {
-                  infile.getline(cNum, 256, ',');
-                  elements[j][i]= atoi(cNum) ;
-                  //cout<<j<<"  "<<i<<"  "<<output[j][i]<<" ";
-                  //cout <<"string "<< cNum <<endl;
-                  i++;
-                  if (i == 3)
-                  {
-                      j++;
-                      i=0;
-                  }
-
-             }
-             infile.close();
-    }
-    else
-    {
-        cout << "Error opening file";
-    }
-
-}
 void save_element_to_txt()
 {
 	string filename;
@@ -1007,3 +948,89 @@ int (*read_conf(int ind))[5]
     }
     return output;
 }
+
+void read_lattice_from_txt(const char *file)
+{
+    fstream infile;
+    int i=0;
+    int j=0;
+    char cNum[256];
+    int skip = 4;
+    infile.open(file, ifstream::in);
+    if (infile.is_open())
+    {
+         infile.getline(cNum, 256);
+         cout<<"header "<<cNum<<endl;
+         while (infile.good())
+             {
+                 if(i == lattice_size-1)
+                 {
+                     infile.getline(cNum, 256);
+                 }
+                 else
+                 {
+                     infile.getline(cNum, 256, ',');
+                 }
+                 lattice[j][i]= atoi(cNum);
+                 cout<<j<<"  "<<i<<"  "<<lattice[j][i]<<" ";
+                 cout <<"string "<< cNum <<endl;
+                 if(i == lattice_size-1)
+                 {
+                     j++;
+                     i=0;
+                     cout << "reset"<<endl;
+                 }
+                 else
+                 {
+                     i++;
+                 }
+             }
+             infile.close();
+    }
+    else
+    {
+        cout << "Error opening file";
+    }
+}
+
+void read_element_from_txt(const char *file)
+{
+    fstream infile;
+    int i=0;
+    int j=0;
+    char cNum[256] ;
+    infile.open(file, ifstream::in);
+    if (infile.is_open())
+    {
+         while (infile.good())
+             {
+                  if(i == 2)
+                     {
+                         infile.getline(cNum, 256);
+                     }
+                     else
+                     {
+                         infile.getline(cNum, 256, ',');
+                     }
+                     elements[j][i]= atoi(cNum);
+                     cout<<j<<"  "<<i<<"  "<<elements[j][i]<<" ";
+                     cout <<"string "<< cNum <<endl;
+                     if(i == 2)
+                     {
+                         j++;
+                         i=0;
+                         cout << "reset"<<endl;
+                     }
+                     else
+                     {
+                         i++;
+                     }
+             }
+             infile.close();
+    }
+    else
+    {
+        cout << "Error opening file";
+    }
+}
+

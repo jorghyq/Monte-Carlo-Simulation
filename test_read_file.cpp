@@ -16,13 +16,13 @@ const int lattice_size = 8;
 void print_array(int (*ar)[3], int length, string name);
 void disp_array();
 int lattice[lattice_size][lattice_size];
-int elements[1000][3];
+int elements[10][3];
 
 int main ()
 {
     memset(lattice, 0, sizeof(lattice[0][0]) * lattice_size * lattice_size);
 	//memset(lattice_num, 0, sizeof(lattice_num[0][0]) * lattice_size * lattice_size);
-	memset(elements, 0, sizeof(elements[0][0]) * 1000 * 3);
+	memset(elements, 0, sizeof(elements[0][0]) * 10 * 3);
     int array[2][5];
     int (*temp)[5];
     temp = read_conf(1);
@@ -34,10 +34,15 @@ int main ()
     }
     string file = "test";
     string file_lattice = file + ".txt";
+    string file_element = file + "_element.txt";
     const char * f_lattice = file_lattice.c_str();
+    const char * f_element = file_element.c_str();
     cout << f_lattice<<endl;
-    read_lattice_from_txt(f_lattice);
-    disp_array();
+    cout << f_element<<endl;
+    //read_lattice_from_txt(f_lattice);
+    read_element_from_txt(f_element);
+    //disp_array();
+    print_array(elements, 10, "element");
     return 0;
 }
 
@@ -87,20 +92,27 @@ void read_lattice_from_txt(const char *file)
          cout<<"header "<<cNum<<endl;
          while (infile.good())
              {
-                 if(i== lattice_size-1)
+                 if(i == lattice_size-1)
                  {
                      infile.getline(cNum, 256);
-                     j++;
-                     i=0;
                  }
                  else
                  {
                      infile.getline(cNum, 256, ',');
                  }
                  lattice[j][i]= atoi(cNum);
-                 cout<<j<<"  "<<i<<"  "<<output[j][i]<<" ";
+                 cout<<j<<"  "<<i<<"  "<<lattice[j][i]<<" ";
                  cout <<"string "<< cNum <<endl;
-                 i++;
+                 if(i == lattice_size-1)
+                 {
+                     j++;
+                     i=0;
+                     cout << "reset"<<endl;
+                 }
+                 else
+                 {
+                     i++;
+                 }
              }
              infile.close();
     }
@@ -122,17 +134,27 @@ void read_element_from_txt(const char *file)
     {
          while (infile.good())
              {
-                  infile.getline(cNum, 256, ',');
-                  elements[j][i]= atoi(cNum) ;
-                  //cout<<j<<"  "<<i<<"  "<<output[j][i]<<" ";
-                  //cout <<"string "<< cNum <<endl;
-                  i++;
-                  if (i == 3)
-                  {
-                      j++;
-                      i=0;
-                  }
-
+                  if(i == 2)
+                     {
+                         infile.getline(cNum, 256);
+                     }
+                     else
+                     {
+                         infile.getline(cNum, 256, ',');
+                     }
+                     elements[j][i]= atoi(cNum);
+                     cout<<j<<"  "<<i<<"  "<<elements[j][i]<<" ";
+                     cout <<"string "<< cNum <<endl;
+                     if(i == 2)
+                     {
+                         j++;
+                         i=0;
+                         cout << "reset"<<endl;
+                     }
+                     else
+                     {
+                         i++;
+                     }
              }
              infile.close();
     }
