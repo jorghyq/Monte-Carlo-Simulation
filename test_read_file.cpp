@@ -37,12 +37,19 @@ int main ()
     string file_element = file + "_element.txt";
     const char * f_lattice = file_lattice.c_str();
     const char * f_element = file_element.c_str();
-    cout << f_lattice<<endl;
-    cout << f_element<<endl;
-    //read_lattice_from_txt(f_lattice);
-    read_element_from_txt(f_element);
-    //disp_array();
-    print_array(elements, 10, "element");
+    if (fstream(f_lattice) && fstream(f_element))
+    {
+        cout << f_lattice<<endl;
+        cout << f_element<<endl;
+        //read_lattice_from_txt(f_lattice);
+        read_element_from_txt(f_element);
+        //disp_array();
+        print_array(elements, 10, "element");
+    }
+    else
+    {
+        cout<< "Configuration files not existed!" <<endl;
+    }
     return 0;
 }
 

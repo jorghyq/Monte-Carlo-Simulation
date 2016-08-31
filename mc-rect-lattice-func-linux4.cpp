@@ -13,7 +13,7 @@ using namespace std;
 
 int total_run = 100000;
 const int SECOND_LOOP = 1;
-int RESTART = 0;
+int RESTORE = 0;
 const int lattice_size = 80;
 const int element_num = 1000;//12 * lattice_size;
 int ffn = 1; // number of results filefolder
@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
 				ffn = atoi(optarg);
 				break;
             case 'i':
-                RESTART = atoi(optarg);
+                RESTORE = atoi(optarg);
 			default:
 				break;
 			}
@@ -167,7 +167,35 @@ int main(int argc, char *argv[])
     angle_mol2 = i;
     cout<<"angle_mol2: "<<angle_mol2<<endl;
     cout<<endl;
-    if (RESTART == 0)
+    if (RESTORE == 1)
+    {
+        cout << "Loading configuration from the previous files..." << endl;
+        string filename;
+        string filename_element;
+        stringstream ss;
+        ss << "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results";
+        ss << ffn << "/";
+        ss.precision(1);
+        ss.setf(ios::scientific);
+        ss << double(total_run) << "_" << lattice_size << "_" << num_molecule1 << "_" << num_molecule2 << "_";
+        ss << num_metal << "_"<< cenergy << "_" << venergy << "_" << mcenergy;// << "_element.txt";
+        filename = ss.str() + ".txt";
+        filename_element = ss.str() + "_element.txt";
+        const char * f_lattice = filename.c_str();
+        const char * f_element = filename_element.c_str();
+        if (fstream(f_lattice) && (fstream(f_element)))
+        {
+            read_lattice_from_txt(f_lattice);
+            read_element_from_txt(f_element);
+            cout << "Loaded lattice from " << filename << endl;
+            cout << "Loaded lattice from " << filename_element <<endl;
+        }
+        else
+        {
+            RESTORE = 0;
+        }
+    }
+    else if (RESTORE == 0)
     {
         cout << "Begin to distribute elemenst..." << endl;
         cout<<"molecules1 "<<num_molecule1 << " molecules2 "<<num_molecule2<<endl; 
@@ -238,28 +266,7 @@ int main(int argc, char *argv[])
         cout << "Elements are distributed..." << endl;
     }
     // IF continue with an old configuration
-    else
-    {
-        cout << "Loading configuration from the previous files..." << endl;
-        string filename;
-        string filename_element;
-        stringstream ss;
-        ss << "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results";
-        ss << ffn << "/";
-        ss.precision(1);
-        ss.setf(ios::scientific);
-        ss << double(total_run) << "_" << lattice_size << "_" << num_molecule1 << "_" << num_molecule2 << "_";
-        ss << num_metal << "_"<< cenergy << "_" << venergy << "_" << mcenergy;// << "_element.txt";
-        filename = ss.str() + ".txt";
-        filename_element = ss.str() + "_element.txt";
-        const char * f_lattice = filename.c_str();
-        const char * f_element = filename_element.c_str();
-        read_lattice_from_txt(f_lattice);
-        read_element_from_txt(f_element);
-        cout << "Loaded lattice from " << filename << endl;
-        cout << "Loaded lattice from " << filename_element <<endl;
-    }
-	start = clock();
+    start = clock();
 	//disp_array(1);
 	// Begin to simulatte
 	cout << "Begin to simulate..." << endl;
@@ -955,12 +962,11 @@ void read_lattice_from_txt(const char *file)
     int i=0;
     int j=0;
     char cNum[256];
-    int skip = 4;
     infile.open(file, ifstream::in);
     if (infile.is_open())
     {
          infile.getline(cNum, 256);
-         cout<<"header "<<cNum<<endl;
+         //cout<<"header "<<cNum<<endl;
          while (infile.good())
              {
                  if(i == lattice_size-1)
@@ -972,13 +978,13 @@ void read_lattice_from_txt(const char *file)
                      infile.getline(cNum, 256, ',');
                  }
                  lattice[j][i]= atoi(cNum);
-                 cout<<j<<"  "<<i<<"  "<<lattice[j][i]<<" ";
-                 cout <<"string "<< cNum <<endl;
+                 //cout<<j<<"  "<<i<<"  "<<lattice[j][i]<<" ";
+                 //cout <<"string "<< cNum <<endl;
                  if(i == lattice_size-1)
                  {
                      j++;
                      i=0;
-                     cout << "reset"<<endl;
+                     //cout << "reset"<<endl;
                  }
                  else
                  {
@@ -1013,13 +1019,13 @@ void read_element_from_txt(const char *file)
                          infile.getline(cNum, 256, ',');
                      }
                      elements[j][i]= atoi(cNum);
-                     cout<<j<<"  "<<i<<"  "<<elements[j][i]<<" ";
-                     cout <<"string "<< cNum <<endl;
+                     //cout<<j<<"  "<<i<<"  "<<elements[j][i]<<" ";
+                     //cout <<"string "<< cNum <<endl;
                      if(i == 2)
                      {
                          j++;
                          i=0;
-                         cout << "reset"<<endl;
+                         //cout << "reset"<<endl;
                      }
                      else
                      {

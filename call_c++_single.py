@@ -23,6 +23,7 @@ venergy = 5
 mcenergy = 20
 ffn=100
 latt_len = 80
+restore = 0
 print len(sys.argv)
 for i in range(len(sys.argv)):
     print i, sys.argv[i]
@@ -40,11 +41,17 @@ elif len(sys.argv) == 5:
     num_mol1 = float(sys.argv[2])
     num_mol2 = float(sys.argv[3])
     num_metal = float(sys.argv[4])
+elif len(sys.argv) == 6:
+    total_run = float(sys.argv[1])
+    num_mol1 = float(sys.argv[2])
+    num_mol2 = float(sys.argv[3])
+    num_metal = float(sys.argv[4])
+    restore = int(sys.argv[5])
 else:
     pass
 
 print total_run, num_mol1, num_mol2, num_metal
-command = './mc-rect-lattice-func-linux4 -a %d -b %d -c %d -d %d -e %f -f %f -g %f -h %d' % (total_run,num_mol1,num_mol2,num_metal,cenergy,venergy,mcenergy,ffn)
+command = './mc-rect-lattice-func-linux4 -a %d -b %d -c %d -d %d -e %f -f %f -g %f -h %d -i %d' % (total_run,num_mol1,num_mol2,num_metal,cenergy,venergy,mcenergy,ffn,restore)
 args = shlex.split(command)
 print args
 #p = subprocess.check_call(args,shell=True)
