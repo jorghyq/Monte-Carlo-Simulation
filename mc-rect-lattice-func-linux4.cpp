@@ -12,6 +12,7 @@ using namespace std;
 
 
 int total_run = 100000;
+int sum_run = total_run;
 const int SECOND_LOOP = 1;
 int RESTORE = 0;
 const int lattice_size = 80;
@@ -169,7 +170,6 @@ int main(int argc, char *argv[])
     cout<<endl;
     if (RESTORE == 1)
     {
-        cout << "Loading configuration from the previous files..." << endl;
         string filename;
         string filename_element;
         stringstream ss;
@@ -185,6 +185,7 @@ int main(int argc, char *argv[])
         const char * f_element = filename_element.c_str();
         if (fstream(f_lattice) && (fstream(f_element)))
         {
+            cout << "Loading configuration from the previous files..." << endl;
             read_lattice_from_txt(f_lattice);
             read_element_from_txt(f_element);
             cout << "Loaded lattice from " << filename << endl;
@@ -193,6 +194,7 @@ int main(int argc, char *argv[])
         else
         {
             RESTORE = 0;
+            cout<<"No configuration files are founded"<<endl;
         }
     }
     else if (RESTORE == 0)
@@ -848,7 +850,11 @@ void save_lattice_to_txt()
 	linestream.clear();
 	linestream<<lattice_size;
 	linestream>>line;
-	file<<line<<"\n";
+	file<<line<<",";
+    linestream.clear();
+    linestream<<double(sum_run);
+    linestream>>line;
+    file<<line<<"\n";
 	linestream.clear();
 	//cout<<"cbond: "<<bond_num[0]<<" vbond: "<<bond_num[1]<<endl;
 	for(int i = 0; i < lattice_size; i = i+1)
@@ -965,7 +971,12 @@ void read_lattice_from_txt(const char *file)
     infile.open(file, ifstream::in);
     if (infile.is_open())
     {
+         for(int p=0;p<4;p++)
+         {
+             infile.getline(cNum, 256, ',');
+         }
          infile.getline(cNum, 256);
+         sum_run = sum_run + atof(cNum);
          //cout<<"header "<<cNum<<endl;
          while (infile.good())
              {
