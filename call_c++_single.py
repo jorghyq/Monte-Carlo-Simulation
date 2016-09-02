@@ -22,7 +22,7 @@ cenergy = 20
 venergy = 5
 mcenergy = 20
 ffn=100
-latt_len = 80
+latt_len = 200
 restore = 0
 print len(sys.argv)
 for i in range(len(sys.argv)):
@@ -60,8 +60,12 @@ fpath = "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results100/
 files = os.listdir(fpath)
 print fpath
 fname = sorted_ls(fpath,files)
-print fname,fname[-2]
-lattice = np.loadtxt(fpath+fname[-2],delimiter=',',skiprows=1)
+if fname[-2][-5] == 't':
+    print fname[-1]
+    lattice = np.loadtxt(fpath+fname[-1],delimiter=',',skiprows=1)
+else:
+    print fname[-2]
+    lattice = np.loadtxt(fpath+fname[-2],delimiter=',',skiprows=1)
 #lattice = np.zeros((100,100))
 #lattice = np.loadtxt("D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results19\\1.0e+009_100_400_250_4.0e+001_5.0e+000_4.0e+001.txt", delimiter=',',skiprows=1)
 #lattice = lattice[0:latt_len,0:]
