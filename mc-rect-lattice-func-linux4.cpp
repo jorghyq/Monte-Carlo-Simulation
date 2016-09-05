@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
 	cout<<"molecule2: ";
     i = 0;
 	//memset(output, 0, sizeof(output[0][0]) * 4 * 5);
-    while(mol_conf2[i][0] != 0)
+    while(mol_conf2[i][0] != 0 and i < 4)
     {
         for(int j=0;j<5;j++)
             cout<<mol_conf2[i][j]<<",";
@@ -466,7 +466,7 @@ void p2a(int (*ptr)[3], int arr[][3], int length)
 
 void p2a2(int (*ptr)[5], int arr [][5])
 {
-    for (int i=0;i<2;i++)
+    for (int i=0;i<4;i++)
     {
         for (int j=0;j<5;j++)
             arr[i][j] = *(ptr[i]+j);
