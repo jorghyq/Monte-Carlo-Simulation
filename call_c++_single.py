@@ -18,12 +18,12 @@ total_run = 1000000
 num_mol1 = 100
 num_mol2 = 0
 num_metal = 0
-cenergy = 20
+cenergy = 10
 venergy = 5
-mcenergy = 20
+mcenergy = 10
 ffn=100
 latt_len = 200
-restore = 0
+restore = 1
 print len(sys.argv)
 for i in range(len(sys.argv)):
     print i, sys.argv[i]
@@ -46,7 +46,7 @@ elif len(sys.argv) == 6:
     num_mol1 = float(sys.argv[2])
     num_mol2 = float(sys.argv[3])
     num_metal = float(sys.argv[4])
-    restore = int(sys.argv[5])
+    ffn = int(sys.argv[5])
 else:
     pass
 
@@ -68,11 +68,12 @@ else:
     lattice = np.loadtxt(fpath+fname[-2],delimiter=',',skiprows=1)
 #lattice = np.zeros((100,100))
 #lattice = np.loadtxt("D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results19\\1.0e+009_100_400_250_4.0e+001_5.0e+000_4.0e+001.txt", delimiter=',',skiprows=1)
-#lattice = lattice[0:latt_len,0:]
 temp1, temp2 = np.where(lattice == 9) # mol1
 temp3, temp4 = np.where(lattice == 10) # mol2
 temp5, temp6 = np.where(lattice == 1)  # metal
 temp7, temp8 = np.where(lattice == 7)
+temp9, temp10 = np.where(lattice == 2)
+temp11, temp12 = np.where(lattice == 3)
 # To have a customer designed shape, one has to draw it by himself
 x = [-1.5,-0.5,-0.5,0.5,0.5,1.5,1.5,0.5,0.5,-0.5,-0.5,-1.5,-1.5]
 y = [0.5,0.5,1.5,1.5,0.5,0.5,-0.5,-0.5,-1.5,-1.5,-0.5,-0.5,0.5]
@@ -89,11 +90,12 @@ fig = plt.figure()
 ax = plt.axes()
 fig.add_axes(ax)
 
-ax.scatter(temp1,temp2,s = 120,c = "#0ACEF5",linewidth='0',marker = xy1)
-ax.scatter(temp3,temp4,s = 120,c = "b",linewidth='0',marker = xy1)
-ax.scatter(temp7,temp8,s = 20,c = "r",linewidth='0',marker = xy3)
-ax.scatter(temp5,temp6,s = 20,c = "#F78C00",linewidth='0',marker = "o")
-
+ax.scatter(temp1,temp2,s = 20,c = "#0ACEF5",linewidth='0',marker = xy1)
+ax.scatter(temp3,temp4,s = 20,c = "b",linewidth='0',marker = xy1)
+ax.scatter(temp7,temp8,s = 2,c = "r",linewidth='0',marker = xy3)
+ax.scatter(temp5,temp6,s = 2,c = "#F78C00",linewidth='0',marker = "o")
+ax.scatter(temp9,temp10,s = 2,c = "g",linewidth='0',marker = "o")
+ax.scatter(temp11,temp12,s = 2,c = "m",linewidth='0',marker = "o")
 plt.xlim([-0.5, latt_len-0.5])
 plt.ylim([-0.5, latt_len-0.5])
 
