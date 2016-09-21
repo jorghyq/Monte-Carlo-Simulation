@@ -128,6 +128,7 @@ int main(int argc, char *argv[])
 	}
     num_molecule = num_molecule1 + num_molecule2;
 	num_total = num_molecule + num_metal;
+    sum_run = total_run;
 	cout<<"Program is initialized with: "<<endl;
 	cout<<"total_run = "<< total_run<<", latt_length = "<<lattice_size<<endl;
 	cout<<"num mol1 = "<<num_molecule1<< " ,num mol2 = "<<num_molecule2<<", num mol = "<<num_molecule<<", num metals = "<<num_metal<<endl;
