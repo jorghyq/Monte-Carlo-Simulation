@@ -877,6 +877,7 @@ void save_lattice_to_txt()
     linestream<<double(sum_run);
     linestream>>line;
     file<<line<<"\n";
+    linestream>>line;
 	linestream.clear();
 	//cout<<"cbond: "<<bond_num[0]<<" vbond: "<<bond_num[1]<<endl;
 	for(int i = 0; i < lattice_size; i = i+1)

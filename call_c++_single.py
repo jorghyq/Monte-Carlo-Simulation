@@ -56,7 +56,7 @@ args = shlex.split(command)
 print args
 #p = subprocess.check_call(args,shell=True)
 os.system(command)
-fpath = "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results100/"
+fpath = "/home/jorghyq/Dropbox/Project/python/Monte-Carlo-Simulation/results%d/" % ffn
 files = os.listdir(fpath)
 print fpath
 fname = sorted_ls(fpath,files)
