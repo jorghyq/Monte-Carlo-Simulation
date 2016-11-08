@@ -8,6 +8,8 @@
 #include <time.h> 
 #include <math.h>
 #include <unistd.h>
+#include <iterator>
+#include <algorithm>
 using namespace std;
 
 
@@ -60,8 +62,8 @@ int *cal_bond_num(void);
 int (*read_conf(int ind))[5];
 /*********************************************************** 
  * molecular macrocycle
- * 9: mol1, light blue
- * 10: mol2, dark blue
+ * 11: mol1, light blue
+ * 12: mol2, dark blue
  *
  * metal
  * 1: metal
@@ -74,9 +76,18 @@ int (*read_conf(int ind))[5];
  * 6: non-reactive, next to the metal forbidden, vdW
  * 7: non-reactive, next to the metal forbidden, no vdW\
  * 8: 2-fold allowd, different energy mcenergy
+ * 9:
+ * 10:
  * **********************************************************/
-int mol_conf1[4][5] = {{3,3,3,3,9},{3,3,3,3,9},{0,0,0,0,0},{0,0,0,0,0}};
-int mol_conf2[4][5] = {{2,2,2,2,10},{2,2,2,2,10},{0,0,0,0,0},{0,0,0,0,0}};
+int end_coor_2f[] = {2};
+int end_coor_4f[] = {3};
+int end_vdw[] = {2,3,4,6,8};
+int end_coor_inactive[] = {4,5};
+int end_coor_repul[] = {6,7};
+int end_coor_e1[] = {2,3};
+int end_coor_e2[] = {8};
+int mol_conf1[4][5] = {{3,3,3,3,11},{3,3,3,3,11},{0,0,0,0,0},{0,0,0,0,0}};
+int mol_conf2[4][5] = {{2,2,2,2,12},{2,2,2,2,12},{0,0,0,0,0},{0,0,0,0,0}};
 int metal_conf[5] = {1,1,1,1,1};
 int main(int argc, char *argv[])
 {
@@ -545,6 +556,9 @@ int is_occupied(int (*co)[3], int length)
 	}	
 	return 0;
 }
+
+bool is_in(int)
+
 
 double cal_energy_mol(int (*co)[3], int length)
 {
