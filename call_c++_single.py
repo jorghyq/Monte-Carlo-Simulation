@@ -20,9 +20,9 @@ total_run = 1000000
 num_mol1 = 100
 num_mol2 = 0
 num_metal = 0
-cenergy = 10
+cenergy = 40
 venergy = 5
-mcenergy = 10
+mcenergy = 40
 ffn=100
 latt_len = 100
 restore = 1
@@ -103,7 +103,6 @@ for i in [11,12]:
 
 # plot endgroups
 for i in range(2,11):
-    print i
     coor_x,coor_y = np.where(lattice == i)
     if str(i) in colors:
         ax.scatter(coor_x,coor_y,s=20,c=colors[str(i)],linewidth='0',marker=xy3)
