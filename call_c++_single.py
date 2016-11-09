@@ -10,6 +10,8 @@ import scipy as sp
 import random as rd
 import matplotlib.pyplot as plt
 import time
+import json
+
 def sorted_ls(path, files):
     mtime = lambda f: os.stat(os.path.join(path, f)).st_mtime
     return list(sorted(files, key=mtime))
@@ -22,7 +24,7 @@ cenergy = 10
 venergy = 5
 mcenergy = 10
 ffn=100
-latt_len = 200
+latt_len = 100
 restore = 1
 print len(sys.argv)
 for i in range(len(sys.argv)):
@@ -51,7 +53,7 @@ else:
     pass
 
 print total_run, num_mol1, num_mol2, num_metal
-command = './mc-rect-lattice-func-linux4 -a %d -b %d -c %d -d %d -e %f -f %f -g %f -h %d -i %d' % (total_run,num_mol1,num_mol2,num_metal,cenergy,venergy,mcenergy,ffn,restore)
+command = './mc-rect-lattice-func-linux6 -a %d -b %d -c %d -d %d -e %f -f %f -g %f -h %d -i %d' % (total_run,num_mol1,num_mol2,num_metal,cenergy,venergy,mcenergy,ffn,restore)
 args = shlex.split(command)
 print args
 #p = subprocess.check_call(args,shell=True)
@@ -68,12 +70,6 @@ else:
     lattice = np.loadtxt(fpath+fname[-2],delimiter=',',skiprows=1)
 #lattice = np.zeros((100,100))
 #lattice = np.loadtxt("D:\Dropbox\Project\python\Monte-Carlo-Simulation\\results19\\1.0e+009_100_400_250_4.0e+001_5.0e+000_4.0e+001.txt", delimiter=',',skiprows=1)
-temp1, temp2 = np.where(lattice == 9) # mol1
-temp3, temp4 = np.where(lattice == 10) # mol2
-temp5, temp6 = np.where(lattice == 1)  # metal
-temp7, temp8 = np.where(lattice == 7)
-temp9, temp10 = np.where(lattice == 2)
-temp11, temp12 = np.where(lattice == 3)
 # To have a customer designed shape, one has to draw it by himself
 x = [-1.5,-0.5,-0.5,0.5,0.5,1.5,1.5,0.5,0.5,-0.5,-0.5,-1.5,-1.5]
 y = [0.5,0.5,1.5,1.5,0.5,0.5,-0.5,-0.5,-1.5,-1.5,-0.5,-0.5,0.5]
@@ -86,16 +82,32 @@ y3 = [0.5,0.5,-0.5,-0.5,-0.5]
 xy1 = list(zip(x,y))
 xy2 = list(zip(x2,y2))
 xy3 = list(zip(x3,y3))
+
+# load colors
+with open('colors.json','r') as f:
+    colors = json.load(f)
+
 fig = plt.figure()
 ax = plt.axes()
 fig.add_axes(ax)
 
-ax.scatter(temp1,temp2,s = 20,c = "#0ACEF5",linewidth='0',marker = xy1)
-ax.scatter(temp3,temp4,s = 20,c = "b",linewidth='0',marker = xy1)
-ax.scatter(temp7,temp8,s = 2,c = "r",linewidth='0',marker = xy3)
-ax.scatter(temp5,temp6,s = 2,c = "#F78C00",linewidth='0',marker = "o")
-ax.scatter(temp9,temp10,s = 2,c = "g",linewidth='0',marker = "o")
-ax.scatter(temp11,temp12,s = 2,c = "m",linewidth='0',marker = "o")
+
+# plot metal
+coor_x, coor_y = np.where(lattice == 1) # metal
+ax.scatter(coor_x,coor_y,s=20,c=colors['1'],linewidth='0',marker = "o")
+
+# plot molecular center
+for i in [11,12]:
+    coor_x,coor_y = np.where(lattice == i)
+    ax.scatter(coor_x,coor_y,s=120,c=colors[str(i)],linewidth='0',marker=xy1)
+
+# plot endgroups
+for i in range(2,11):
+    print i
+    coor_x,coor_y = np.where(lattice == i)
+    if str(i) in colors:
+        ax.scatter(coor_x,coor_y,s=20,c=colors[str(i)],linewidth='0',marker=xy3)
+
 plt.xlim([-0.5, latt_len-0.5])
 plt.ylim([-0.5, latt_len-0.5])
 

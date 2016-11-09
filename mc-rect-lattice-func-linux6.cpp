@@ -438,13 +438,15 @@ int main(int argc, char *argv[])
 			//	} 
 			last_energy = energy_sys;
 			//cout<<" system energy: "<<energy_sys<<endl;
-			if((l%(total_run/10)) == 0)
+			
+		}
+        //cout<<l<<endl;
+        if((l%(total_run/10)) == 0)
 			{
 				finish = clock();
 				energy_sys = cal_energy_sys();
 				cout<<"current number: "<< l/(total_run/10)<<",time: "<<(finish-start)/CLOCKS_PER_SEC<<" system energy: "<<energy_sys<<endl;
 			}
-		}
 	}
 	finish = clock();
 	energy_sys = cal_energy_sys();
