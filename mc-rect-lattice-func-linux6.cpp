@@ -57,6 +57,7 @@ void save_element_to_txt();
 void read_lattice_from_txt(const char* file);
 void read_element_from_txt(const char* file);
 void disp_array(int i);
+bool is_in(int x,int (&a)[6]);
 double cal_energy_sys(void);
 int *cal_bond_num(void);
 int (*read_conf(int ind))[5];
@@ -79,13 +80,13 @@ int (*read_conf(int ind))[5];
  * 9:
  * 10:
  * **********************************************************/
-int end_coor_2f[] = {2};
-int end_coor_4f[] = {3};
-int end_vdw[] = {2,3,4,6,8};
-int end_coor_inactive[] = {4,5};
-int end_coor_repul[] = {6,7};
-int end_coor_e1[] = {2,3};
-int end_coor_e2[] = {8};
+int end_coor_2f[] = {2,-1,-1,-1,-1,-1};
+int end_coor_4f[] = {3,-1,-1,-1,-1,-1};
+int end_vdw[] = {2,3,4,6,8,-1};
+int end_coor_inactive[] = {4,5,-1,-1,-1,-1};
+int end_coor_repul[] = {6,7,-1,-1,-1,-1};
+int end_coor_e1[] = {2,3,-1,-1,-1,-1};
+int end_coor_e2[] = {8,-1,-1,-1,-1,-1};
 int mol_conf1[4][5] = {{3,3,3,3,11},{3,3,3,3,11},{0,0,0,0,0},{0,0,0,0,0}};
 int mol_conf2[4][5] = {{2,2,2,2,12},{2,2,2,2,12},{0,0,0,0,0},{0,0,0,0,0}};
 int metal_conf[5] = {1,1,1,1,1};
@@ -775,6 +776,19 @@ int is_forbidden(int (*co)[3], int length)
 		return 0;
 	}
 }
+
+bool is_in(int x,int (&a)[4])
+{
+	//cout << x<<endl;
+	//bool exists = true;
+    return any_of(begin(a),end(a),[=](int n){return n == x;});
+	/*for (int i=0;i<4;i++)
+	{
+		cout<<a[i]<<",";
+		}
+	cout<<endl;*/	
+	//return exists;
+	}
 
 int *cal_bond_num(void)
 {
