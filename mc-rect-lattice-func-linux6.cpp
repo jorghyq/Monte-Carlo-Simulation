@@ -81,12 +81,13 @@ int (*read_conf(int ind))[5];
  * 10:
  * **********************************************************/
 int end_coor_2f[] = {2,-1,-1,-1,-1,-1};
-int end_coor_4f[] = {3,-1,-1,-1,-1,-1};
+int end_coor[] = {2,3,8,-1,-1,-1};
 int end_vdw[] = {2,3,4,6,8,-1};
 int end_coor_inactive[] = {4,5,-1,-1,-1,-1};
 int end_coor_repul[] = {6,7,-1,-1,-1,-1};
 int end_coor_e1[] = {2,3,-1,-1,-1,-1};
 int end_coor_e2[] = {8,-1,-1,-1,-1,-1};
+int end_coor_repel[] = {9,-1,-1,-1,-1,-1};// For one adatom, only one of this coordination could be formed.
 int mol_conf1[4][5] = {{3,3,3,3,11},{3,3,3,3,11},{0,0,0,0,0},{0,0,0,0,0}};
 int mol_conf2[4][5] = {{2,2,2,2,12},{2,2,2,2,12},{0,0,0,0,0},{0,0,0,0,0}};
 int metal_conf[5] = {1,1,1,1,1};
@@ -558,9 +559,6 @@ int is_occupied(int (*co)[3], int length)
 	return 0;
 }
 
-bool is_in(int)
-
-
 double cal_energy_mol(int (*co)[3], int length)
 {
 	double energy = 0;
@@ -574,19 +572,23 @@ double cal_energy_mol(int (*co)[3], int length)
 		pos_around2[i][0] = kwn(lattice_size, pos_around[i][0] + direct[i][0]);
 		pos_around2[i][1] = kwn(lattice_size, pos_around[i][1] + direct[i][1]);
         // coordination bond formed
-		if (lattice[pos_around[i][0]][pos_around[i][1]] == 1 && (*(co[i]+2) == 2 || *(co[i]+2) == 3))
-		{
+		//if (lattice[pos_around[i][0]][pos_around[i][1]] == 1 && (*(co[i]+2) == 2 || *(co[i]+2) == 3))
+		if (lattice[pos_around[i][0]][pos_around[i][1]] == 1 && is_in(*(co[i]+2), end_coor_e1))
+        {
 			energy = energy - double(cenergy);
 		}
-        if (lattice[pos_around[i][0]][pos_around[i][1]] == 1 && (*(co[i]+2) == 8))
+        //if (lattice[pos_around[i][0]][pos_around[i][1]] == 1 && (*(co[i]+2) == 8))
+        if (lattice[pos_around[i][0]][pos_around[i][1]] == 1 && is_in(*(co[i]+2), end_coor_e2))
 		{
 			energy = energy - double(mcenergy);
 		}
         // vdW interaction, vdW reactive endgroup: 2,3,4,6
-        if (*(co[i]+2) < 5 || *(co[i]+2) == 6 || *(co[i]+2) == 8)
+        //if (*(co[i]+2) < 5 || *(co[i]+2) == 6 || *(co[i]+2) == 8)
+        if (is_in(*(co[i]+2), end_vdw))
         {
             //cout<<"vdW detected"<<endl;
-            if ((lattice[pos_around[i][0]][pos_around[i][1]] == 2 || lattice[pos_around[i][0]][pos_around[i][1]] == 3 || lattice[pos_around[i][0]][pos_around[i][1]] == 4 || lattice[pos_around[i][0]][pos_around[i][1]] == 6 || lattice[pos_around[i][0]][pos_around[i][1]] == 8) && (lattice[pos_around2[i][0]][pos_around2[i][1]] != 9 && lattice[pos_around2[i][0]][pos_around2[i][1]] != 10))
+            if (is_in(lattice[pos_around[i][0]][pos_around[i][1]], end_vdw) && (lattice[pos_around2[i][0]][pos_around2[i][1]] != 11 && lattice[pos_around2[i][0]][pos_around2[i][1]] != 12))
+            //if ((lattice[pos_around[i][0]][pos_around[i][1]] == 2 || lattice[pos_around[i][0]][pos_around[i][1]] == 3 || lattice[pos_around[i][0]][pos_around[i][1]] == 4 || lattice[pos_around[i][0]][pos_around[i][1]] == 6 || lattice[pos_around[i][0]][pos_around[i][1]] == 8) && (lattice[pos_around2[i][0]][pos_around2[i][1]] != 11 && lattice[pos_around2[i][0]][pos_around2[i][1]] != 12))
             {
                 energy = energy - double(venergy);
                 //cout<<"vdW confirmed"<<endl;
@@ -607,17 +609,18 @@ double cal_energy_metal(int (*co)[3], int length)
 		pos_around[i][1] = *(co[i]+1);
 		pos_around2[i][0] = kwn(lattice_size, pos_around[i][0] + direct[i][0]);
 		pos_around2[i][1] = kwn(lattice_size, pos_around[i][1] + direct[i][1]);
-		if (lattice[pos_around[i][0]][pos_around[i][1]] == 2 || lattice[pos_around[i][0]][pos_around[i][1]] == 3)
-		{
-			if (lattice[pos_around2[i][0]][pos_around2[i][1]] > 8)
+		//if (lattice[pos_around[i][0]][pos_around[i][1]] == 2 || lattice[pos_around[i][0]][pos_around[i][1]] == 3)
+		if (is_in(lattice[pos_around[i][0]][pos_around[i][1]], end_coor_e1))
+        {
+			if (lattice[pos_around2[i][0]][pos_around2[i][1]] > 10)
 			{
 				energy = energy - double(cenergy);
                 //cout<<"coordination detected!"<<endl;
 			}
 		}
-        if (lattice[pos_around[i][0]][pos_around[i][1]] == 8)
+        if (is_in(lattice[pos_around[i][0]][pos_around[i][1]],end_coor_e2))
 		{
-			if (lattice[pos_around2[i][0]][pos_around2[i][1]] > 8)
+			if (lattice[pos_around2[i][0]][pos_around2[i][1]] > 10)
 			{
 				energy = energy - double(mcenergy);
                 //cout<<"coordination detected!"<<endl;
@@ -680,27 +683,29 @@ int is_forbidden(int (*co)[3], int length)
 			// metals can not form cluster
             if (lattice[pos_around[i][0]][pos_around[i][1]] == 1) return 1;
             // endgroup 6 and 7 are forbidden for coordination
-            else if (lattice[pos_around[i][0]][pos_around[i][1]] == 6 || lattice[pos_around[i][0]][pos_around[i][1]] == 7)
+            //else if (lattice[pos_around[i][0]][pos_around[i][1]] == 6 || lattice[pos_around[i][0]][pos_around[i][1]] == 7)
+            else if (is_in(lattice[pos_around[i][0]][pos_around[i][1]], end_coor_inactive))
             {
-                if (lattice[pos_around2[i][0]][pos_around2[i][1]] > 8)  return 1;
+                if (lattice[pos_around2[i][0]][pos_around2[i][1]] > 10)  return 1;
             }
             // check if the linear 2-fold coordination condition is violated
-			else if (lattice[pos_around[i][0]][pos_around[i][1]] == 2)
+			//else if (lattice[pos_around[i][0]][pos_around[i][1]] == 2)
+			else if (is_in(lattice[pos_around[i][0]][pos_around[i][1]], end_coor_2f))
 			{
-				if (lattice[pos_around2[i][0]][pos_around2[i][1]] > 8)
+				if (lattice[pos_around2[i][0]][pos_around2[i][1]] > 10)
                 {
 					count[i] = 1;
 					count_num = count_num +1;
 				}
 			}
-            else if (lattice[pos_around[i][0]][pos_around[i][1]] == 8)
+            /*else if (lattice[pos_around[i][0]][pos_around[i][1]] == 8)
 			{
-				if (lattice[pos_around2[i][0]][pos_around2[i][1]] > 8)
+				if (lattice[pos_around2[i][0]][pos_around2[i][1]] > 10)
                 {
 					count[i] = 1;
 					count_num = count_num +1;
 				}
-			}
+			}*/
 
 		}
 		//cout<<"num of count: "<<count_num<<" "<<count[0]<<" "<<count[1]<<" "<<count[2]<<" "<<count[3]<<endl;
@@ -722,7 +727,8 @@ int is_forbidden(int (*co)[3], int length)
             // if the meso substituent is only allowed for two-fold coordination
             pos_around[i][0] = kwn(lattice_size, *co[i] + direct[i][0]);
             pos_around[i][1] = kwn(lattice_size, *(co[i]+1) + direct[i][1]);
-            if (*(co[i]+2) == 2 || *(co[i]+2) == 8)
+            //if (*(co[i]+2) == 2 || *(co[i]+2) == 8)
+            if (is_in(*(co[i]+2), end_coor_2f))
             {
                 //pos_around2[i][0] = kwn(lattice_size, pos_around[i][0] + direct[i][0]);
                 //pos_around2[i][1] = kwn(lattice_size, pos_around[i][1] + direct[i][1]);
@@ -750,18 +756,21 @@ int is_forbidden(int (*co)[3], int length)
                     minus2[1] = kwn(lattice_size, minus1[1] + direct[minus][1]);
                     // 4-fold not allowed, here 2-fold coordination could also
                     // have 4-fold at its neighbour coordination positions
-                    if ((lattice[plus1[0]][plus1[1]] == 2 || lattice[plus1[0]][plus1[1]] == 8) && lattice[plus2[0]][plus2[1]] > 8)
+                    //if ((lattice[plus1[0]][plus1[1]] == 2 || lattice[plus1[0]][plus1[1]] == 8) && lattice[plus2[0]][plus2[1]] > 10)
+                    if (is_in(lattice[plus1[0]][plus1[1]], end_coor_2f) && lattice[plus2[0]][plus2[1]] > 10)
                     {
                         return 1;
                     }
-                    if ((lattice[minus1[0]][minus1[1]] == 2 || lattice[minus1[0]][minus1[1]] == 8) && lattice[minus2[0]][minus2[1]] > 8)
+                    //if ((lattice[minus1[0]][minus1[1]] == 2 || lattice[minus1[0]][minus1[1]] == 8) && lattice[minus2[0]][minus2[1]] > 10)
+                    if (is_in(lattice[minus1[0]][minus1[1]], end_coor_2f) && lattice[minus2[0]][minus2[1]] > 10)
                     {
                         return 1;
                     }
                 }
             }
             // if the meso substituent is non active, just continue
-            else if (*(co[i]+2) == 6 || *(co[i]+2) == 7)
+            //else if (*(co[i]+2) == 6 || *(co[i]+2) == 7)
+            else if (is_in(*(co[i]+2), end_coor_repul))
             {
 				if (lattice[pos_around[i][0]][pos_around[i][1]] == 1)
                 {
@@ -777,7 +786,7 @@ int is_forbidden(int (*co)[3], int length)
 	}
 }
 
-bool is_in(int x,int (&a)[4])
+bool is_in(int x,int (&a)[6])
 {
 	//cout << x<<endl;
 	//bool exists = true;
@@ -816,8 +825,9 @@ int *cal_bond_num(void)
 			pos_around[i][1] = kwn(lattice_size,*(points_t1[i]+1) + direct[i][1]);
 			pos_around2[i][0] = kwn(lattice_size, pos_around[i][0] + direct[i][0]);
 			pos_around2[i][1] = kwn(lattice_size, pos_around[i][1] + direct[i][1]);
-			if (lattice[pos_around[i][0]][pos_around[i][1]] == 1 && *(points_t1[i]+2) < 4)
-			{
+			//if (lattice[pos_around[i][0]][pos_around[i][1]] == 1 && *(points_t1[i]+2) < 4)
+			if (lattice[pos_around[i][0]][pos_around[i][1]] == 1 && is_in(*(points_t1[i]+2),end_coor))
+            {
 				cbond = cbond + 1;
 			}
 			else if (lattice[pos_around[i][0]][pos_around[i][1]] != 0)

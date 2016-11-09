@@ -15,5 +15,8 @@ mc4: mc-rect-lattice-func-linux4.cpp
 mc5: mc-rect-lattice-func-linux5.cpp
 	g++ -o mc-rect-lattice-func-linux5 mc-rect-lattice-func-linux5.cpp -I .
 
+mc6: mc-rect-lattice-func-linux6.cpp
+	g++ -std=c++11 -o mc-rect-lattice-func-linux6 mc-rect-lattice-func-linux6.cpp -I .
+
 test: test_read_file.cpp
 	g++ -o test_read_file test_read_file.cpp -I .
