@@ -77,11 +77,11 @@ int (*read_conf(int ind))[5];
  * 6: non-reactive, next to the metal forbidden, vdW
  * 7: non-reactive, next to the metal forbidden, no vdW\
  * 8: 2-fold allowd, different energy mcenergy
- * 9:
+ * 9: only one coordination to itself
  * 10:
  * **********************************************************/
-int end_coor_2f[] = {2,-1,-1,-1,-1,-1};
-int end_coor[] = {2,3,8,-1,-1,-1};
+int end_coor_2f[] = {2,8,9,-1,-1,-1};
+int end_coor[] = {2,3,8,9,-1,-1};
 int end_vdw[] = {2,3,4,6,8,-1};
 int end_coor_inactive[] = {4,5,-1,-1,-1,-1};
 int end_coor_repul[] = {6,7,-1,-1,-1,-1};
@@ -674,7 +674,9 @@ int is_forbidden(int (*co)[3], int length)
 		int pos_around[4][3];
 		int pos_around2[4][3];
 		int count[4] = {0,0,0,0};
+        //int count2[4] = {0,0,0,0};
 		int count_num = 0;
+        int count_num2 = 0;
 		//pos_around = det_neighbour(*co[0],*(co[0]+1),ind,4);
 		for (int i=0;i<4;i++)
 		{
@@ -700,6 +702,13 @@ int is_forbidden(int (*co)[3], int length)
 					count_num = count_num +1;
 				}
 			}
+            else if (is_in(lattice[pos_around[i][0]][pos_around[i][1]], end_coor_repel))
+            {
+                if (lattice[pos_around2[i][0]][pos_around2[i][1]] > 10)
+                {
+					count_num2 = count_num2 +1;
+				}
+            }
             /*else if (lattice[pos_around[i][0]][pos_around[i][1]] == 8)
 			{
 				if (lattice[pos_around2[i][0]][pos_around2[i][1]] > 10)
@@ -710,6 +719,7 @@ int is_forbidden(int (*co)[3], int length)
 			}*/
 
 		}
+        if (count_num2 > 1) return 1;
 		//cout<<"num of count: "<<count_num<<" "<<count[0]<<" "<<count[1]<<" "<<count[2]<<" "<<count[3]<<endl;
 		if (count_num > 2) return 1;
 		else if (count_num == 2)
@@ -738,16 +748,22 @@ int is_forbidden(int (*co)[3], int length)
                 int plus2[2] = {0};
                 int minus1[2] = {0};
                 int minus2[2] = {0};
+                int counter1[2] = {0};
+                int counter2[2] = {0};
 				if (lattice[pos_around[i][0]][pos_around[i][1]] == 1)
                 {
                     int plus = kwn(4,i+1);
                     int minus = kwn(4,i-1);
+                    int counter = kwn(4,i+2);
                     //cout<<"i: "<<i<<" plus: "<<plus<<" minus: "<<minus<<endl;
                     //cout<<"minus"<<minus<<endl;
+                    counter1[0] = kwn(lattice_size, pos_around[i][0] + direct[counter][0]);
+                    counter1[1] = kwn(lattice_size, pos_around[i][1] + direct[counter][1]);
+                    counter2[0] = kwn(lattice_size, counter1[0] + direct[counter][0]);
+                    counter2[1] = kwn(lattice_size, counter1[1] + direct[counter][1]);
                     // points 
                     plus1[0] = kwn(lattice_size, pos_around[i][0] + direct[plus][0]);
                     plus1[1] = kwn(lattice_size, pos_around[i][1] + direct[plus][1]);
-                    //cout<<"plus1x: "<<plus1[0]<<" plus1y: "<<plus1[1]<<endl;
                     plus2[0] = kwn(lattice_size, plus1[0] + direct[plus][0]);
                     plus2[1] = kwn(lattice_size, plus1[1] + direct[plus][1]);
                     //cout<<"plus2x: "<<plus2[0]<<" plus2y: "<<plus2[1]<<endl;
@@ -768,6 +784,11 @@ int is_forbidden(int (*co)[3], int length)
                     {
                         return 1;
                     }
+                    if (is_in(lattice[minus1[0]][minus1[1]], end_coor_repel) && lattice[counter2[0]][counter2[1]] > 10)
+                    {
+                        return 1;
+                    }
+
                 }
             }
             // if the meso substituent is non active, just continue
