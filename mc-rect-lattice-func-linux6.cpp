@@ -85,7 +85,7 @@ int end_coor[] = {2,3,8,9,-1,-1};
 int end_vdw[] = {2,3,4,6,8,-1};
 int end_coor_inactive[] = {4,5,-1,-1,-1,-1};
 int end_coor_repul[] = {6,7,-1,-1,-1,-1};
-int end_coor_e1[] = {2,3,-1,-1,-1,-1};
+int end_coor_e1[] = {2,3,9,-1,-1,-1};
 int end_coor_e2[] = {8,-1,-1,-1,-1,-1};
 int end_coor_repel[] = {9,-1,-1,-1,-1,-1};// For one adatom, only one of this coordination could be formed.
 int mol_conf1[4][5] = {{3,3,3,3,11},{3,3,3,3,11},{0,0,0,0,0},{0,0,0,0,0}};
@@ -590,7 +590,6 @@ double cal_energy_mol(int (*co)[3], int length)
         {
             //cout<<"vdW detected"<<endl;
             if (is_in(lattice[pos_around[i][0]][pos_around[i][1]], end_vdw) && (lattice[pos_around2[i][0]][pos_around2[i][1]] != 11 && lattice[pos_around2[i][0]][pos_around2[i][1]] != 12))
-            //if ((lattice[pos_around[i][0]][pos_around[i][1]] == 2 || lattice[pos_around[i][0]][pos_around[i][1]] == 3 || lattice[pos_around[i][0]][pos_around[i][1]] == 4 || lattice[pos_around[i][0]][pos_around[i][1]] == 6 || lattice[pos_around[i][0]][pos_around[i][1]] == 8) && (lattice[pos_around2[i][0]][pos_around2[i][1]] != 11 && lattice[pos_around2[i][0]][pos_around2[i][1]] != 12))
             {
                 energy = energy - double(venergy);
                 //cout<<"vdW confirmed"<<endl;
@@ -688,7 +687,7 @@ int is_forbidden(int (*co)[3], int length)
             if (lattice[pos_around[i][0]][pos_around[i][1]] == 1) return 1;
             // endgroup 6 and 7 are forbidden for coordination
             //else if (lattice[pos_around[i][0]][pos_around[i][1]] == 6 || lattice[pos_around[i][0]][pos_around[i][1]] == 7)
-            else if (is_in(lattice[pos_around[i][0]][pos_around[i][1]], end_coor_inactive))
+            else if (is_in(lattice[pos_around[i][0]][pos_around[i][1]], end_coor_repul))
             {
                 if (lattice[pos_around2[i][0]][pos_around2[i][1]] > 10)  return 1;
             }
@@ -709,15 +708,6 @@ int is_forbidden(int (*co)[3], int length)
 					count_num2 = count_num2 +1;
 				}
             }
-            /*else if (lattice[pos_around[i][0]][pos_around[i][1]] == 8)
-			{
-				if (lattice[pos_around2[i][0]][pos_around2[i][1]] > 10)
-                {
-					count[i] = 1;
-					count_num = count_num +1;
-				}
-			}*/
-
 		}
         if (count_num2 > 1) return 1;
 		//cout<<"num of count: "<<count_num<<" "<<count[0]<<" "<<count[1]<<" "<<count[2]<<" "<<count[3]<<endl;
@@ -754,7 +744,7 @@ int is_forbidden(int (*co)[3], int length)
                 {
                     int plus = kwn(4,i+1);
                     int minus = kwn(4,i-1);
-                    int counter = kwn(4,i+2);
+                    int counter = i;//kwn(4,i);
                     //cout<<"i: "<<i<<" plus: "<<plus<<" minus: "<<minus<<endl;
                     //cout<<"minus"<<minus<<endl;
                     counter1[0] = kwn(lattice_size, pos_around[i][0] + direct[counter][0]);
@@ -784,7 +774,7 @@ int is_forbidden(int (*co)[3], int length)
                     {
                         return 1;
                     }
-                    if (is_in(lattice[minus1[0]][minus1[1]], end_coor_repel) && lattice[counter2[0]][counter2[1]] > 10)
+                    if (is_in(lattice[counter1[0]][counter1[1]], end_coor_repel) && lattice[counter2[0]][counter2[1]] > 10)
                     {
                         return 1;
                     }
