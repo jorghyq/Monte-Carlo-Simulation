@@ -67,6 +67,6 @@ for line in files:
         #ax.text(-10,0,headdate[0])
         ax.set_aspect("equal")
         #plt.show()#plt.imsave(newline,lattice,[0,2])
-        plt.savefig(newline,dpi=300,bbox_inches='tight',pad_inches=0)
+        plt.savefig(newline,dpi=500,bbox_inches='tight',pad_inches=0)
         #plt.show()
 
