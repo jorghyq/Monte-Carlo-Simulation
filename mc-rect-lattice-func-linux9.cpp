@@ -824,11 +824,13 @@ int is_forbidden(int (*co)[3], int length)
                     {
                         return 1;
                     }
-                    if (is_in(lattice[counter1[0]][counter1[1]], end_coor_repel) && lattice[counter2[0]][counter2[1]] > 10)
+                    if (is_in(*(co[i]+2), end_coor_repel))
                     {
-                        return 1;
+                        if (is_in(lattice[counter1[0]][counter1[1]], end_coor_repel) && lattice[counter2[0]][counter2[1]] > 10)
+                        {
+                            return 1;
+                        }
                     }
-
                 }
             }
             // if the meso substituent is non active, just continue
