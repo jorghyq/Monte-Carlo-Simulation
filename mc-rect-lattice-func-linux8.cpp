@@ -17,12 +17,12 @@ int total_run = 100000;
 int sum_run = total_run;
 const int SECOND_LOOP = 1;
 int RESTORE = 0;
-const int lattice_size = 100;
-const int element_num = 2000;//12 * lattice_size;
+const int lattice_size = 20;
+const int element_num = 300;//12 * lattice_size;
 int ffn = 1; // number of results filefolder
-int num_molecule = 40;
-int num_molecule1 = 20;
-int num_molecule2 = 20;
+int num_molecule = 4;
+int num_molecule1 = 2;
+int num_molecule2 = 2;
 int angle_mol1 = 2;
 int angle_mol2 = 2;
 int num_metal = 0;
@@ -42,6 +42,7 @@ double energy_sys = 0;
 double last_energy =  0;
 double p = 0;
 double p_temp = 0;
+int step_num = 8;
 int kwn(int n, int var);
 void p2a(int (*ptr)[3], int arr[][3], int length);
 void p2a2(int (*ptr)[5], int arr [][5]);
@@ -102,7 +103,7 @@ int main(int argc, char *argv[])
 	// f: venergy
 	// g: mcenergy
 	int opt;
-	const char *optstring = "a:b:c:d:e:f:g:h:i:";
+	const char *optstring = "a:b:c:d:e:f:g:h:i:j:";
 	while((opt = getopt(argc, argv, optstring)) != -1)
 	{
 		switch(opt)
@@ -135,10 +136,26 @@ int main(int argc, char *argv[])
 				break;
             case 'i':
                 RESTORE = atoi(optarg);
+            case 'j':
+                step_num = atof(optarg);
 			default:
 				break;
 			}
 	}
+    /*****  energy annealing setup **************/
+    double cenergy_init = cenergy;
+    double venergy_init = venergy;
+    double mcenergy_init = mcenergy;
+    int cstep = cenergy_init/step_num;
+    int vstep = venergy_init/step_num;
+    int mcstep = mcenergy_init/step_num;
+
+    cenergy = cenergy_init/step_num;
+    venergy = venergy_init/step_num;
+    mcenergy = mcenergy_init/step_num;
+
+
+    /*****  energy annealing setup end **********/
     num_molecule = num_molecule1 + num_molecule2;
 	num_total = num_molecule + num_metal;
     sum_run = total_run;
@@ -192,7 +209,7 @@ int main(int argc, char *argv[])
         ss.precision(1);
         ss.setf(ios::scientific);
         ss << double(total_run) << "_" << lattice_size << "_" << num_molecule1 << "_" << num_molecule2 << "_";
-        ss << num_metal << "_"<< cenergy << "_" << venergy << "_" << mcenergy;// << "_element.txt";
+        ss << num_metal << "_"<< cenergy_init << "_" << venergy_init << "_" << mcenergy_init;// << "_element.txt";
         filename = ss.str() + ".txt";
         filename_element = ss.str() + "_element.txt";
         const char * f_lattice = filename.c_str();
@@ -291,6 +308,7 @@ int main(int argc, char *argv[])
     int old_angle;
     int new_angle;
     int ind_ele = 0;
+    int pos_or_angle = 0;
 	for(int l = 0; l < total_run;l = l + 1)
 	{
 		for(int m = 0; m < num_molecule + num_metal; m = m + 1)
@@ -323,6 +341,16 @@ int main(int argc, char *argv[])
 					//cout << "Enters the loop..."<<endl;
 					int new_pos[2] = {rand()%lattice_size,rand()%lattice_size};
                     //cout << new_pos[0] <<" "<<new_pos[1]<<endl;
+                    pos_or_angle = rand()%2;
+                    if (pos_or_angle ==  0)
+                    {
+                        new_angle = old_angle;
+                    }
+                    else
+                    {
+                        new_pos[0] = elements[ind_ele][0];
+                        new_pos[1] = elements[ind_ele][1];
+                    }
 					points_t2 = det_neighbour(new_pos[0],new_pos[1],ind,mol_conf1[new_angle-1],5);
 					p2a(points_t2,points_new,5);
 					//print_array(points_t2,5);
@@ -367,6 +395,16 @@ int main(int argc, char *argv[])
 					int new_pos[2] = {rand()%lattice_size,rand()%lattice_size};
 					//int new_angle = rand()%2 + 1;
                     //cout << new_pos[0] <<" "<<new_pos[1]<<endl;
+                    pos_or_angle = rand()%2;
+                    if (pos_or_angle ==  0)
+                    {
+                        new_angle = old_angle;
+                    }
+                    else
+                    {
+                        new_pos[0] = elements[ind_ele][0];
+                        new_pos[1] = elements[ind_ele][1];
+                    }
                     points_t2 = det_neighbour(new_pos[0],new_pos[1],ind,mol_conf2[new_angle-1],5);
 					p2a(points_t2,points_new,5);
                     //print_array(points_t2,5);
@@ -444,8 +482,16 @@ int main(int argc, char *argv[])
         if((l%(total_run/10)) == 0)
 			{
 				finish = clock();
-				energy_sys = cal_energy_sys();
+                energy_sys = cal_energy_sys();
 				cout<<"current number: "<< l/(total_run/10)<<",time: "<<(finish-start)/CLOCKS_PER_SEC<<" system energy: "<<energy_sys<<endl;
+                cout<<"cenergy: "<<cenergy<<", venergy: "<<venergy<<", mcenergy: "<<mcenergy<<endl;
+                if (cenergy < cenergy_init)
+                {
+                    cenergy = cenergy + cstep;
+                    venergy = venergy + vstep;
+                    mcenergy = mcenergy + mcstep;
+                }
+
 			}
 	}
 	finish = clock();
@@ -699,15 +745,19 @@ int is_forbidden(int (*co)[3], int length)
                 {
 					count[i] = 1;
 					count_num = count_num +1;
+                    if (is_in(lattice[pos_around[i][0]][pos_around[i][1]], end_coor_repel))
+                    {
+                        count_num2 = count_num2 + 1;
+                    }
 				}
 			}
-            else if (is_in(lattice[pos_around[i][0]][pos_around[i][1]], end_coor_repel))
+            /*else if (is_in(lattice[pos_around[i][0]][pos_around[i][1]], end_coor_repel))
             {
                 if (lattice[pos_around2[i][0]][pos_around2[i][1]] > 10)
                 {
 					count_num2 = count_num2 +1;
 				}
-            }
+            }*/
 		}
         if (count_num2 > 1) return 1;
 		//cout<<"num of count: "<<count_num<<" "<<count[0]<<" "<<count[1]<<" "<<count[2]<<" "<<count[3]<<endl;
